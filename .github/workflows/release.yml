@@ -15,17 +15,17 @@ jobs:
         uses: actions/checkout@v1
         with:
           fetch-depth: 10
-#       - name: Publish GitHub Release
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-#           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-#           GIT_CHGLOG_VERION: 0.9.1
-#         run: |
-#           sudo wget -O /usr/local/bin/git-chglog https://github.com/git-chglog/git-chglog/releases/download/${GIT_CHGLOG_VERION}/git-chglog_linux_amd64
-#           sudo chmod +x /usr/local/bin/git-chglog
-#           export PATH=$PATH:/usr/local/bin
-#           export TAG=${GITHUB_REF/refs\/tags\//}
-#           make VERSION=${TAG} release
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          GIT_CHGLOG_VERION: 0.9.1
+        run: |
+          sudo wget -O /usr/local/bin/git-chglog https://github.com/git-chglog/git-chglog/releases/download/${GIT_CHGLOG_VERION}/git-chglog_linux_amd64
+          sudo chmod +x /usr/local/bin/git-chglog
+          export PATH=$PATH:/usr/local/bin
+          export TAG=${GITHUB_REF/refs\/tags\//}
+          make VERSION=${TAG} release
       - name: Publish mainnet Docker image to quay
         uses: elgohr/Publish-Docker-Github-Action@2.12
         with:
