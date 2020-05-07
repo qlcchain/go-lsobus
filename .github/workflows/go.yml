@@ -67,11 +67,11 @@ jobs:
 #         name: vr-artifact
 #         path: artifact/
 
-#     - name: Build and Publish the Docker image to Quay
-#       uses: elgohr/Publish-Docker-Github-Action@2.12
-#       with:
-#         name: consoleconnect/qlc_virtual_lsobus
-#         registry: quay.io
-#         username: ${{ secrets.DOCKER_USERNAME }}
-#         password: ${{ secrets.DOCKER_PASSWORD }}
-#         dockerfile: Dockerfile
+      - name: Build and Publish the Docker image to Quay
+        uses: elgohr/Publish-Docker-Github-Action@2.12
+        with:
+          name: consoleconnect/qlc_virtual_lsobus
+          registry: quay.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	logfile = "vr.log"
+	logfile = "vb.log"
 )
 
 var (
