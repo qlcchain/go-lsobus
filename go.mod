@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200413010456-f2b14b7cc597
+	github.com/spf13/cobra v1.0.0
 	go.uber.org/multierr v1.5.0 // indirect
 	go.uber.org/zap v1.10.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

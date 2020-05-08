@@ -37,6 +37,13 @@ clean:
 lint:
 	golangci-lint run --fix
 
+gofmt:
+	gofmt -w .
+
+style:
+	gofmt -w .
+	goimports -local github.com/iixlabs/virtual-lsobus -w .
+
 snapshot:
 	goreleaser --snapshot --rm-dist
 

@@ -3,10 +3,11 @@ package contract
 import (
 	"context"
 
-	"github.com/iixlabs/virtual-lsobus/config"
 	qlcchain "github.com/qlcchain/qlc-go-sdk"
 	qlctypes "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/zap"
+
+	"github.com/iixlabs/virtual-lsobus/config"
 )
 
 type ContractService struct {

@@ -6,8 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/iixlabs/virtual-lsobus/sonata/common/models"
 )
 
 // Describing Target to the schema describing the product spec resource (and type)
@@ -20,10 +23,32 @@ type Describing struct {
 
 	// Indicates the (class) type of resource
 	AtType string `json:"@type,omitempty"`
+
+	// following fields are added mannually
+	*models.MEFUNISpecV3
+	*models.MEFELineSpecV3
 }
 
 // Validate validates this describing
 func (m *Describing) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if m.MEFUNISpecV3 != nil {
+		if err := m.MEFUNISpecV3.Validate(formats); err != nil {
+			res = append(res, err)
+		}
+	}
+
+	if m.MEFELineSpecV3 != nil {
+		if err := m.MEFELineSpecV3.Validate(formats); err != nil {
+			res = append(res, err)
+		}
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+
 	return nil
 }
 
