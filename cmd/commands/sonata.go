@@ -5,9 +5,11 @@ import (
 )
 
 func init() {
+	sonataCmd.AddCommand(sonataSiteCmd)
 	sonataCmd.AddCommand(sonataPoqCmd)
 	sonataCmd.AddCommand(sonataQuoteCmd)
 	sonataCmd.AddCommand(sonataOrderCmd)
+	sonataCmd.AddCommand(sonataInvCmd)
 }
 
 var sonataCmd = &cobra.Command{

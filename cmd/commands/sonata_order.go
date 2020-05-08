@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +19,5 @@ var sonataOrderCreateCmd = &cobra.Command{
 	Short: "create product ordering",
 	Long:  `create product ordering`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("running", cmd.Name())
 	},
 }
