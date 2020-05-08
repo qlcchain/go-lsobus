@@ -1,0 +1,198 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API ProductSpecificationManagement",
+    "description": "**Product Specification Management**It holds Payload Descriptions for common production specification structures that are used with others APIs",
+    "version": "1.0.0"
+  },
+  "host": "serverRoot",
+  "basePath": "/api/mef/productSpecificationManagement/v1/",
+  "schemes": [
+    "https"
+  ],
+  "produces": [
+    "application/json;charset=utf-8"
+  ],
+  "tags": [
+    {
+      "name": "ProductSpecification",
+      "description": "Product Specification resource"
+    }
+  ],
+  "paths": {
+    "/UNISpec": {
+      "get": {
+        "tags": [
+          "UNISpec"
+        ],
+        "produces": [
+          "application/json;charset=utf-8"
+        ],
+        "operationId": "uniSpecGet",
+        "summary": "retrieveUNISpec",
+        "description": "The Buyer requests the full details for a UNI specification provided by the Seller. ",
+        "deprecated": false,
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "$ref": "./MEF_UNISpec_v3.json"
+            }
+          },
+          "400": {
+            "description": "Bad Request\n\nList of supported error codes:\n- 20: Invalid URL parameter value\n- 21: Missing body\n- 22: Invalid body\n- 23: Missing body field\n- 24: Invalid body field\n- 25: Missing header\n- 26: Invalid header value\n- 27: Missing query-string parameter\n- 28: Invalid query-string parameter value",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "401": {
+            "description": "Unauthorized\n\nList of supported error codes:\n- 40: Missing credentials\n- 41: Invalid credentials\n- 42: Expired credentials",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "404": {
+            "description": "Not Found\n\nList of supported error codes:\n- 60: Resource not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "408": {
+            "description": "Request Time-out\n\nList of supported error codes:\n- 63: Request time-out",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity\n\nFunctional error",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error\n\nList of supported error codes:\n- 1: Internal error",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "503": {
+            "description": "Service Unavailable\n\n",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          }
+        }
+      }
+    },
+    "/ELineSpec": {
+      "get": {
+        "tags": [
+          "ELineSpec"
+        ],
+        "produces": [
+          "application/json;charset=utf-8"
+        ],
+        "operationId": "elineSpecGet",
+        "summary": "retrieveELineSpec",
+        "description": "The Buyer requests the full details for a ELine specification provided by the Seller. ",
+        "deprecated": false,
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "$ref": "./MEF_ELineSpec_v3.json"
+            }
+          },
+          "400": {
+            "description": "Bad Request\n\nList of supported error codes:\n- 20: Invalid URL parameter value\n- 21: Missing body\n- 22: Invalid body\n- 23: Missing body field\n- 24: Invalid body field\n- 25: Missing header\n- 26: Invalid header value\n- 27: Missing query-string parameter\n- 28: Invalid query-string parameter value",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "401": {
+            "description": "Unauthorized\n\nList of supported error codes:\n- 40: Missing credentials\n- 41: Invalid credentials\n- 42: Expired credentials",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "404": {
+            "description": "Not Found\n\nList of supported error codes:\n- 60: Resource not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "408": {
+            "description": "Request Time-out\n\nList of supported error codes:\n- 63: Request time-out",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity\n\nFunctional error",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error\n\nList of supported error codes:\n- 1: Internal error",
+            "schema": {
+
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          },
+          "503": {
+            "description": "Service Unavailable\n\n",
+            "schema": {
+              "$ref": "#/definitions/ErrorRepresentation"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ErrorRepresentation": {
+      "description": "Class used to describe API response error",
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Application related code (as defined in the API or from a common list)",
+          "type": "integer",
+          "format": "int32"
+        },
+        "reason": {
+          "description": "Text that explains the reason for error. This can be shown to a client user.",
+          "type": "string"
+        },
+        "message": {
+          "description": "Text that provide more details and corrective actions related to the error. This can be shown to a client user.",
+          "type": "string"
+        },
+        "status": {
+          "description": "http error code extension like 400-2",
+          "type": "string"
+        },
+        "referenceError": {
+          "description": "url pointing to documentation describing the error",
+          "type": "string"
+        },
+        "@type": {
+          "description": "The class type of a REST resource.",
+          "type": "string"
+        },
+        "@schemaLocation": {
+          "description": "it provides a link to the schema describing a REST resource.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
