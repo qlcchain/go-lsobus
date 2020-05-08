@@ -26,7 +26,7 @@ swagger generate model -t ./common -f ./spec/MEF_api_productSpec.json
 swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/poq -f ./spec/MEF_api_productOfferingQualificationNotification_3.0.0.json
 
 ## Quote Notification
-swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/quote -f ./spec/MEF_api_quoteNotification_1.0.0.yaml
+swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/quote -f ./spec/MEF_api_quoteNotification_1.0.0.json
 
 ## Product Order Notification
 swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/order/ -f ./spec/MEF_api_productOrderNotification_3.0.0.json
