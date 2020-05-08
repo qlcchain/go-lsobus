@@ -1,38 +1,50 @@
 package orchestra
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
 	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
-	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client"
-	poqcli "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
+	poqcli "github.com/iixlabs/virtual-lsobus/sonata/poq/client"
+	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
 	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
 )
 
-func SendSonataPOQCreateRequest() {
-	reqParams := BuildSonataPOQCreateParams()
+type sonataPOQImpl struct {
+	sonataBaseImpl
+}
 
-	tranCfg := poqapi.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	poqCli := poqapi.NewHTTPClientWithConfig(nil, tranCfg)
+func newSonataPOQImpl() *sonataPOQImpl {
+	s := &sonataPOQImpl{}
+	return s
+}
+
+func (s *sonataPOQImpl) Init() error {
+	return s.sonataBaseImpl.Init()
+}
+
+func (s *sonataPOQImpl) SendCreateRequest() {
+	reqParams := s.BuildCreateParams()
+
+	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
 
 	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
 	if err != nil {
-		fmt.Println("send request,", "error:", err)
+		s.logger.Error("send request,", "error:", err)
 		return
 	}
-	fmt.Println("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
 }
 
-func BuildSonataPOQCreateParams() *poqcli.ProductOfferingQualificationCreateParams {
-	reqParams := poqcli.NewProductOfferingQualificationCreateParams()
-	poqCreate := new(poqmod.ProductOfferingQualificationCreate)
+func (s *sonataPOQImpl) BuildCreateParams() *poqapi.ProductOfferingQualificationCreateParams {
+	reqParams := poqapi.NewProductOfferingQualificationCreateParams()
+
+	reqParams.ProductOfferingQualification = new(poqmod.ProductOfferingQualificationCreate)
 	isqVal := true
-	poqCreate.ProjectID = "DoD-CBC-PCCW"
-	poqCreate.InstantSyncQualification = &isqVal
-	poqCreate.RequestedResponseDate.Scan(time.Now())
-	reqParams.SetProductOfferingQualification(poqCreate)
+	reqParams.ProductOfferingQualification.ProjectID = "DoD-CBC-PCCW"
+	reqParams.ProductOfferingQualification.InstantSyncQualification = &isqVal
+	reqParams.ProductOfferingQualification.RequestedResponseDate.Scan(time.Now())
 
 	itemIdSeq := int(0)
 
@@ -61,7 +73,7 @@ func BuildSonataPOQCreateParams() *poqcli.ProductOfferingQualificationCreatePara
 	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr1000BASET}
 	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.MaxServiceFrameSize = 1522
 	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.NumberOfLinks = 1
-	poqCreate.ProductOfferingQualificationItem = append(poqCreate.ProductOfferingQualificationItem, uniItem)
+	reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, uniItem)
 
 	// ELine
 	itemIdSeq++
@@ -100,7 +112,7 @@ func BuildSonataPOQCreateParams() *poqcli.ProductOfferingQualificationCreatePara
 	lineItemRelOnUni.ID = &uniItemID
 	lineItem.ProductOfferingQualificationItemRelationship = append(lineItem.ProductOfferingQualificationItemRelationship, lineItemRelOnUni)
 
-	poqCreate.ProductOfferingQualificationItem = append(poqCreate.ProductOfferingQualificationItem, lineItem)
+	reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, lineItem)
 
 	// Related Parties
 	/*

@@ -1,11 +1,7 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
-
-	"github.com/iixlabs/virtual-lsobus/orchestra"
 )
 
 func init() {
@@ -23,7 +19,5 @@ var sonataPoqCreateCmd = &cobra.Command{
 	Short: "create product offering qualification",
 	Long:  `create product offering qualification`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("running", cmd.Name())
-		orchestra.SendSonataPOQCreateRequest()
 	},
 }

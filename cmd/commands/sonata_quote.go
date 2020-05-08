@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 
+	"github.com/iixlabs/virtual-lsobus/orchestra"
+
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +23,10 @@ var sonataQuoteCreateCmd = &cobra.Command{
 	Short: "create product quoting",
 	Long:  `create product quoting`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("running", cmd.Name())
+		o := orchestra.NewOrchestra()
+		err := o.Init()
+		if err != nil {
+			fmt.Println(err)
+		}
 	},
 }

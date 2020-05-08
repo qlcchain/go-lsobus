@@ -13,7 +13,7 @@ Orchestra is responsible for making a series of MEF calls to the partner:
 - to get a quote for the requested service
 - to create ProductOrder request
 - to check for ProductOrder updates
-ODO is responsible for managing the responses and providing email notifications to appropriate OperatorA users.
+Orchestra is responsible for managing the responses and update status to chain.
 
 ### Contract
 Contract is responsible for make a series interactions to blockchain smart contract.
@@ -23,8 +23,17 @@ RPC Server is responsible for providing APIs to Front Web UI.
 
 ## Process Flows
 
-### E-Line Order
+### UNI & E-Line Order
 #### External
-User -> Front Web UI -> QLC Chain -> Virtual-LSOBUS.
+Uploading order to chain:
+User -> Front Web UI -> Virtual-LSOBUS -> QLC Chain.
+
+Sending order to partner:
+User -> Front Web UI -> Virtual-LSOBUS -> Sonata Server.
+
 #### Internal
-QLC Chain -> Contract -> Orchestra -> Sonata -> Partner.
+Uploading order to chain:
+RPC -> Contract -> QLC Chain.
+
+Sending order to partner:
+RPC -> Orchestra -> Sonata Client -> Sonata Server.
