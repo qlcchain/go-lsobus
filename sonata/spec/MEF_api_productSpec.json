@@ -20,17 +20,17 @@
     }
   ],
   "paths": {
-    "/UNISpec": {
+    "/productSpecification": {
       "get": {
         "tags": [
-          "UNISpec"
+          "ProductSpecification"
         ],
         "produces": [
           "application/json;charset=utf-8"
         ],
-        "operationId": "uniSpecGet",
-        "summary": "retrieveUNISpec",
-        "description": "The Buyer requests the full details for a UNI specification provided by the Seller. ",
+        "operationId": "productSpecificationGet",
+        "summary": "retrieveProductSpecification",
+        "description": "The Buyer requests the full details for a product specification provided by the Seller. ",
         "deprecated": false,
         "parameters": [
         ],
@@ -38,7 +38,10 @@
           "200": {
             "description": "Ok",
             "schema": {
-              "$ref": "./MEF_UNISpec_v3.json"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProductSpecificationRef"
+              }
             }
           },
           "400": {
@@ -74,73 +77,6 @@
           "500": {
             "description": "Internal Server Error\n\nList of supported error codes:\n- 1: Internal error",
             "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "503": {
-            "description": "Service Unavailable\n\n",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          }
-        }
-      }
-    },
-    "/ELineSpec": {
-      "get": {
-        "tags": [
-          "ELineSpec"
-        ],
-        "produces": [
-          "application/json;charset=utf-8"
-        ],
-        "operationId": "elineSpecGet",
-        "summary": "retrieveELineSpec",
-        "description": "The Buyer requests the full details for a ELine specification provided by the Seller. ",
-        "deprecated": false,
-        "parameters": [
-        ],
-        "responses": {
-          "200": {
-            "description": "Ok",
-            "schema": {
-              "$ref": "./MEF_ELineSpec_v3.json"
-            }
-          },
-          "400": {
-            "description": "Bad Request\n\nList of supported error codes:\n- 20: Invalid URL parameter value\n- 21: Missing body\n- 22: Invalid body\n- 23: Missing body field\n- 24: Invalid body field\n- 25: Missing header\n- 26: Invalid header value\n- 27: Missing query-string parameter\n- 28: Invalid query-string parameter value",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "401": {
-            "description": "Unauthorized\n\nList of supported error codes:\n- 40: Missing credentials\n- 41: Invalid credentials\n- 42: Expired credentials",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "404": {
-            "description": "Not Found\n\nList of supported error codes:\n- 60: Resource not found",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "408": {
-            "description": "Request Time-out\n\nList of supported error codes:\n- 63: Request time-out",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "422": {
-            "description": "Unprocessable entity\n\nFunctional error",
-            "schema": {
-              "$ref": "#/definitions/ErrorRepresentation"
-            }
-          },
-          "500": {
-            "description": "Internal Server Error\n\nList of supported error codes:\n- 1: Internal error",
-            "schema": {
-
               "$ref": "#/definitions/ErrorRepresentation"
             }
           },
@@ -193,6 +129,60 @@
           "type": "string"
         }
       }
+    },
+    "ProductSpecificationRef": {
+      "description": "A structured set of well-defined technical attributes and/or behaviors that are used to construct a Product Offering for sale to a market.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the product specification",
+          "type": "string"
+        },
+        "describing": {
+          "$ref": "#/definitions/Describing"
+        }
+      }
+    },
+    "Describing": {
+      "description": "Target to the schema describing the product spec resource (and type)",
+      "discriminator":"@type",
+      "type": "object",
+      "properties": {
+        "@schemaLocation": {
+          "description": "This field provided a link to the schema describing this REST resource.",
+          "type": "string"
+        },
+        "@type":{
+          "description":"When sub-classing, this defines the sub-class entity name.\nUsed when spec is described by value (litterally)\nCould be valued to UNIProductSpecification or ELineProductSpecification",
+          "type":"string"
+        },
+        "@referredType":{
+          "description":"The actual type of the target instance when needed for disambiguation.\nUsed when spec is described by reference\n@referredType could be valued to UNIProductSpecification or ELineProductSpecification",
+          "type":"string"
+        }
+      }
+    },
+    "UNIProductSpecification": {
+      "description": "Description of UNISpec for Ordering - source 57.1.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Describing"
+        },
+        {
+          "$ref": "./MEF_UNISpec_v3.json"
+        }
+      ]
+    },
+    "ELineProductSpecification": {
+      "description": "Description of ELineSpec for Ordering - source 57.1.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Describing"
+        },
+        {
+          "$ref": "./MEF_ELineSpec_v3.json"
+        }
+      ]
     }
   }
 }
