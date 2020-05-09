@@ -11,7 +11,7 @@
     "https"
   ],
   "produces": [
-    "application/json;charset=utf-8"
+    "application/json"
   ],
   "tags": [
     {
@@ -26,7 +26,7 @@
           "ProductSpecification"
         ],
         "produces": [
-          "application/json;charset=utf-8"
+          "application/json"
         ],
         "operationId": "productSpecificationGet",
         "summary": "retrieveProductSpecification",
@@ -145,20 +145,20 @@
     },
     "Describing": {
       "description": "Target to the schema describing the product spec resource (and type)",
-      "discriminator":"@type",
+      "discriminator": "@type",
       "type": "object",
       "properties": {
         "@schemaLocation": {
           "description": "This field provided a link to the schema describing this REST resource.",
           "type": "string"
         },
-        "@type":{
-          "description":"When sub-classing, this defines the sub-class entity name.\nUsed when spec is described by value (litterally)\nCould be valued to UNIProductSpecification or ELineProductSpecification",
-          "type":"string"
+        "@type": {
+          "description": "When sub-classing, this defines the sub-class entity name.\nUsed when spec is described by value (litterally)\nCould be valued to UNIProductSpecification or ELineProductSpecification",
+          "type": "string"
         },
-        "@referredType":{
-          "description":"The actual type of the target instance when needed for disambiguation.\nUsed when spec is described by reference\n@referredType could be valued to UNIProductSpecification or ELineProductSpecification",
-          "type":"string"
+        "@referredType": {
+          "description": "The actual type of the target instance when needed for disambiguation.\nUsed when spec is described by reference\n@referredType could be valued to UNIProductSpecification or ELineProductSpecification",
+          "type": "string"
         }
       }
     },

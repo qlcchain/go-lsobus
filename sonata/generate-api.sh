@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+rm -rf ./address ./site ./poq ./quote ./order/ ./inventory ./common ./notify
+mkdir -p ./address ./site ./poq ./quote ./order/ ./inventory ./common ./notify/poq ./notify/quote ./notify/order
+
 # Client
 ## Serviceability
 ### Address
@@ -29,4 +32,4 @@ swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify
 swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/quote -f ./spec/MEF_api_quoteNotification_1.0.0.json
 
 ## Product Order Notification
-swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/order/ -f ./spec/MEF_api_productOrderNotification_3.0.0.json
+swagger generate server --exclude-main --skip-support --exclude-spec -t ./notify/order -f ./spec/MEF_api_productOrderNotification_3.0.0.json

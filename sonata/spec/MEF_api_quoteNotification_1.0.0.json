@@ -15,7 +15,7 @@
     "https"
   ],
   "produces": [
-    "application/json;charset=utf-8"
+    "application/json"
   ],
   "tags": [
     {
@@ -30,7 +30,7 @@
           "Notification"
         ],
         "consumes": [
-          "application/json;charset=utf-8"
+          "application/json"
         ],
         "operationId": "notificationQuoteCreationNotification",
         "summary": "Quote creation notification structure",
@@ -108,7 +108,7 @@
           "Notification"
         ],
         "consumes": [
-          "application/json;charset=utf-8"
+          "application/json"
         ],
         "operationId": "notificationQuoteStateChangeNotification",
         "summary": "Quote state change notification structure",
@@ -186,7 +186,7 @@
           "Notification"
         ],
         "consumes": [
-          "application/json;charset=utf-8"
+          "application/json"
         ],
         "operationId": "notificationQuoteInformationRequiredNotification",
         "summary": "Quote information required notification structure",
@@ -267,7 +267,7 @@
           "Notification"
         ],
         "consumes": [
-          "application/json;charset=utf-8"
+          "application/json"
         ],
         "operationId": "notificationQuoteAttributeValueChangeNotification",
         "summary": "Quote attribute value change notification structure",
@@ -747,7 +747,6 @@
     },
     "ProductSpecificationRef": {
       "description": "A ProductSpecification is a detailed description of a tangible or intangible object made available externally in the form of a ProductOffering to customers or other parties playing a party role.",
-      "discriminator": "id",
       "type": "object",
       "properties": {
         "id": {
@@ -792,6 +791,7 @@
     },
     "Describing": {
       "description": "Target to the schema describing the product spec resource (and type)",
+      "discriminator": "@type",
       "type": "object",
       "properties": {
         "@type": {
