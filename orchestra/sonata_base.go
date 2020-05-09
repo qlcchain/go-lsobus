@@ -3,6 +3,8 @@ package orchestra
 import (
 	"strconv"
 
+	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
+
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
@@ -28,4 +30,38 @@ func (s *sonataBaseImpl) Init() error {
 
 func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
+}
+
+func (s *sonataBaseImpl) FillUNIProductSpec(uniSpec *cmnmod.UNIProductSpecification, params *OrderParams) error {
+	uniSpec.SetAtSchemaLocation(MEFSchemaLocationSpecUNI)
+	uniSpec.SetAtType("UNISpec")
+
+	if params.SrcPortSpeed == 1000 {
+		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr1000BASET}
+	} else if params.SrcPortSpeed == 10000 {
+		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr10GBASESR}
+	} else {
+		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr100BASETX}
+	}
+	uniSpec.MaxServiceFrameSize = 1522
+	uniSpec.NumberOfLinks = 1
+
+	return nil
+}
+
+func (s *sonataBaseImpl) FillELineProductSpec(lineDesc *cmnmod.ELineProductSpecification, params *OrderParams) error {
+	lineDesc.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
+	lineDesc.SetAtType("ELineSpec")
+
+	lineDesc.ClassOfServiceName = params.CosName
+	lineDesc.MaximumFrameSize = 1526
+	lineDesc.SVlanID = int32(params.SVlanID)
+	bwMbps := int32(params.Bandwidth)
+	bwProfile := &cmnmod.BandwidthProfile{
+		Cir: &cmnmod.InformationRate{Unit: "Mbps", Amount: &bwMbps},
+	}
+	lineDesc.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+	lineDesc.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+
+	return nil
 }

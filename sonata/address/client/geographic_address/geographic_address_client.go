@@ -47,7 +47,7 @@ func (a *Client) GeographicAddressGet(params *GeographicAddressGetParams) (*Geog
 		ID:                 "geographicAddressGet",
 		Method:             "GET",
 		PathPattern:        "/geographicAddress/{GeographicAddressId}",
-		ProducesMediaTypes: []string{"application/json;charset=utf-8"},
+		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"https"},
 		Params:             params,

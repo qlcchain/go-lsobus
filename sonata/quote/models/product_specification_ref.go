@@ -9,116 +9,98 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // ProductSpecificationRef A structured set of well-defined technical attributes and/or behaviors that are used to construct a Product Offering for sale to a market.
 //
-// swagger:discriminator ProductSpecificationRef id
-type ProductSpecificationRef interface {
-	runtime.Validatable
-
-	// describing
-	Describing() *Describing
-	SetDescribing(*Describing)
+// swagger:model ProductSpecificationRef
+type ProductSpecificationRef struct {
+	describingField Describing
 
 	// Unique identifier of the product specification
-	ID() string
-	SetID(string)
-
-	// AdditionalProperties in base type shoud be handled just like regular properties
-	// At this moment, the base type property is pushed down to the subtype
+	ID string `json:"id,omitempty"`
 }
 
-type productSpecificationRef struct {
-	describingField *Describing
-
-	idField string
-}
-
-// Describing gets the describing of this polymorphic type
-func (m *productSpecificationRef) Describing() *Describing {
+// Describing gets the describing of this base type
+func (m *ProductSpecificationRef) Describing() Describing {
 	return m.describingField
 }
 
-// SetDescribing sets the describing of this polymorphic type
-func (m *productSpecificationRef) SetDescribing(val *Describing) {
+// SetDescribing sets the describing of this base type
+func (m *ProductSpecificationRef) SetDescribing(val Describing) {
 	m.describingField = val
 }
 
-// ID gets the id of this polymorphic type
-func (m *productSpecificationRef) ID() string {
-	return "ProductSpecificationRef"
-}
+// UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
+func (m *ProductSpecificationRef) UnmarshalJSON(raw []byte) error {
+	var data struct {
+		Describing json.RawMessage `json:"describing,omitempty"`
 
-// SetID sets the id of this polymorphic type
-func (m *productSpecificationRef) SetID(val string) {
-}
+		ID string `json:"id,omitempty"`
+	}
+	buf := bytes.NewBuffer(raw)
+	dec := json.NewDecoder(buf)
+	dec.UseNumber()
 
-// UnmarshalProductSpecificationRefSlice unmarshals polymorphic slices of ProductSpecificationRef
-func UnmarshalProductSpecificationRefSlice(reader io.Reader, consumer runtime.Consumer) ([]ProductSpecificationRef, error) {
-	var elements []json.RawMessage
-	if err := consumer.Consume(reader, &elements); err != nil {
-		return nil, err
+	if err := dec.Decode(&data); err != nil {
+		return err
 	}
 
-	var result []ProductSpecificationRef
-	for _, element := range elements {
-		obj, err := unmarshalProductSpecificationRef(element, consumer)
-		if err != nil {
-			return nil, err
+	var propDescribing Describing
+	if string(data.Describing) != "null" {
+		describing, err := UnmarshalDescribing(bytes.NewBuffer(data.Describing), runtime.JSONConsumer())
+		if err != nil && err != io.EOF {
+			return err
 		}
-		result = append(result, obj)
+		propDescribing = describing
 	}
-	return result, nil
+
+	var result ProductSpecificationRef
+
+	// describing
+	result.describingField = propDescribing
+
+	// id
+	result.ID = data.ID
+
+	*m = result
+
+	return nil
 }
 
-// UnmarshalProductSpecificationRef unmarshals polymorphic ProductSpecificationRef
-func UnmarshalProductSpecificationRef(reader io.Reader, consumer runtime.Consumer) (ProductSpecificationRef, error) {
-	// we need to read this twice, so first into a buffer
-	data, err := ioutil.ReadAll(reader)
+// MarshalJSON marshals this object with a polymorphic type to a JSON structure
+func (m ProductSpecificationRef) MarshalJSON() ([]byte, error) {
+	var b1, b2, b3 []byte
+	var err error
+	b1, err = json.Marshal(struct {
+		ID string `json:"id,omitempty"`
+	}{
+
+		ID: m.ID,
+	})
 	if err != nil {
 		return nil, err
 	}
-	return unmarshalProductSpecificationRef(data, consumer)
-}
+	b2, err = json.Marshal(struct {
+		Describing Describing `json:"describing,omitempty"`
+	}{
 
-func unmarshalProductSpecificationRef(data []byte, consumer runtime.Consumer) (ProductSpecificationRef, error) {
-	buf := bytes.NewBuffer(data)
-	buf2 := bytes.NewBuffer(data)
-
-	// the first time this is read is to fetch the value of the id property.
-	var getType struct {
-		ID string `json:"id"`
-	}
-	if err := consumer.Consume(buf, &getType); err != nil {
+		Describing: m.describingField,
+	})
+	if err != nil {
 		return nil, err
 	}
 
-	if err := validate.RequiredString("id", "body", getType.ID); err != nil {
-		return nil, err
-	}
-
-	// The value of id is used to determine which type to create and unmarshal the data into
-	switch getType.ID {
-	case "ProductSpecificationRef":
-		var result productSpecificationRef
-		if err := consumer.Consume(buf2, &result); err != nil {
-			return nil, err
-		}
-		return &result, nil
-	}
-	return nil, errors.New(422, "invalid id value: %q", getType.ID)
+	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
 // Validate validates this product specification ref
-func (m *productSpecificationRef) Validate(formats strfmt.Registry) error {
+func (m *ProductSpecificationRef) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateDescribing(formats); err != nil {
@@ -131,20 +113,36 @@ func (m *productSpecificationRef) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *productSpecificationRef) validateDescribing(formats strfmt.Registry) error {
+func (m *ProductSpecificationRef) validateDescribing(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Describing()) { // not required
 		return nil
 	}
 
-	if m.Describing() != nil {
-		if err := m.Describing().Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("describing")
-			}
-			return err
+	if err := m.Describing().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("describing")
 		}
+		return err
 	}
 
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ProductSpecificationRef) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ProductSpecificationRef) UnmarshalBinary(b []byte) error {
+	var res ProductSpecificationRef
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
 	return nil
 }

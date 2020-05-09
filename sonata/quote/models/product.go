@@ -35,7 +35,8 @@ type Product struct {
 	// product relationship
 	ProductRelationship []*ProductRelationship `json:"productRelationship"`
 
-	productSpecificationField ProductSpecificationRef
+	// product specification
+	ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 }
 
 // Place gets the place of this base type
@@ -46,16 +47,6 @@ func (m *Product) Place() []RelatedPlaceRefOrValue {
 // SetPlace sets the place of this base type
 func (m *Product) SetPlace(val []RelatedPlaceRefOrValue) {
 	m.placeField = val
-}
-
-// ProductSpecification gets the product specification of this base type
-func (m *Product) ProductSpecification() ProductSpecificationRef {
-	return m.productSpecificationField
-}
-
-// SetProductSpecification sets the product specification of this base type
-func (m *Product) SetProductSpecification(val ProductSpecificationRef) {
-	m.productSpecificationField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -69,7 +60,7 @@ func (m *Product) UnmarshalJSON(raw []byte) error {
 
 		ProductRelationship []*ProductRelationship `json:"productRelationship"`
 
-		ProductSpecification json.RawMessage `json:"productSpecification,omitempty"`
+		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -87,14 +78,6 @@ func (m *Product) UnmarshalJSON(raw []byte) error {
 		}
 		propPlace = place
 	}
-	var propProductSpecification ProductSpecificationRef
-	if string(data.ProductSpecification) != "null" {
-		productSpecification, err := UnmarshalProductSpecificationRef(bytes.NewBuffer(data.ProductSpecification), runtime.JSONConsumer())
-		if err != nil && err != io.EOF {
-			return err
-		}
-		propProductSpecification = productSpecification
-	}
 
 	var result Product
 
@@ -111,7 +94,7 @@ func (m *Product) UnmarshalJSON(raw []byte) error {
 	result.ProductRelationship = data.ProductRelationship
 
 	// productSpecification
-	result.productSpecificationField = propProductSpecification
+	result.ProductSpecification = data.ProductSpecification
 
 	*m = result
 
@@ -128,6 +111,8 @@ func (m Product) MarshalJSON() ([]byte, error) {
 		ID *string `json:"id"`
 
 		ProductRelationship []*ProductRelationship `json:"productRelationship"`
+
+		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}{
 
 		Href: m.Href,
@@ -135,19 +120,17 @@ func (m Product) MarshalJSON() ([]byte, error) {
 		ID: m.ID,
 
 		ProductRelationship: m.ProductRelationship,
+
+		ProductSpecification: m.ProductSpecification,
 	})
 	if err != nil {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
 		Place []RelatedPlaceRefOrValue `json:"place"`
-
-		ProductSpecification ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}{
 
 		Place: m.placeField,
-
-		ProductSpecification: m.productSpecificationField,
 	})
 	if err != nil {
 		return nil, err
@@ -238,15 +221,17 @@ func (m *Product) validateProductRelationship(formats strfmt.Registry) error {
 
 func (m *Product) validateProductSpecification(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ProductSpecification()) { // not required
+	if swag.IsZero(m.ProductSpecification) { // not required
 		return nil
 	}
 
-	if err := m.ProductSpecification().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("productSpecification")
+	if m.ProductSpecification != nil {
+		if err := m.ProductSpecification.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("productSpecification")
+			}
+			return err
 		}
-		return err
 	}
 
 	return nil

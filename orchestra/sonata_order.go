@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
+
 	"github.com/go-openapi/strfmt"
 
 	ordcli "github.com/iixlabs/virtual-lsobus/sonata/order/client"
@@ -139,9 +141,9 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	// UNI Product Specification
 	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniItem.Product.ProductSpecification.Describing = &ordmod.Describing{}
-	uniItem.Product.ProductSpecification.Describing.AtType = "UNISpec"
-	uniItem.Product.ProductSpecification.Describing.AtSchemaLocation = MEFSchemaLocationSpecUNI
+	uniDesc := &cmnmod.UNIProductSpecification{}
+	s.FillUNIProductSpec(uniDesc, orderParams)
+	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
 }
@@ -165,9 +167,9 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	//Product Specification
 	lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineItem.Product.ProductSpecification.Describing = &ordmod.Describing{}
-	lineItem.Product.ProductSpecification.Describing.AtType = "ELineSpec"
-	lineItem.Product.ProductSpecification.Describing.AtSchemaLocation = MEFSchemaLocationSpecELine
+	lineDesc := &cmnmod.ELineProductSpecification{}
+	s.FillELineProductSpec(lineDesc, orderParams)
+	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem
 }

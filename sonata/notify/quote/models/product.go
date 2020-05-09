@@ -6,12 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
@@ -30,89 +25,8 @@ type Product struct {
 	// Required: true
 	ID *string `json:"id"`
 
-	productSpecificationField ProductSpecificationRef
-}
-
-// ProductSpecification gets the product specification of this base type
-func (m *Product) ProductSpecification() ProductSpecificationRef {
-	return m.productSpecificationField
-}
-
-// SetProductSpecification sets the product specification of this base type
-func (m *Product) SetProductSpecification(val ProductSpecificationRef) {
-	m.productSpecificationField = val
-}
-
-// UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *Product) UnmarshalJSON(raw []byte) error {
-	var data struct {
-		Href *string `json:"href"`
-
-		ID *string `json:"id"`
-
-		ProductSpecification json.RawMessage `json:"productSpecification,omitempty"`
-	}
-	buf := bytes.NewBuffer(raw)
-	dec := json.NewDecoder(buf)
-	dec.UseNumber()
-
-	if err := dec.Decode(&data); err != nil {
-		return err
-	}
-
-	var propProductSpecification ProductSpecificationRef
-	if string(data.ProductSpecification) != "null" {
-		productSpecification, err := UnmarshalProductSpecificationRef(bytes.NewBuffer(data.ProductSpecification), runtime.JSONConsumer())
-		if err != nil && err != io.EOF {
-			return err
-		}
-		propProductSpecification = productSpecification
-	}
-
-	var result Product
-
-	// href
-	result.Href = data.Href
-
-	// id
-	result.ID = data.ID
-
-	// productSpecification
-	result.productSpecificationField = propProductSpecification
-
-	*m = result
-
-	return nil
-}
-
-// MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m Product) MarshalJSON() ([]byte, error) {
-	var b1, b2, b3 []byte
-	var err error
-	b1, err = json.Marshal(struct {
-		Href *string `json:"href"`
-
-		ID *string `json:"id"`
-	}{
-
-		Href: m.Href,
-
-		ID: m.ID,
-	})
-	if err != nil {
-		return nil, err
-	}
-	b2, err = json.Marshal(struct {
-		ProductSpecification ProductSpecificationRef `json:"productSpecification,omitempty"`
-	}{
-
-		ProductSpecification: m.productSpecificationField,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return swag.ConcatJSON(b1, b2, b3), nil
+	// product specification
+	ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 }
 
 // Validate validates this product
@@ -157,15 +71,17 @@ func (m *Product) validateID(formats strfmt.Registry) error {
 
 func (m *Product) validateProductSpecification(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ProductSpecification()) { // not required
+	if swag.IsZero(m.ProductSpecification) { // not required
 		return nil
 	}
 
-	if err := m.ProductSpecification().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("productSpecification")
+	if m.ProductSpecification != nil {
+		if err := m.ProductSpecification.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("productSpecification")
+			}
+			return err
 		}
-		return err
 	}
 
 	return nil

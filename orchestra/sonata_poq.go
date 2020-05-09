@@ -119,7 +119,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 
 	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"}
 
-	uniItem.Product = new(poqmod.Product)
+	uniItem.Product = &poqmod.Product{}
 
 	// UNI Place
 	uniPlace := &poqmod.ReferencedAddress{}
@@ -127,21 +127,11 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	uniItem.Product.SetPlace([]poqmod.RelatedPlaceReforValue{uniPlace})
 
 	// UNI Product Specification
-	uniItem.Product.ProductSpecification = new(poqmod.ProductSpecificationRef)
+	uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniItem.Product.ProductSpecification.Describing = new(poqmod.Describing)
-	uniItem.Product.ProductSpecification.Describing.AtSchemaLocation = MEFSchemaLocationSpecUNI
-	uniItem.Product.ProductSpecification.Describing.AtType = "UNISpec"
-	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3 = new(cmnmod.MEFUNISpecV3)
-	if orderParams.SrcPortSpeed == 1000 {
-		uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr1000BASET}
-	} else if orderParams.SrcPortSpeed == 10000 {
-		uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr10GBASESR}
-	} else {
-		uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr100BASETX}
-	}
-	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.MaxServiceFrameSize = 1522
-	uniItem.Product.ProductSpecification.Describing.MEFUNISpecV3.NumberOfLinks = 1
+	uniDesc := &cmnmod.UNIProductSpecification{}
+	s.FillUNIProductSpec(uniDesc, orderParams)
+	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
 }
@@ -153,24 +143,14 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
 	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetConnection"}
-	lineItem.Product = new(poqmod.Product)
+	lineItem.Product = &poqmod.Product{}
 
 	//Product Specification
-	lineItem.Product.ProductSpecification = new(poqmod.ProductSpecificationRef)
+	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineItem.Product.ProductSpecification.Describing = new(poqmod.Describing)
-	lineItem.Product.ProductSpecification.Describing.AtSchemaLocation = MEFSchemaLocationSpecELine
-	lineItem.Product.ProductSpecification.Describing.AtType = "ELineSpec"
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3 = new(cmnmod.MEFELineSpecV3)
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3.ClassOfServiceName = orderParams.CosName
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3.MaximumFrameSize = 1526
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3.SVlanID = int32(orderParams.SVlanID)
-	bwMbps := int32(orderParams.Bandwidth)
-	bwProfile := &cmnmod.BandwidthProfile{
-		Cir: &cmnmod.InformationRate{Unit: "Mbps", Amount: &bwMbps},
-	}
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
-	lineItem.Product.ProductSpecification.Describing.MEFELineSpecV3.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+	lineDesc := &cmnmod.ELineProductSpecification{}
+	s.FillELineProductSpec(lineDesc, orderParams)
+	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem
 }

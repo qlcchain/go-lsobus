@@ -6,7 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
@@ -16,13 +21,84 @@ import (
 //
 // swagger:model ProductSpecificationRef
 type ProductSpecificationRef struct {
-
-	// describing
-	Describing *Describing `json:"describing,omitempty"`
+	describingField Describing
 
 	// A unique identifier of the product spec.
 	// Required: true
 	ID *string `json:"id"`
+}
+
+// Describing gets the describing of this base type
+func (m *ProductSpecificationRef) Describing() Describing {
+	return m.describingField
+}
+
+// SetDescribing sets the describing of this base type
+func (m *ProductSpecificationRef) SetDescribing(val Describing) {
+	m.describingField = val
+}
+
+// UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
+func (m *ProductSpecificationRef) UnmarshalJSON(raw []byte) error {
+	var data struct {
+		Describing json.RawMessage `json:"describing,omitempty"`
+
+		ID *string `json:"id"`
+	}
+	buf := bytes.NewBuffer(raw)
+	dec := json.NewDecoder(buf)
+	dec.UseNumber()
+
+	if err := dec.Decode(&data); err != nil {
+		return err
+	}
+
+	var propDescribing Describing
+	if string(data.Describing) != "null" {
+		describing, err := UnmarshalDescribing(bytes.NewBuffer(data.Describing), runtime.JSONConsumer())
+		if err != nil && err != io.EOF {
+			return err
+		}
+		propDescribing = describing
+	}
+
+	var result ProductSpecificationRef
+
+	// describing
+	result.describingField = propDescribing
+
+	// id
+	result.ID = data.ID
+
+	*m = result
+
+	return nil
+}
+
+// MarshalJSON marshals this object with a polymorphic type to a JSON structure
+func (m ProductSpecificationRef) MarshalJSON() ([]byte, error) {
+	var b1, b2, b3 []byte
+	var err error
+	b1, err = json.Marshal(struct {
+		ID *string `json:"id"`
+	}{
+
+		ID: m.ID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	b2, err = json.Marshal(struct {
+		Describing Describing `json:"describing,omitempty"`
+	}{
+
+		Describing: m.describingField,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
 // Validate validates this product specification ref
@@ -45,17 +121,15 @@ func (m *ProductSpecificationRef) Validate(formats strfmt.Registry) error {
 
 func (m *ProductSpecificationRef) validateDescribing(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Describing) { // not required
+	if swag.IsZero(m.Describing()) { // not required
 		return nil
 	}
 
-	if m.Describing != nil {
-		if err := m.Describing.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("describing")
-			}
-			return err
+	if err := m.Describing().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("describing")
 		}
+		return err
 	}
 
 	return nil
