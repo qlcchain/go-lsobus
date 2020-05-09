@@ -19,7 +19,7 @@ import (
 //
 // swagger:model EventPlus
 type EventPlus struct {
-	eventField QuoteSummaryView
+	eventField *QuoteSummaryView
 
 	eventTimeField *strfmt.DateTime
 
@@ -35,12 +35,12 @@ type EventPlus struct {
 }
 
 // Event gets the event of this subtype
-func (m *EventPlus) Event() QuoteSummaryView {
+func (m *EventPlus) Event() *QuoteSummaryView {
 	return m.eventField
 }
 
 // SetEvent sets the event of this subtype
-func (m *EventPlus) SetEvent(val QuoteSummaryView) {
+func (m *EventPlus) SetEvent(val *QuoteSummaryView) {
 	m.eventField = val
 }
 
@@ -96,7 +96,7 @@ func (m *EventPlus) UnmarshalJSON(raw []byte) error {
 	var base struct {
 		/* Just the base type fields. Used for unmashalling polymorphic types.*/
 
-		Event QuoteSummaryView `json:"-"`
+		Event *QuoteSummaryView `json:"event"`
 
 		EventID string `json:"eventId"`
 
@@ -155,7 +155,7 @@ func (m EventPlus) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		Event QuoteSummaryView `json:"event"`
+		Event *QuoteSummaryView `json:"event"`
 
 		EventID string `json:"eventId"`
 
@@ -215,11 +215,13 @@ func (m *EventPlus) validateEvent(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := m.Event().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("event")
+	if m.Event() != nil {
+		if err := m.Event().Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("event")
+			}
+			return err
 		}
-		return err
 	}
 
 	return nil

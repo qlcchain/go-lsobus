@@ -23,8 +23,10 @@ import (
 type Event interface {
 	runtime.Validatable
 
-	Event() QuoteSummaryView
-	SetEvent(QuoteSummaryView)
+	// event
+	// Required: true
+	Event() *QuoteSummaryView
+	SetEvent(*QuoteSummaryView)
 
 	// Id of the event
 	// Required: true
@@ -47,7 +49,7 @@ type Event interface {
 }
 
 type event struct {
-	eventField QuoteSummaryView
+	eventField *QuoteSummaryView
 
 	eventIdField string
 
@@ -57,12 +59,12 @@ type event struct {
 }
 
 // Event gets the event of this polymorphic type
-func (m *event) Event() QuoteSummaryView {
+func (m *event) Event() *QuoteSummaryView {
 	return m.eventField
 }
 
 // SetEvent sets the event of this polymorphic type
-func (m *event) SetEvent(val QuoteSummaryView) {
+func (m *event) SetEvent(val *QuoteSummaryView) {
 	m.eventField = val
 }
 
@@ -185,11 +187,13 @@ func (m *event) validateEvent(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := m.Event().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("event")
+	if m.Event() != nil {
+		if err := m.Event().Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("event")
+			}
+			return err
 		}
-		return err
 	}
 
 	return nil

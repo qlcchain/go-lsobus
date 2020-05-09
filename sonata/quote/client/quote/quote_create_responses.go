@@ -93,25 +93,25 @@ func NewQuoteCreateCreated() *QuoteCreateCreated {
 Created
 */
 type QuoteCreateCreated struct {
-	Payload models.Quote
+	Payload *models.Quote
 }
 
 func (o *QuoteCreateCreated) Error() string {
 	return fmt.Sprintf("[POST /quote][%d] quoteCreateCreated  %+v", 201, o.Payload)
 }
 
-func (o *QuoteCreateCreated) GetPayload() models.Quote {
+func (o *QuoteCreateCreated) GetPayload() *models.Quote {
 	return o.Payload
 }
 
 func (o *QuoteCreateCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	// response payload as interface type
-	payload, err := models.UnmarshalQuote(response.Body(), consumer)
-	if err != nil {
+	o.Payload = new(models.Quote)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
-	o.Payload = payload
 
 	return nil
 }

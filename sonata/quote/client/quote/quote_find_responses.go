@@ -102,14 +102,14 @@ type QuoteFindOK struct {
 	 */
 	XTotalCount int32
 
-	Payload []models.QuoteFind
+	Payload []*models.QuoteFind
 }
 
 func (o *QuoteFindOK) Error() string {
 	return fmt.Sprintf("[GET /quote][%d] quoteFindOK  %+v", 200, o.Payload)
 }
 
-func (o *QuoteFindOK) GetPayload() []models.QuoteFind {
+func (o *QuoteFindOK) GetPayload() []*models.QuoteFind {
 	return o.Payload
 }
 
@@ -129,12 +129,10 @@ func (o *QuoteFindOK) readResponse(response runtime.ClientResponse, consumer run
 	}
 	o.XTotalCount = xTotalCount
 
-	// response payload as interface type
-	payload, err := models.UnmarshalQuoteFindSlice(response.Body(), consumer)
-	if err != nil {
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
-	o.Payload = payload
 
 	return nil
 }

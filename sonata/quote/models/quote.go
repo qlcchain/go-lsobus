@@ -6,14 +6,9 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"strconv"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
@@ -22,420 +17,86 @@ import (
 // Quote A quote which can be used to negotiate service and product acquisition or modification between
 // a customer and a service provider
 //
-// swagger:discriminator Quote id
-type Quote interface {
-	runtime.Validatable
+// swagger:model Quote
+type Quote struct {
 
 	// Indicates the base (class) type of the quote.
-	AtBaseType() string
-	SetAtBaseType(string)
+	AtBaseType string `json:"@baseType,omitempty"`
 
 	// Link to the schema describing the REST resource.
-	AtSchemaLocation() string
-	SetAtSchemaLocation(string)
+	AtSchemaLocation string `json:"@schemaLocation,omitempty"`
 
 	// Indicates the (class) type of the quote.
-	AtType() string
-	SetAtType(string)
+	AtType string `json:"@type,omitempty"`
 
 	// agreement
-	Agreement() []*AgreementRef
-	SetAgreement([]*AgreementRef)
+	Agreement []*AgreementRef `json:"agreement"`
 
 	// Description of the quote
-	Description() string
-	SetDescription(string)
+	Description string `json:"description,omitempty"`
 
 	// Date when the quoted was Cancelled or Rejected or Accepted
 	// Format: date-time
-	EffectiveQuoteCompletionDate() strfmt.DateTime
-	SetEffectiveQuoteCompletionDate(strfmt.DateTime)
+	EffectiveQuoteCompletionDate strfmt.DateTime `json:"effectiveQuoteCompletionDate,omitempty"`
 
 	// This is the date wished by the requester to have the requested quote item(s) delivered
 	// Format: date
-	ExpectedFulfillmentStartDate() strfmt.Date
-	SetExpectedFulfillmentStartDate(strfmt.Date)
+	ExpectedFulfillmentStartDate strfmt.Date `json:"expectedFulfillmentStartDate,omitempty"`
 
 	// This is the date filled by the seller to indicate expected quote completion date.
 	// Format: date
-	ExpectedQuoteCompletionDate() strfmt.Date
-	SetExpectedQuoteCompletionDate(strfmt.Date)
+	ExpectedQuoteCompletionDate strfmt.Date `json:"expectedQuoteCompletionDate,omitempty"`
 
 	// ID given by the consumer and only understandable by him (to facilitate his searches afterwards)
-	ExternalID() string
-	SetExternalID(string)
+	ExternalID string `json:"externalId,omitempty"`
 
 	// Hyperlink to access the quote
-	Href() string
-	SetHref(string)
+	Href string `json:"href,omitempty"`
 
 	// Unique (within the quoting domain) identifier for the quote, as attributed by the quoting system
-	ID() string
-	SetID(string)
+	ID string `json:"id,omitempty"`
 
 	// If this flag is set to Yes, Buyer requests to have instant quoting to be provided in operation POST response
 	// Required: true
-	InstantSyncQuoting() bool
-	SetInstantSyncQuoting(bool)
+	InstantSyncQuoting bool `json:"instantSyncQuoting"`
 
 	// note
-	Note() []*Note
-	SetNote([]*Note)
+	Note []*Note `json:"note"`
 
 	// This value MAY be assigned by the Buyer/Seller to identify a project the quoting request is associated with.
-	ProjectID() string
-	SetProjectID(string)
+	ProjectID string `json:"projectId,omitempty"`
 
 	// Date when the quote was created
 	// Format: date-time
-	QuoteDate() strfmt.DateTime
-	SetQuoteDate(strfmt.DateTime)
+	QuoteDate strfmt.DateTime `json:"quoteDate,omitempty"`
 
 	// quote item
 	// Required: true
-	QuoteItem() []*QuoteItem
-	SetQuoteItem([]*QuoteItem)
+	QuoteItem []*QuoteItem `json:"quoteItem"`
 
 	// quote level
 	// Required: true
-	QuoteLevel() QuoteLevel
-	SetQuoteLevel(QuoteLevel)
+	QuoteLevel QuoteLevel `json:"quoteLevel"`
 
 	// related party
 	// Required: true
-	RelatedParty() []*RelatedParty
-	SetRelatedParty([]*RelatedParty)
+	RelatedParty []*RelatedParty `json:"relatedParty"`
 
 	// This is the date wished by the requester to have the quote completed (meaning priced)
 	// Required: true
 	// Format: date-time
-	RequestedQuoteCompletionDate() *strfmt.DateTime
-	SetRequestedQuoteCompletionDate(*strfmt.DateTime)
+	RequestedQuoteCompletionDate *strfmt.DateTime `json:"requestedQuoteCompletionDate"`
 
 	// state
 	// Required: true
-	State() QuoteStateType
-	SetState(QuoteStateType)
+	State QuoteStateType `json:"state"`
 
 	// valid for
-	ValidFor() *TimePeriod
-	SetValidFor(*TimePeriod)
-
-	// AdditionalProperties in base type shoud be handled just like regular properties
-	// At this moment, the base type property is pushed down to the subtype
-}
-
-type quote struct {
-	atBaseTypeField string
-
-	atSchemaLocationField string
-
-	atTypeField string
-
-	agreementField []*AgreementRef
-
-	descriptionField string
-
-	effectiveQuoteCompletionDateField strfmt.DateTime
-
-	expectedFulfillmentStartDateField strfmt.Date
-
-	expectedQuoteCompletionDateField strfmt.Date
-
-	externalIdField string
-
-	hrefField string
-
-	idField string
-
-	instantSyncQuotingField bool
-
-	noteField []*Note
-
-	projectIdField string
-
-	quoteDateField strfmt.DateTime
-
-	quoteItemField []*QuoteItem
-
-	quoteLevelField QuoteLevel
-
-	relatedPartyField []*RelatedParty
-
-	requestedQuoteCompletionDateField *strfmt.DateTime
-
-	stateField QuoteStateType
-
-	validForField *TimePeriod
-}
-
-// AtBaseType gets the at base type of this polymorphic type
-func (m *quote) AtBaseType() string {
-	return m.atBaseTypeField
-}
-
-// SetAtBaseType sets the at base type of this polymorphic type
-func (m *quote) SetAtBaseType(val string) {
-	m.atBaseTypeField = val
-}
-
-// AtSchemaLocation gets the at schema location of this polymorphic type
-func (m *quote) AtSchemaLocation() string {
-	return m.atSchemaLocationField
-}
-
-// SetAtSchemaLocation sets the at schema location of this polymorphic type
-func (m *quote) SetAtSchemaLocation(val string) {
-	m.atSchemaLocationField = val
-}
-
-// AtType gets the at type of this polymorphic type
-func (m *quote) AtType() string {
-	return m.atTypeField
-}
-
-// SetAtType sets the at type of this polymorphic type
-func (m *quote) SetAtType(val string) {
-	m.atTypeField = val
-}
-
-// Agreement gets the agreement of this polymorphic type
-func (m *quote) Agreement() []*AgreementRef {
-	return m.agreementField
-}
-
-// SetAgreement sets the agreement of this polymorphic type
-func (m *quote) SetAgreement(val []*AgreementRef) {
-	m.agreementField = val
-}
-
-// Description gets the description of this polymorphic type
-func (m *quote) Description() string {
-	return m.descriptionField
-}
-
-// SetDescription sets the description of this polymorphic type
-func (m *quote) SetDescription(val string) {
-	m.descriptionField = val
-}
-
-// EffectiveQuoteCompletionDate gets the effective quote completion date of this polymorphic type
-func (m *quote) EffectiveQuoteCompletionDate() strfmt.DateTime {
-	return m.effectiveQuoteCompletionDateField
-}
-
-// SetEffectiveQuoteCompletionDate sets the effective quote completion date of this polymorphic type
-func (m *quote) SetEffectiveQuoteCompletionDate(val strfmt.DateTime) {
-	m.effectiveQuoteCompletionDateField = val
-}
-
-// ExpectedFulfillmentStartDate gets the expected fulfillment start date of this polymorphic type
-func (m *quote) ExpectedFulfillmentStartDate() strfmt.Date {
-	return m.expectedFulfillmentStartDateField
-}
-
-// SetExpectedFulfillmentStartDate sets the expected fulfillment start date of this polymorphic type
-func (m *quote) SetExpectedFulfillmentStartDate(val strfmt.Date) {
-	m.expectedFulfillmentStartDateField = val
-}
-
-// ExpectedQuoteCompletionDate gets the expected quote completion date of this polymorphic type
-func (m *quote) ExpectedQuoteCompletionDate() strfmt.Date {
-	return m.expectedQuoteCompletionDateField
-}
-
-// SetExpectedQuoteCompletionDate sets the expected quote completion date of this polymorphic type
-func (m *quote) SetExpectedQuoteCompletionDate(val strfmt.Date) {
-	m.expectedQuoteCompletionDateField = val
-}
-
-// ExternalID gets the external Id of this polymorphic type
-func (m *quote) ExternalID() string {
-	return m.externalIdField
-}
-
-// SetExternalID sets the external Id of this polymorphic type
-func (m *quote) SetExternalID(val string) {
-	m.externalIdField = val
-}
-
-// Href gets the href of this polymorphic type
-func (m *quote) Href() string {
-	return m.hrefField
-}
-
-// SetHref sets the href of this polymorphic type
-func (m *quote) SetHref(val string) {
-	m.hrefField = val
-}
-
-// ID gets the id of this polymorphic type
-func (m *quote) ID() string {
-	return "Quote"
-}
-
-// SetID sets the id of this polymorphic type
-func (m *quote) SetID(val string) {
-}
-
-// InstantSyncQuoting gets the instant sync quoting of this polymorphic type
-func (m *quote) InstantSyncQuoting() bool {
-	return m.instantSyncQuotingField
-}
-
-// SetInstantSyncQuoting sets the instant sync quoting of this polymorphic type
-func (m *quote) SetInstantSyncQuoting(val bool) {
-	m.instantSyncQuotingField = val
-}
-
-// Note gets the note of this polymorphic type
-func (m *quote) Note() []*Note {
-	return m.noteField
-}
-
-// SetNote sets the note of this polymorphic type
-func (m *quote) SetNote(val []*Note) {
-	m.noteField = val
-}
-
-// ProjectID gets the project Id of this polymorphic type
-func (m *quote) ProjectID() string {
-	return m.projectIdField
-}
-
-// SetProjectID sets the project Id of this polymorphic type
-func (m *quote) SetProjectID(val string) {
-	m.projectIdField = val
-}
-
-// QuoteDate gets the quote date of this polymorphic type
-func (m *quote) QuoteDate() strfmt.DateTime {
-	return m.quoteDateField
-}
-
-// SetQuoteDate sets the quote date of this polymorphic type
-func (m *quote) SetQuoteDate(val strfmt.DateTime) {
-	m.quoteDateField = val
-}
-
-// QuoteItem gets the quote item of this polymorphic type
-func (m *quote) QuoteItem() []*QuoteItem {
-	return m.quoteItemField
-}
-
-// SetQuoteItem sets the quote item of this polymorphic type
-func (m *quote) SetQuoteItem(val []*QuoteItem) {
-	m.quoteItemField = val
-}
-
-// QuoteLevel gets the quote level of this polymorphic type
-func (m *quote) QuoteLevel() QuoteLevel {
-	return m.quoteLevelField
-}
-
-// SetQuoteLevel sets the quote level of this polymorphic type
-func (m *quote) SetQuoteLevel(val QuoteLevel) {
-	m.quoteLevelField = val
-}
-
-// RelatedParty gets the related party of this polymorphic type
-func (m *quote) RelatedParty() []*RelatedParty {
-	return m.relatedPartyField
-}
-
-// SetRelatedParty sets the related party of this polymorphic type
-func (m *quote) SetRelatedParty(val []*RelatedParty) {
-	m.relatedPartyField = val
-}
-
-// RequestedQuoteCompletionDate gets the requested quote completion date of this polymorphic type
-func (m *quote) RequestedQuoteCompletionDate() *strfmt.DateTime {
-	return m.requestedQuoteCompletionDateField
-}
-
-// SetRequestedQuoteCompletionDate sets the requested quote completion date of this polymorphic type
-func (m *quote) SetRequestedQuoteCompletionDate(val *strfmt.DateTime) {
-	m.requestedQuoteCompletionDateField = val
-}
-
-// State gets the state of this polymorphic type
-func (m *quote) State() QuoteStateType {
-	return m.stateField
-}
-
-// SetState sets the state of this polymorphic type
-func (m *quote) SetState(val QuoteStateType) {
-	m.stateField = val
-}
-
-// ValidFor gets the valid for of this polymorphic type
-func (m *quote) ValidFor() *TimePeriod {
-	return m.validForField
-}
-
-// SetValidFor sets the valid for of this polymorphic type
-func (m *quote) SetValidFor(val *TimePeriod) {
-	m.validForField = val
-}
-
-// UnmarshalQuoteSlice unmarshals polymorphic slices of Quote
-func UnmarshalQuoteSlice(reader io.Reader, consumer runtime.Consumer) ([]Quote, error) {
-	var elements []json.RawMessage
-	if err := consumer.Consume(reader, &elements); err != nil {
-		return nil, err
-	}
-
-	var result []Quote
-	for _, element := range elements {
-		obj, err := unmarshalQuote(element, consumer)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, obj)
-	}
-	return result, nil
-}
-
-// UnmarshalQuote unmarshals polymorphic Quote
-func UnmarshalQuote(reader io.Reader, consumer runtime.Consumer) (Quote, error) {
-	// we need to read this twice, so first into a buffer
-	data, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshalQuote(data, consumer)
-}
-
-func unmarshalQuote(data []byte, consumer runtime.Consumer) (Quote, error) {
-	buf := bytes.NewBuffer(data)
-	buf2 := bytes.NewBuffer(data)
-
-	// the first time this is read is to fetch the value of the id property.
-	var getType struct {
-		ID string `json:"id"`
-	}
-	if err := consumer.Consume(buf, &getType); err != nil {
-		return nil, err
-	}
-
-	if err := validate.RequiredString("id", "body", getType.ID); err != nil {
-		return nil, err
-	}
-
-	// The value of id is used to determine which type to create and unmarshal the data into
-	switch getType.ID {
-	case "Quote":
-		var result quote
-		if err := consumer.Consume(buf2, &result); err != nil {
-			return nil, err
-		}
-		return &result, nil
-	}
-	return nil, errors.New(422, "invalid id value: %q", getType.ID)
+	ValidFor *TimePeriod `json:"validFor,omitempty"`
 }
 
 // Validate validates this quote
-func (m *quote) Validate(formats strfmt.Registry) error {
+func (m *Quote) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAgreement(formats); err != nil {
@@ -496,19 +157,19 @@ func (m *quote) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateAgreement(formats strfmt.Registry) error {
+func (m *Quote) validateAgreement(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Agreement()) { // not required
+	if swag.IsZero(m.Agreement) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(m.Agreement()); i++ {
-		if swag.IsZero(m.agreementField[i]) { // not required
+	for i := 0; i < len(m.Agreement); i++ {
+		if swag.IsZero(m.Agreement[i]) { // not required
 			continue
 		}
 
-		if m.agreementField[i] != nil {
-			if err := m.agreementField[i].Validate(formats); err != nil {
+		if m.Agreement[i] != nil {
+			if err := m.Agreement[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("agreement" + "." + strconv.Itoa(i))
 				}
@@ -521,67 +182,67 @@ func (m *quote) validateAgreement(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *Quote) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.EffectiveQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateExpectedFulfillmentStartDate(formats strfmt.Registry) error {
+func (m *Quote) validateExpectedFulfillmentStartDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ExpectedFulfillmentStartDate()) { // not required
+	if swag.IsZero(m.ExpectedFulfillmentStartDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("expectedFulfillmentStartDate", "body", "date", m.ExpectedFulfillmentStartDate().String(), formats); err != nil {
+	if err := validate.FormatOf("expectedFulfillmentStartDate", "body", "date", m.ExpectedFulfillmentStartDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *Quote) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ExpectedQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.ExpectedQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateInstantSyncQuoting(formats strfmt.Registry) error {
+func (m *Quote) validateInstantSyncQuoting(formats strfmt.Registry) error {
 
-	if err := validate.Required("instantSyncQuoting", "body", bool(m.InstantSyncQuoting())); err != nil {
+	if err := validate.Required("instantSyncQuoting", "body", bool(m.InstantSyncQuoting)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateNote(formats strfmt.Registry) error {
+func (m *Quote) validateNote(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Note()) { // not required
+	if swag.IsZero(m.Note) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(m.Note()); i++ {
-		if swag.IsZero(m.noteField[i]) { // not required
+	for i := 0; i < len(m.Note); i++ {
+		if swag.IsZero(m.Note[i]) { // not required
 			continue
 		}
 
-		if m.noteField[i] != nil {
-			if err := m.noteField[i].Validate(formats); err != nil {
+		if m.Note[i] != nil {
+			if err := m.Note[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("note" + "." + strconv.Itoa(i))
 				}
@@ -594,32 +255,32 @@ func (m *quote) validateNote(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateQuoteDate(formats strfmt.Registry) error {
+func (m *Quote) validateQuoteDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.QuoteDate()) { // not required
+	if swag.IsZero(m.QuoteDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate().String(), formats); err != nil {
+	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateQuoteItem(formats strfmt.Registry) error {
+func (m *Quote) validateQuoteItem(formats strfmt.Registry) error {
 
-	if err := validate.Required("quoteItem", "body", m.QuoteItem()); err != nil {
+	if err := validate.Required("quoteItem", "body", m.QuoteItem); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.QuoteItem()); i++ {
-		if swag.IsZero(m.quoteItemField[i]) { // not required
+	for i := 0; i < len(m.QuoteItem); i++ {
+		if swag.IsZero(m.QuoteItem[i]) { // not required
 			continue
 		}
 
-		if m.quoteItemField[i] != nil {
-			if err := m.quoteItemField[i].Validate(formats); err != nil {
+		if m.QuoteItem[i] != nil {
+			if err := m.QuoteItem[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("quoteItem" + "." + strconv.Itoa(i))
 				}
@@ -632,9 +293,9 @@ func (m *quote) validateQuoteItem(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateQuoteLevel(formats strfmt.Registry) error {
+func (m *Quote) validateQuoteLevel(formats strfmt.Registry) error {
 
-	if err := m.QuoteLevel().Validate(formats); err != nil {
+	if err := m.QuoteLevel.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("quoteLevel")
 		}
@@ -644,19 +305,19 @@ func (m *quote) validateQuoteLevel(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateRelatedParty(formats strfmt.Registry) error {
+func (m *Quote) validateRelatedParty(formats strfmt.Registry) error {
 
-	if err := validate.Required("relatedParty", "body", m.RelatedParty()); err != nil {
+	if err := validate.Required("relatedParty", "body", m.RelatedParty); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.RelatedParty()); i++ {
-		if swag.IsZero(m.relatedPartyField[i]) { // not required
+	for i := 0; i < len(m.RelatedParty); i++ {
+		if swag.IsZero(m.RelatedParty[i]) { // not required
 			continue
 		}
 
-		if m.relatedPartyField[i] != nil {
-			if err := m.relatedPartyField[i].Validate(formats); err != nil {
+		if m.RelatedParty[i] != nil {
+			if err := m.RelatedParty[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("relatedParty" + "." + strconv.Itoa(i))
 				}
@@ -669,22 +330,22 @@ func (m *quote) validateRelatedParty(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *Quote) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate()); err != nil {
+	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate); err != nil {
 		return err
 	}
 
-	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quote) validateState(formats strfmt.Registry) error {
+func (m *Quote) validateState(formats strfmt.Registry) error {
 
-	if err := m.State().Validate(formats); err != nil {
+	if err := m.State.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state")
 		}
@@ -694,14 +355,14 @@ func (m *quote) validateState(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quote) validateValidFor(formats strfmt.Registry) error {
+func (m *Quote) validateValidFor(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ValidFor()) { // not required
+	if swag.IsZero(m.ValidFor) { // not required
 		return nil
 	}
 
-	if m.ValidFor() != nil {
-		if err := m.ValidFor().Validate(formats); err != nil {
+	if m.ValidFor != nil {
+		if err := m.ValidFor.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("validFor")
 			}
@@ -709,5 +370,23 @@ func (m *quote) validateValidFor(formats strfmt.Registry) error {
 		}
 	}
 
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *Quote) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *Quote) UnmarshalBinary(b []byte) error {
+	var res Quote
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
 	return nil
 }

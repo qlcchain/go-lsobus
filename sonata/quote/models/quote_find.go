@@ -6,13 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"io/ioutil"
-
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
@@ -20,254 +14,50 @@ import (
 
 // QuoteFind Quote Summary view is provided in the response of the GET(LIST) quote. Only a subset of information are provided.
 //
-// swagger:discriminator Quote_Find id
-type QuoteFind interface {
-	runtime.Validatable
+// swagger:model Quote_Find
+type QuoteFind struct {
 
 	// Description of the quote
-	Description() string
-	SetDescription(string)
+	Description string `json:"description,omitempty"`
 
 	// Date when the quoted was Cancelled or Rejected or Accepted
 	// Format: date-time
-	EffectiveQuoteCompletionDate() strfmt.DateTime
-	SetEffectiveQuoteCompletionDate(strfmt.DateTime)
+	EffectiveQuoteCompletionDate strfmt.DateTime `json:"effectiveQuoteCompletionDate,omitempty"`
 
 	// This is the date filled by the seller to indicate expected quote completion date.
 	// Format: date
-	ExpectedQuoteCompletionDate() strfmt.Date
-	SetExpectedQuoteCompletionDate(strfmt.Date)
+	ExpectedQuoteCompletionDate strfmt.Date `json:"expectedQuoteCompletionDate,omitempty"`
 
 	// ID given by the consumer and only understandable by him (to facilitate his searches afterwards)
-	ExternalID() string
-	SetExternalID(string)
+	ExternalID string `json:"externalId,omitempty"`
 
 	// Hyperlink to access the quote
-	Href() string
-	SetHref(string)
+	Href string `json:"href,omitempty"`
 
 	// ID attributed by quoting system
-	ID() string
-	SetID(string)
+	ID string `json:"id,omitempty"`
 
 	// This value MAY be assigned by the Buyer/Seller to identify a project the quoting request is associated with.
-	ProjectID() string
-	SetProjectID(string)
+	ProjectID string `json:"projectId,omitempty"`
 
 	// Date when the quote was created
 	// Format: date-time
-	QuoteDate() strfmt.DateTime
-	SetQuoteDate(strfmt.DateTime)
+	QuoteDate strfmt.DateTime `json:"quoteDate,omitempty"`
 
 	// quote level
-	QuoteLevel() QuoteLevel
-	SetQuoteLevel(QuoteLevel)
+	QuoteLevel QuoteLevel `json:"quoteLevel,omitempty"`
 
 	// This is the date wished by the requester to have the quote completed (meaning priced)
 	// Required: true
 	// Format: date-time
-	RequestedQuoteCompletionDate() *strfmt.DateTime
-	SetRequestedQuoteCompletionDate(*strfmt.DateTime)
+	RequestedQuoteCompletionDate *strfmt.DateTime `json:"requestedQuoteCompletionDate"`
 
 	// state
-	State() QuoteStateType
-	SetState(QuoteStateType)
-
-	// AdditionalProperties in base type shoud be handled just like regular properties
-	// At this moment, the base type property is pushed down to the subtype
-}
-
-type quoteFind struct {
-	descriptionField string
-
-	effectiveQuoteCompletionDateField strfmt.DateTime
-
-	expectedQuoteCompletionDateField strfmt.Date
-
-	externalIdField string
-
-	hrefField string
-
-	idField string
-
-	projectIdField string
-
-	quoteDateField strfmt.DateTime
-
-	quoteLevelField QuoteLevel
-
-	requestedQuoteCompletionDateField *strfmt.DateTime
-
-	stateField QuoteStateType
-}
-
-// Description gets the description of this polymorphic type
-func (m *quoteFind) Description() string {
-	return m.descriptionField
-}
-
-// SetDescription sets the description of this polymorphic type
-func (m *quoteFind) SetDescription(val string) {
-	m.descriptionField = val
-}
-
-// EffectiveQuoteCompletionDate gets the effective quote completion date of this polymorphic type
-func (m *quoteFind) EffectiveQuoteCompletionDate() strfmt.DateTime {
-	return m.effectiveQuoteCompletionDateField
-}
-
-// SetEffectiveQuoteCompletionDate sets the effective quote completion date of this polymorphic type
-func (m *quoteFind) SetEffectiveQuoteCompletionDate(val strfmt.DateTime) {
-	m.effectiveQuoteCompletionDateField = val
-}
-
-// ExpectedQuoteCompletionDate gets the expected quote completion date of this polymorphic type
-func (m *quoteFind) ExpectedQuoteCompletionDate() strfmt.Date {
-	return m.expectedQuoteCompletionDateField
-}
-
-// SetExpectedQuoteCompletionDate sets the expected quote completion date of this polymorphic type
-func (m *quoteFind) SetExpectedQuoteCompletionDate(val strfmt.Date) {
-	m.expectedQuoteCompletionDateField = val
-}
-
-// ExternalID gets the external Id of this polymorphic type
-func (m *quoteFind) ExternalID() string {
-	return m.externalIdField
-}
-
-// SetExternalID sets the external Id of this polymorphic type
-func (m *quoteFind) SetExternalID(val string) {
-	m.externalIdField = val
-}
-
-// Href gets the href of this polymorphic type
-func (m *quoteFind) Href() string {
-	return m.hrefField
-}
-
-// SetHref sets the href of this polymorphic type
-func (m *quoteFind) SetHref(val string) {
-	m.hrefField = val
-}
-
-// ID gets the id of this polymorphic type
-func (m *quoteFind) ID() string {
-	return "Quote_Find"
-}
-
-// SetID sets the id of this polymorphic type
-func (m *quoteFind) SetID(val string) {
-}
-
-// ProjectID gets the project Id of this polymorphic type
-func (m *quoteFind) ProjectID() string {
-	return m.projectIdField
-}
-
-// SetProjectID sets the project Id of this polymorphic type
-func (m *quoteFind) SetProjectID(val string) {
-	m.projectIdField = val
-}
-
-// QuoteDate gets the quote date of this polymorphic type
-func (m *quoteFind) QuoteDate() strfmt.DateTime {
-	return m.quoteDateField
-}
-
-// SetQuoteDate sets the quote date of this polymorphic type
-func (m *quoteFind) SetQuoteDate(val strfmt.DateTime) {
-	m.quoteDateField = val
-}
-
-// QuoteLevel gets the quote level of this polymorphic type
-func (m *quoteFind) QuoteLevel() QuoteLevel {
-	return m.quoteLevelField
-}
-
-// SetQuoteLevel sets the quote level of this polymorphic type
-func (m *quoteFind) SetQuoteLevel(val QuoteLevel) {
-	m.quoteLevelField = val
-}
-
-// RequestedQuoteCompletionDate gets the requested quote completion date of this polymorphic type
-func (m *quoteFind) RequestedQuoteCompletionDate() *strfmt.DateTime {
-	return m.requestedQuoteCompletionDateField
-}
-
-// SetRequestedQuoteCompletionDate sets the requested quote completion date of this polymorphic type
-func (m *quoteFind) SetRequestedQuoteCompletionDate(val *strfmt.DateTime) {
-	m.requestedQuoteCompletionDateField = val
-}
-
-// State gets the state of this polymorphic type
-func (m *quoteFind) State() QuoteStateType {
-	return m.stateField
-}
-
-// SetState sets the state of this polymorphic type
-func (m *quoteFind) SetState(val QuoteStateType) {
-	m.stateField = val
-}
-
-// UnmarshalQuoteFindSlice unmarshals polymorphic slices of QuoteFind
-func UnmarshalQuoteFindSlice(reader io.Reader, consumer runtime.Consumer) ([]QuoteFind, error) {
-	var elements []json.RawMessage
-	if err := consumer.Consume(reader, &elements); err != nil {
-		return nil, err
-	}
-
-	var result []QuoteFind
-	for _, element := range elements {
-		obj, err := unmarshalQuoteFind(element, consumer)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, obj)
-	}
-	return result, nil
-}
-
-// UnmarshalQuoteFind unmarshals polymorphic QuoteFind
-func UnmarshalQuoteFind(reader io.Reader, consumer runtime.Consumer) (QuoteFind, error) {
-	// we need to read this twice, so first into a buffer
-	data, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshalQuoteFind(data, consumer)
-}
-
-func unmarshalQuoteFind(data []byte, consumer runtime.Consumer) (QuoteFind, error) {
-	buf := bytes.NewBuffer(data)
-	buf2 := bytes.NewBuffer(data)
-
-	// the first time this is read is to fetch the value of the id property.
-	var getType struct {
-		ID string `json:"id"`
-	}
-	if err := consumer.Consume(buf, &getType); err != nil {
-		return nil, err
-	}
-
-	if err := validate.RequiredString("id", "body", getType.ID); err != nil {
-		return nil, err
-	}
-
-	// The value of id is used to determine which type to create and unmarshal the data into
-	switch getType.ID {
-	case "Quote_Find":
-		var result quoteFind
-		if err := consumer.Consume(buf2, &result); err != nil {
-			return nil, err
-		}
-		return &result, nil
-	}
-	return nil, errors.New(422, "invalid id value: %q", getType.ID)
+	State QuoteStateType `json:"state,omitempty"`
 }
 
 // Validate validates this quote find
-func (m *quoteFind) Validate(formats strfmt.Registry) error {
+func (m *QuoteFind) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateEffectiveQuoteCompletionDate(formats); err != nil {
@@ -300,52 +90,52 @@ func (m *quoteFind) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteFind) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteFind) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.EffectiveQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteFind) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteFind) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ExpectedQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.ExpectedQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteFind) validateQuoteDate(formats strfmt.Registry) error {
+func (m *QuoteFind) validateQuoteDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.QuoteDate()) { // not required
+	if swag.IsZero(m.QuoteDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate().String(), formats); err != nil {
+	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteFind) validateQuoteLevel(formats strfmt.Registry) error {
+func (m *QuoteFind) validateQuoteLevel(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.QuoteLevel()) { // not required
+	if swag.IsZero(m.QuoteLevel) { // not required
 		return nil
 	}
 
-	if err := m.QuoteLevel().Validate(formats); err != nil {
+	if err := m.QuoteLevel.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("quoteLevel")
 		}
@@ -355,31 +145,49 @@ func (m *quoteFind) validateQuoteLevel(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteFind) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteFind) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate()); err != nil {
+	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate); err != nil {
 		return err
 	}
 
-	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteFind) validateState(formats strfmt.Registry) error {
+func (m *QuoteFind) validateState(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.State()) { // not required
+	if swag.IsZero(m.State) { // not required
 		return nil
 	}
 
-	if err := m.State().Validate(formats); err != nil {
+	if err := m.State.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state")
 		}
 		return err
 	}
 
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *QuoteFind) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *QuoteFind) UnmarshalBinary(b []byte) error {
+	var res QuoteFind
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
 	return nil
 }

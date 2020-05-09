@@ -6,14 +6,9 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"strconv"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
@@ -21,353 +16,71 @@ import (
 
 // QuoteSummaryView Quote Summary view is provided in the response of the GET(LIST) quote. Only a subset of information are provided.
 //
-// swagger:discriminator QuoteSummaryView id
-type QuoteSummaryView interface {
-	runtime.Validatable
+// swagger:model QuoteSummaryView
+type QuoteSummaryView struct {
 
 	// Indicates the base (class) type of the quote.
-	AtBaseType() string
-	SetAtBaseType(string)
+	AtBaseType string `json:"@baseType,omitempty"`
 
 	// Link to the schema describing the REST resource.
-	AtSchemaLocation() string
-	SetAtSchemaLocation(string)
+	AtSchemaLocation string `json:"@schemaLocation,omitempty"`
 
 	// Indicates the (class) type of the quote.
-	AtType() string
-	SetAtType(string)
+	AtType string `json:"@type,omitempty"`
 
 	// Used to categorize the quote from a business perspective that can be useful for the CRM system (e.g. “enterprise”, “residential”, ...)
-	Category() string
-	SetCategory(string)
+	Category string `json:"category,omitempty"`
 
 	// Date when the quoted was Cancelled or Rejected or Accepted
 	// Format: date-time
-	EffectiveQuoteCompletionDate() strfmt.DateTime
-	SetEffectiveQuoteCompletionDate(strfmt.DateTime)
+	EffectiveQuoteCompletionDate strfmt.DateTime `json:"effectiveQuoteCompletionDate,omitempty"`
 
 	// This is the date wished by the requester to have the requested quote item(s) delivered
 	// Format: date
-	ExpectedFulfillmentStartDate() strfmt.Date
-	SetExpectedFulfillmentStartDate(strfmt.Date)
+	ExpectedFulfillmentStartDate strfmt.Date `json:"expectedFulfillmentStartDate,omitempty"`
 
 	// This is the date filled by the seller to indicate expected quote completion date.
 	// Format: date
-	ExpectedQuoteCompletionDate() strfmt.Date
-	SetExpectedQuoteCompletionDate(strfmt.Date)
+	ExpectedQuoteCompletionDate strfmt.Date `json:"expectedQuoteCompletionDate,omitempty"`
 
 	// ID given by the consumer and only understandable by him (to facilitate his searches afterwards)
-	ExternalID() string
-	SetExternalID(string)
+	ExternalID string `json:"externalId,omitempty"`
 
 	// Hyperlink to access the quote
-	Href() string
-	SetHref(string)
+	Href string `json:"href,omitempty"`
 
 	// ID attributed by quoting system
-	ID() string
-	SetID(string)
+	ID string `json:"id,omitempty"`
 
 	// Date when the quote was created
 	// Format: date-time
-	QuoteDate() strfmt.DateTime
-	SetQuoteDate(strfmt.DateTime)
+	QuoteDate strfmt.DateTime `json:"quoteDate,omitempty"`
 
 	// quote item
 	// Required: true
-	QuoteItem() []*QuoteItem
-	SetQuoteItem([]*QuoteItem)
+	QuoteItem []*QuoteItem `json:"quoteItem"`
 
 	// quote level
-	QuoteLevel() QuoteLevel
-	SetQuoteLevel(QuoteLevel)
+	QuoteLevel QuoteLevel `json:"quoteLevel,omitempty"`
 
 	// related party role
 	// Required: true
-	RelatedPartyRole() []*RelatedPartyRole
-	SetRelatedPartyRole([]*RelatedPartyRole)
+	RelatedPartyRole []*RelatedPartyRole `json:"relatedPartyRole"`
 
 	// This is the date wished by the requester to have the quote completed (meaning priced)
 	// Required: true
 	// Format: date-time
-	RequestedQuoteCompletionDate() *strfmt.DateTime
-	SetRequestedQuoteCompletionDate(*strfmt.DateTime)
+	RequestedQuoteCompletionDate *strfmt.DateTime `json:"requestedQuoteCompletionDate"`
 
 	// state
-	State() QuoteState
-	SetState(QuoteState)
+	State QuoteState `json:"state,omitempty"`
 
 	// valid for
-	ValidFor() *TimePeriod
-	SetValidFor(*TimePeriod)
-
-	// AdditionalProperties in base type shoud be handled just like regular properties
-	// At this moment, the base type property is pushed down to the subtype
-}
-
-type quoteSummaryView struct {
-	atBaseTypeField string
-
-	atSchemaLocationField string
-
-	atTypeField string
-
-	categoryField string
-
-	effectiveQuoteCompletionDateField strfmt.DateTime
-
-	expectedFulfillmentStartDateField strfmt.Date
-
-	expectedQuoteCompletionDateField strfmt.Date
-
-	externalIdField string
-
-	hrefField string
-
-	idField string
-
-	quoteDateField strfmt.DateTime
-
-	quoteItemField []*QuoteItem
-
-	quoteLevelField QuoteLevel
-
-	relatedPartyRoleField []*RelatedPartyRole
-
-	requestedQuoteCompletionDateField *strfmt.DateTime
-
-	stateField QuoteState
-
-	validForField *TimePeriod
-}
-
-// AtBaseType gets the at base type of this polymorphic type
-func (m *quoteSummaryView) AtBaseType() string {
-	return m.atBaseTypeField
-}
-
-// SetAtBaseType sets the at base type of this polymorphic type
-func (m *quoteSummaryView) SetAtBaseType(val string) {
-	m.atBaseTypeField = val
-}
-
-// AtSchemaLocation gets the at schema location of this polymorphic type
-func (m *quoteSummaryView) AtSchemaLocation() string {
-	return m.atSchemaLocationField
-}
-
-// SetAtSchemaLocation sets the at schema location of this polymorphic type
-func (m *quoteSummaryView) SetAtSchemaLocation(val string) {
-	m.atSchemaLocationField = val
-}
-
-// AtType gets the at type of this polymorphic type
-func (m *quoteSummaryView) AtType() string {
-	return m.atTypeField
-}
-
-// SetAtType sets the at type of this polymorphic type
-func (m *quoteSummaryView) SetAtType(val string) {
-	m.atTypeField = val
-}
-
-// Category gets the category of this polymorphic type
-func (m *quoteSummaryView) Category() string {
-	return m.categoryField
-}
-
-// SetCategory sets the category of this polymorphic type
-func (m *quoteSummaryView) SetCategory(val string) {
-	m.categoryField = val
-}
-
-// EffectiveQuoteCompletionDate gets the effective quote completion date of this polymorphic type
-func (m *quoteSummaryView) EffectiveQuoteCompletionDate() strfmt.DateTime {
-	return m.effectiveQuoteCompletionDateField
-}
-
-// SetEffectiveQuoteCompletionDate sets the effective quote completion date of this polymorphic type
-func (m *quoteSummaryView) SetEffectiveQuoteCompletionDate(val strfmt.DateTime) {
-	m.effectiveQuoteCompletionDateField = val
-}
-
-// ExpectedFulfillmentStartDate gets the expected fulfillment start date of this polymorphic type
-func (m *quoteSummaryView) ExpectedFulfillmentStartDate() strfmt.Date {
-	return m.expectedFulfillmentStartDateField
-}
-
-// SetExpectedFulfillmentStartDate sets the expected fulfillment start date of this polymorphic type
-func (m *quoteSummaryView) SetExpectedFulfillmentStartDate(val strfmt.Date) {
-	m.expectedFulfillmentStartDateField = val
-}
-
-// ExpectedQuoteCompletionDate gets the expected quote completion date of this polymorphic type
-func (m *quoteSummaryView) ExpectedQuoteCompletionDate() strfmt.Date {
-	return m.expectedQuoteCompletionDateField
-}
-
-// SetExpectedQuoteCompletionDate sets the expected quote completion date of this polymorphic type
-func (m *quoteSummaryView) SetExpectedQuoteCompletionDate(val strfmt.Date) {
-	m.expectedQuoteCompletionDateField = val
-}
-
-// ExternalID gets the external Id of this polymorphic type
-func (m *quoteSummaryView) ExternalID() string {
-	return m.externalIdField
-}
-
-// SetExternalID sets the external Id of this polymorphic type
-func (m *quoteSummaryView) SetExternalID(val string) {
-	m.externalIdField = val
-}
-
-// Href gets the href of this polymorphic type
-func (m *quoteSummaryView) Href() string {
-	return m.hrefField
-}
-
-// SetHref sets the href of this polymorphic type
-func (m *quoteSummaryView) SetHref(val string) {
-	m.hrefField = val
-}
-
-// ID gets the id of this polymorphic type
-func (m *quoteSummaryView) ID() string {
-	return "QuoteSummaryView"
-}
-
-// SetID sets the id of this polymorphic type
-func (m *quoteSummaryView) SetID(val string) {
-}
-
-// QuoteDate gets the quote date of this polymorphic type
-func (m *quoteSummaryView) QuoteDate() strfmt.DateTime {
-	return m.quoteDateField
-}
-
-// SetQuoteDate sets the quote date of this polymorphic type
-func (m *quoteSummaryView) SetQuoteDate(val strfmt.DateTime) {
-	m.quoteDateField = val
-}
-
-// QuoteItem gets the quote item of this polymorphic type
-func (m *quoteSummaryView) QuoteItem() []*QuoteItem {
-	return m.quoteItemField
-}
-
-// SetQuoteItem sets the quote item of this polymorphic type
-func (m *quoteSummaryView) SetQuoteItem(val []*QuoteItem) {
-	m.quoteItemField = val
-}
-
-// QuoteLevel gets the quote level of this polymorphic type
-func (m *quoteSummaryView) QuoteLevel() QuoteLevel {
-	return m.quoteLevelField
-}
-
-// SetQuoteLevel sets the quote level of this polymorphic type
-func (m *quoteSummaryView) SetQuoteLevel(val QuoteLevel) {
-	m.quoteLevelField = val
-}
-
-// RelatedPartyRole gets the related party role of this polymorphic type
-func (m *quoteSummaryView) RelatedPartyRole() []*RelatedPartyRole {
-	return m.relatedPartyRoleField
-}
-
-// SetRelatedPartyRole sets the related party role of this polymorphic type
-func (m *quoteSummaryView) SetRelatedPartyRole(val []*RelatedPartyRole) {
-	m.relatedPartyRoleField = val
-}
-
-// RequestedQuoteCompletionDate gets the requested quote completion date of this polymorphic type
-func (m *quoteSummaryView) RequestedQuoteCompletionDate() *strfmt.DateTime {
-	return m.requestedQuoteCompletionDateField
-}
-
-// SetRequestedQuoteCompletionDate sets the requested quote completion date of this polymorphic type
-func (m *quoteSummaryView) SetRequestedQuoteCompletionDate(val *strfmt.DateTime) {
-	m.requestedQuoteCompletionDateField = val
-}
-
-// State gets the state of this polymorphic type
-func (m *quoteSummaryView) State() QuoteState {
-	return m.stateField
-}
-
-// SetState sets the state of this polymorphic type
-func (m *quoteSummaryView) SetState(val QuoteState) {
-	m.stateField = val
-}
-
-// ValidFor gets the valid for of this polymorphic type
-func (m *quoteSummaryView) ValidFor() *TimePeriod {
-	return m.validForField
-}
-
-// SetValidFor sets the valid for of this polymorphic type
-func (m *quoteSummaryView) SetValidFor(val *TimePeriod) {
-	m.validForField = val
-}
-
-// UnmarshalQuoteSummaryViewSlice unmarshals polymorphic slices of QuoteSummaryView
-func UnmarshalQuoteSummaryViewSlice(reader io.Reader, consumer runtime.Consumer) ([]QuoteSummaryView, error) {
-	var elements []json.RawMessage
-	if err := consumer.Consume(reader, &elements); err != nil {
-		return nil, err
-	}
-
-	var result []QuoteSummaryView
-	for _, element := range elements {
-		obj, err := unmarshalQuoteSummaryView(element, consumer)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, obj)
-	}
-	return result, nil
-}
-
-// UnmarshalQuoteSummaryView unmarshals polymorphic QuoteSummaryView
-func UnmarshalQuoteSummaryView(reader io.Reader, consumer runtime.Consumer) (QuoteSummaryView, error) {
-	// we need to read this twice, so first into a buffer
-	data, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-	return unmarshalQuoteSummaryView(data, consumer)
-}
-
-func unmarshalQuoteSummaryView(data []byte, consumer runtime.Consumer) (QuoteSummaryView, error) {
-	buf := bytes.NewBuffer(data)
-	buf2 := bytes.NewBuffer(data)
-
-	// the first time this is read is to fetch the value of the id property.
-	var getType struct {
-		ID string `json:"id"`
-	}
-	if err := consumer.Consume(buf, &getType); err != nil {
-		return nil, err
-	}
-
-	if err := validate.RequiredString("id", "body", getType.ID); err != nil {
-		return nil, err
-	}
-
-	// The value of id is used to determine which type to create and unmarshal the data into
-	switch getType.ID {
-	case "QuoteSummaryView":
-		var result quoteSummaryView
-		if err := consumer.Consume(buf2, &result); err != nil {
-			return nil, err
-		}
-		return &result, nil
-	}
-	return nil, errors.New(422, "invalid id value: %q", getType.ID)
+	ValidFor *TimePeriod `json:"validFor,omitempty"`
 }
 
 // Validate validates this quote summary view
-func (m *quoteSummaryView) Validate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateEffectiveQuoteCompletionDate(formats); err != nil {
@@ -416,71 +129,71 @@ func (m *quoteSummaryView) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteSummaryView) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateEffectiveQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.EffectiveQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("effectiveQuoteCompletionDate", "body", "date-time", m.EffectiveQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteSummaryView) validateExpectedFulfillmentStartDate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateExpectedFulfillmentStartDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ExpectedFulfillmentStartDate()) { // not required
+	if swag.IsZero(m.ExpectedFulfillmentStartDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("expectedFulfillmentStartDate", "body", "date", m.ExpectedFulfillmentStartDate().String(), formats); err != nil {
+	if err := validate.FormatOf("expectedFulfillmentStartDate", "body", "date", m.ExpectedFulfillmentStartDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteSummaryView) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateExpectedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ExpectedQuoteCompletionDate()) { // not required
+	if swag.IsZero(m.ExpectedQuoteCompletionDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("expectedQuoteCompletionDate", "body", "date", m.ExpectedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteSummaryView) validateQuoteDate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateQuoteDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.QuoteDate()) { // not required
+	if swag.IsZero(m.QuoteDate) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate().String(), formats); err != nil {
+	if err := validate.FormatOf("quoteDate", "body", "date-time", m.QuoteDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteSummaryView) validateQuoteItem(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateQuoteItem(formats strfmt.Registry) error {
 
-	if err := validate.Required("quoteItem", "body", m.QuoteItem()); err != nil {
+	if err := validate.Required("quoteItem", "body", m.QuoteItem); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.QuoteItem()); i++ {
-		if swag.IsZero(m.quoteItemField[i]) { // not required
+	for i := 0; i < len(m.QuoteItem); i++ {
+		if swag.IsZero(m.QuoteItem[i]) { // not required
 			continue
 		}
 
-		if m.quoteItemField[i] != nil {
-			if err := m.quoteItemField[i].Validate(formats); err != nil {
+		if m.QuoteItem[i] != nil {
+			if err := m.QuoteItem[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("quoteItem" + "." + strconv.Itoa(i))
 				}
@@ -493,13 +206,13 @@ func (m *quoteSummaryView) validateQuoteItem(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteSummaryView) validateQuoteLevel(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateQuoteLevel(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.QuoteLevel()) { // not required
+	if swag.IsZero(m.QuoteLevel) { // not required
 		return nil
 	}
 
-	if err := m.QuoteLevel().Validate(formats); err != nil {
+	if err := m.QuoteLevel.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("quoteLevel")
 		}
@@ -509,19 +222,19 @@ func (m *quoteSummaryView) validateQuoteLevel(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteSummaryView) validateRelatedPartyRole(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateRelatedPartyRole(formats strfmt.Registry) error {
 
-	if err := validate.Required("relatedPartyRole", "body", m.RelatedPartyRole()); err != nil {
+	if err := validate.Required("relatedPartyRole", "body", m.RelatedPartyRole); err != nil {
 		return err
 	}
 
-	for i := 0; i < len(m.RelatedPartyRole()); i++ {
-		if swag.IsZero(m.relatedPartyRoleField[i]) { // not required
+	for i := 0; i < len(m.RelatedPartyRole); i++ {
+		if swag.IsZero(m.RelatedPartyRole[i]) { // not required
 			continue
 		}
 
-		if m.relatedPartyRoleField[i] != nil {
-			if err := m.relatedPartyRoleField[i].Validate(formats); err != nil {
+		if m.RelatedPartyRole[i] != nil {
+			if err := m.RelatedPartyRole[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("relatedPartyRole" + "." + strconv.Itoa(i))
 				}
@@ -534,26 +247,26 @@ func (m *quoteSummaryView) validateRelatedPartyRole(formats strfmt.Registry) err
 	return nil
 }
 
-func (m *quoteSummaryView) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateRequestedQuoteCompletionDate(formats strfmt.Registry) error {
 
-	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate()); err != nil {
+	if err := validate.Required("requestedQuoteCompletionDate", "body", m.RequestedQuoteCompletionDate); err != nil {
 		return err
 	}
 
-	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate().String(), formats); err != nil {
+	if err := validate.FormatOf("requestedQuoteCompletionDate", "body", "date-time", m.RequestedQuoteCompletionDate.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *quoteSummaryView) validateState(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateState(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.State()) { // not required
+	if swag.IsZero(m.State) { // not required
 		return nil
 	}
 
-	if err := m.State().Validate(formats); err != nil {
+	if err := m.State.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state")
 		}
@@ -563,14 +276,14 @@ func (m *quoteSummaryView) validateState(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *quoteSummaryView) validateValidFor(formats strfmt.Registry) error {
+func (m *QuoteSummaryView) validateValidFor(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ValidFor()) { // not required
+	if swag.IsZero(m.ValidFor) { // not required
 		return nil
 	}
 
-	if m.ValidFor() != nil {
-		if err := m.ValidFor().Validate(formats); err != nil {
+	if m.ValidFor != nil {
+		if err := m.ValidFor.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("validFor")
 			}
@@ -578,5 +291,23 @@ func (m *quoteSummaryView) validateValidFor(formats strfmt.Registry) error {
 		}
 	}
 
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *QuoteSummaryView) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *QuoteSummaryView) UnmarshalBinary(b []byte) error {
+	var res QuoteSummaryView
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
 	return nil
 }

@@ -8,11 +8,12 @@ import (
 	"github.com/iixlabs/virtual-lsobus/common/event"
 	"github.com/iixlabs/virtual-lsobus/log"
 
-	"github.com/iixlabs/virtual-lsobus/config"
-	ct "github.com/iixlabs/virtual-lsobus/services/context"
 	qlcchain "github.com/qlcchain/qlc-go-sdk"
 	qlctypes "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/zap"
+
+	"github.com/iixlabs/virtual-lsobus/config"
+	ct "github.com/iixlabs/virtual-lsobus/services/context"
 )
 
 const (

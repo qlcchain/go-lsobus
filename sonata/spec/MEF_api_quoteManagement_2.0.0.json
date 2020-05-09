@@ -1021,7 +1021,6 @@
     },
     "Quote": {
       "description": "A quote which can be used to negotiate service and product acquisition or modification between\na customer and a service provider",
-      "discriminator": "id",
       "required": [
         "state",
         "instantSyncQuoting",
@@ -1546,7 +1545,6 @@
     },
     "Quote_Find": {
       "description": "Quote Summary view is provided in the response of the GET(LIST) quote. Only a subset of information are provided.",
-      "discriminator": "id",
       "required": [
         "requestedQuoteCompletionDate"
       ],

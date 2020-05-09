@@ -93,25 +93,25 @@ func NewQuoteGetOK() *QuoteGetOK {
 Ok
 */
 type QuoteGetOK struct {
-	Payload models.Quote
+	Payload *models.Quote
 }
 
 func (o *QuoteGetOK) Error() string {
 	return fmt.Sprintf("[GET /quote/{id}][%d] quoteGetOK  %+v", 200, o.Payload)
 }
 
-func (o *QuoteGetOK) GetPayload() models.Quote {
+func (o *QuoteGetOK) GetPayload() *models.Quote {
 	return o.Payload
 }
 
 func (o *QuoteGetOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	// response payload as interface type
-	payload, err := models.UnmarshalQuote(response.Body(), consumer)
-	if err != nil {
+	o.Payload = new(models.Quote)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
-	o.Payload = payload
 
 	return nil
 }
