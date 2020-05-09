@@ -1,16 +1,14 @@
 package orchestra
 
-import (
-	"go.uber.org/zap"
+type OrderParams struct {
+	SrcSiteID    string
+	SrcPortSpeed uint
+	DstSiteID    string
+	DstPortSpeed uint
 
-	"github.com/iixlabs/virtual-lsobus/log"
-)
-
-type sonataBaseImpl struct {
-	logger *zap.SugaredLogger
-}
-
-func (s *sonataBaseImpl) Init() error {
-	s.logger = log.NewLogger("sonataPOQImpl")
-	return nil
+	SrcPortID string
+	DstPortID string
+	Bandwidth uint
+	SVlanID   uint
+	CosName   string
 }

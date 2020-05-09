@@ -1,14 +1,13 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/iixlabs/virtual-lsobus/orchestra"
 
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	addFlagsForOrderParams(sonataQuoteCreateCmd)
 	sonataQuoteCmd.AddCommand(sonataQuoteCreateCmd)
 }
 
@@ -23,10 +22,25 @@ var sonataQuoteCreateCmd = &cobra.Command{
 	Short: "create product quoting",
 	Long:  `create product quoting`,
 	Run: func(cmd *cobra.Command, args []string) {
-		o := orchestra.NewOrchestra()
-		err := o.Init()
+		var err error
+		op := &orchestra.OrderParams{}
+		err = fillOrderParamsByCmdFlags(op, cmd)
 		if err != nil {
-			fmt.Println(err)
+			cmd.PrintErrln(err)
+			return
+		}
+
+		o := orchestra.NewOrchestra()
+		err = o.Init()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		err = o.ExecQuote(op)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
 		}
 	},
 }

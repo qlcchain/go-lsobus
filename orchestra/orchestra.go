@@ -1,5 +1,7 @@
 package orchestra
 
+import ologger "github.com/go-openapi/runtime/logger"
+
 type Orchestra struct {
 	sonataSiteImpl  *sonataSiteImpl
 	sonataPOQImpl   *sonataPOQImpl
@@ -44,5 +46,19 @@ func (o *Orchestra) Init() error {
 		return err
 	}
 
+	ologger.DebugEnabled()
+
 	return nil
+}
+
+func (o *Orchestra) ExecPOQ(params *OrderParams) error {
+	return o.sonataPOQImpl.SendCreateRequest(params)
+}
+
+func (o *Orchestra) ExecQuote(params *OrderParams) error {
+	return o.sonataQuoteImpl.SendCreateRequest(params)
+}
+
+func (o *Orchestra) ExecOrder(params *OrderParams) error {
+	return o.sonataOrderImpl.SendCreateRequest(params)
 }
