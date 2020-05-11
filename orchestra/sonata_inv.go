@@ -11,6 +11,7 @@ type sonataInvImpl struct {
 
 func newSonataInvImpl() *sonataInvImpl {
 	s := &sonataInvImpl{}
+	s.Version = MEFAPIVersionInv
 	return s
 }
 

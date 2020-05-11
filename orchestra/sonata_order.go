@@ -18,6 +18,7 @@ type sonataOrderImpl struct {
 
 func newSonataOrderImpl() *sonataOrderImpl {
 	s := &sonataOrderImpl{}
+	s.Version = MEFAPIVersionOrder
 	return s
 }
 
@@ -99,10 +100,14 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 	reqParams := ordapi.NewProductOrderCreateParams()
 
 	reqParams.ProductOrder = &ordmod.ProductOrderCreate{}
+	reqParams.ProductOrder.OrderVersion = &s.Version
 
-	reqParams.ProductOrder.ProjectID = ""
-	reqParams.ProductOrder.ExternalID = nil
+	reqParams.ProductOrder.ProjectID = orderParams.ProjectID
+	if orderParams.ExternalID != "" {
+		reqParams.ProductOrder.ExternalID = &orderParams.ExternalID
+	}
 
+	reqParams.ProductOrder.OrderActivity = ordmod.OrderActivityInstall
 	reqParams.ProductOrder.BuyerRequestDate = &strfmt.DateTime{}
 	reqParams.ProductOrder.BuyerRequestDate.Scan(time.Now())
 	reqParams.ProductOrder.RequestedStartDate.Scan(time.Now().Add(time.Minute))
@@ -167,17 +172,11 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, lineItem)
 	}
 
-	// Pricing
-	reqParams.ProductOrder.PricingTerm = 12
-	reqParams.ProductOrder.PricingMethod = ordmod.PricingMethodTariff
-
 	// Billing
-	reqParams.ProductOrder.BillingAccount = &ordmod.BillingAccountRef{}
-	reqParams.ProductOrder.BillingAccount.BillingContact = &ordmod.Contact{}
-	//reqParams.ProductOrder.BillingAccount.BillingContact.ContactName = ""
+	s.BuildOrderBilling(reqParams.ProductOrder, orderParams)
 
 	// Party
-	//reqParams.ProductOrder.RelatedParty = &ordmod.RelatedParty{}
+	s.BuildOrderRelatedParty(reqParams.ProductOrder, orderParams)
 
 	return reqParams
 }
@@ -215,15 +214,17 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
 	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.FillUNIProductSpec(uniDesc, orderParams)
+	s.BuildUNIProductSpec(uniDesc, orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	// Price
-	uniItem.PricingMethod = ordmod.PricingMethodTariff
-	//uniItem.PricingTerm = 1
+	s.BuildItemPrice(uniItem, orderParams)
+
+	// Billing
+	s.BuildItemBilling(uniItem, orderParams)
 
 	// Party
-	//uniItem.RelatedParty = &ordmod.RelatedParty{}
+	s.BuildItemRelatedParty(uniItem, orderParams)
 
 	return uniItem
 }
@@ -248,15 +249,64 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
 	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.FillELineProductSpec(lineDesc, orderParams)
+	s.BuildELineProductSpec(lineDesc, orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	// Price
-	lineItem.PricingMethod = ordmod.PricingMethodTariff
-	//lineItem.PricingTerm = 1
+	s.BuildItemPrice(lineItem, orderParams)
+
+	// Billing
+	s.BuildItemBilling(lineItem, orderParams)
 
 	// Party
-	//lineItem.RelatedParty = &ordmod.RelatedParty{}
+	s.BuildItemRelatedParty(lineItem, orderParams)
 
 	return lineItem
+}
+
+func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
+	// Price
+	item.PricingMethod = ordmod.PricingMethodContract
+	item.PricingReference = params.ContractID
+
+	itemPrice := &ordmod.OrderItemPrice{}
+	itemPrice.PriceType = ordmod.PriceTypeRecurring
+	itemPrice.Price = &ordmod.Price{}
+	curUnit := "USA"
+	curVal := float32(12.34)
+	itemPrice.Price.DutyFreeAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
+	itemPrice.Price.TaxIncludedAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
+	taxRate := float32(0)
+	itemPrice.Price.TaxRate = &taxRate
+	//itemPrice.Price.UnitOfMesure = ""
+	item.OrderItemPrice = append(item.OrderItemPrice, itemPrice)
+
+	itemPrice.RecurringChargePeriod = ordmod.ChargePeriodDay
+}
+
+func (s *sonataOrderImpl) BuildItemRelatedParty(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
+}
+
+func (s *sonataOrderImpl) BuildItemBilling(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
+}
+
+func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreate, params *OrderParams) {
+}
+
+func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
+	if params.Buyer != nil {
+		partBuy := &ordmod.RelatedParty{}
+		partBuy.Role = []string{"Buyer"}
+		partBuy.ID = &params.Buyer.ID
+		partBuy.Name = &params.Buyer.Name
+		order.RelatedParty = append(order.RelatedParty, partBuy)
+	}
+
+	if params.Seller != nil {
+		partSell := &ordmod.RelatedParty{}
+		partSell.Role = []string{"Seller"}
+		partSell.ID = &params.Seller.ID
+		partSell.Name = &params.Seller.Name
+		order.RelatedParty = append(order.RelatedParty, partSell)
+	}
 }

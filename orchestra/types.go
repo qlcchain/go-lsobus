@@ -1,6 +1,19 @@
 package orchestra
 
+type Partner struct {
+	ID   string
+	Name string
+}
+
 type OrderParams struct {
+	ContractID string
+	Buyer      *Partner
+	Seller     *Partner
+
+	ExternalID  string
+	Description string
+	ProjectID   string
+
 	SrcSiteID    string
 	SrcPortSpeed uint
 	DstSiteID    string
@@ -26,4 +39,8 @@ type FindParams struct {
 	State      string
 
 	ProductSpecificationID string
+}
+
+type GetParams struct {
+	ID string
 }

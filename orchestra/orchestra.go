@@ -51,14 +51,34 @@ func (o *Orchestra) Init() error {
 	return nil
 }
 
-func (o *Orchestra) ExecPOQ(params *OrderParams) error {
+func (o *Orchestra) ExecPOQCreate(params *OrderParams) error {
 	return o.sonataPOQImpl.SendCreateRequest(params)
 }
 
-func (o *Orchestra) ExecQuote(params *OrderParams) error {
+func (o *Orchestra) ExecPOQFind(params *FindParams) error {
+	return o.sonataPOQImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecQuoteCreate(params *OrderParams) error {
 	return o.sonataQuoteImpl.SendCreateRequest(params)
 }
 
-func (o *Orchestra) ExecOrder(params *OrderParams) error {
+func (o *Orchestra) ExecQuoteFind(params *FindParams) error {
+	return o.sonataQuoteImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecOrderCreate(params *OrderParams) error {
 	return o.sonataOrderImpl.SendCreateRequest(params)
+}
+
+func (o *Orchestra) ExecOrderFind(params *FindParams) error {
+	return o.sonataOrderImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecInventoryFind(params *FindParams) error {
+	return o.sonataInvImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecSiteFind(params *FindParams) error {
+	return o.sonataSiteImpl.SendFindRequest(params)
 }

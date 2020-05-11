@@ -11,6 +11,7 @@ type sonataSiteImpl struct {
 
 func newSonataSiteImpl() *sonataSiteImpl {
 	s := &sonataSiteImpl{}
+	s.Version = MEFAPIVersionSite
 	return s
 }
 

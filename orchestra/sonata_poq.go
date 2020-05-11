@@ -15,6 +15,7 @@ type sonataPOQImpl struct {
 
 func newSonataPOQImpl() *sonataPOQImpl {
 	s := &sonataPOQImpl{}
+	s.Version = MEFAPIVersionPOQ
 	return s
 }
 
@@ -84,6 +85,8 @@ func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.Prod
 	reqParams := poqapi.NewProductOfferingQualificationCreateParams()
 
 	reqParams.ProductOfferingQualification = new(poqmod.ProductOfferingQualificationCreate)
+	reqParams.ProductOfferingQualification.ProjectID = orderParams.ProjectID
+
 	isqVal := true
 	reqParams.ProductOfferingQualification.InstantSyncQualification = &isqVal
 	reqParams.ProductOfferingQualification.RequestedResponseDate.Scan(time.Now())
@@ -173,7 +176,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
 	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.FillUNIProductSpec(uniDesc, orderParams)
+	s.BuildUNIProductSpec(uniDesc, orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -192,7 +195,7 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
 	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.FillELineProductSpec(lineDesc, orderParams)
+	s.BuildELineProductSpec(lineDesc, orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem

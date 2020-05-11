@@ -12,15 +12,24 @@ import (
 )
 
 const (
+	MEFAPIVersionSite  = "3"
+	MEFAPIVersionPOQ   = "3"
+	MEFAPIVersionQuote = "2"
+	MEFAPIVersionOrder = "3"
+	MEFAPIVersionInv   = "3"
+
 	MEFSchemaLocationRoot      = "https://github.com/MEF-GIT/MEF-LSO-Sonata-SDK/blob/working-draft"
 	MEFSchemaLocationSpecRoot  = MEFSchemaLocationRoot + "/payload_descriptions/ProductSpecDescription"
 	MEFSchemaLocationSpecUNI   = MEFSchemaLocationSpecRoot + "/MEF_UNISpec_v3.json"
 	MEFSchemaLocationSpecELine = MEFSchemaLocationSpecRoot + "/MEF_ELineSpec_v3.json"
 )
 
+var MEFAPIVersionOver = "v3"
+
 type sonataBaseImpl struct {
-	logger *zap.SugaredLogger
-	itemID atomic.Int32
+	logger  *zap.SugaredLogger
+	itemID  atomic.Int32
+	Version string
 }
 
 func (s *sonataBaseImpl) Init() error {
@@ -32,7 +41,7 @@ func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
 }
 
-func (s *sonataBaseImpl) FillUNIProductSpec(uniSpec *cmnmod.UNIProductSpecification, params *OrderParams) error {
+func (s *sonataBaseImpl) BuildUNIProductSpec(uniSpec *cmnmod.UNIProductSpecification, params *OrderParams) error {
 	uniSpec.SetAtSchemaLocation(MEFSchemaLocationSpecUNI)
 	uniSpec.SetAtType("UNISpec")
 
@@ -49,7 +58,7 @@ func (s *sonataBaseImpl) FillUNIProductSpec(uniSpec *cmnmod.UNIProductSpecificat
 	return nil
 }
 
-func (s *sonataBaseImpl) FillELineProductSpec(lineDesc *cmnmod.ELineProductSpecification, params *OrderParams) error {
+func (s *sonataBaseImpl) BuildELineProductSpec(lineDesc *cmnmod.ELineProductSpecification, params *OrderParams) error {
 	lineDesc.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineDesc.SetAtType("ELineSpec")
 

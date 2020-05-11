@@ -37,14 +37,22 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
 }
 
-func addFlagsForQueryParams(cmd *cobra.Command) {
+func addFlagsForFindParams(cmd *cobra.Command) {
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 }
 
+func addFlagsForGetParams(cmd *cobra.Command) {
+	cmd.Flags().String("id", "", "ID of site/quote/order")
+}
+
 func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command) error {
 	var err error
+
+	params.Buyer = &orchestra.Partner{ID: "", Name: "CBC"}
+	params.Seller = &orchestra.Partner{ID: "", Name: "PCCW"}
+
 	/*
 		params.SrcSiteID, err = cmd.Flags().GetString("siteID")
 		if err != nil {
@@ -56,6 +64,7 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 	*/
+
 	params.SrcPortID, err = cmd.Flags().GetString("srcUniID")
 	if err != nil {
 		return err
@@ -94,8 +103,9 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	return nil
 }
 
-func fillQueryParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {
+func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {
 	var err error
+
 	params.ProjectID, err = cmd.Flags().GetString("projectID")
 	if err != nil {
 		return err
@@ -112,4 +122,24 @@ func fillQueryParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command)
 	}
 
 	return nil
+}
+
+func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) error {
+	var err error
+	params.ID, err = cmd.Flags().GetString("id")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getOrchestraInstance() (*orchestra.Orchestra, error) {
+	o := orchestra.NewOrchestra()
+	err := o.Init()
+	if err != nil {
+		return nil, err
+	}
+
+	return o, nil
 }

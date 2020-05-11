@@ -9,6 +9,9 @@ import (
 func init() {
 	addFlagsForOrderParams(sonataPoqCreateCmd)
 	sonataPoqCmd.AddCommand(sonataPoqCreateCmd)
+
+	addFlagsForFindParams(sonataPoqFindCmd)
+	sonataPoqCmd.AddCommand(sonataPoqFindCmd)
 }
 
 var sonataPoqCmd = &cobra.Command{
@@ -37,7 +40,35 @@ var sonataPoqCreateCmd = &cobra.Command{
 			return
 		}
 
-		err = o.ExecPOQ(op)
+		err = o.ExecPOQCreate(op)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+	},
+}
+
+var sonataPoqFindCmd = &cobra.Command{
+	Use:   "find",
+	Short: "retrieve offering qualification list",
+	Long:  `retrieve offering qualification list`,
+	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
+		params := &orchestra.FindParams{}
+		err = fillFindParamsByCmdFlags(params, cmd)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		o, err := getOrchestraInstance()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		err = o.ExecPOQFind(params)
 		if err != nil {
 			cmd.PrintErrln(err)
 			return

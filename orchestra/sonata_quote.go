@@ -18,6 +18,7 @@ type sonataQuoteImpl struct {
 
 func newSonataQuoteImpl() *sonataQuoteImpl {
 	s := &sonataQuoteImpl{}
+	s.Version = MEFAPIVersionQuote
 	return s
 }
 
@@ -90,6 +91,10 @@ func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.Qu
 	reqParams := quoapi.NewQuoteCreateParams()
 
 	reqParams.Quote = &quomod.QuoteCreate{}
+
+	reqParams.Quote.ExternalID = orderParams.ExternalID
+	reqParams.Quote.Description = orderParams.Description
+	reqParams.Quote.ProjectID = orderParams.ProjectID
 
 	isqVal := true
 	reqParams.Quote.InstantSyncQuoting = &isqVal
@@ -186,7 +191,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 
 	// UNI Product Specification
 	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.FillUNIProductSpec(uniDesc, orderParams)
+	s.BuildUNIProductSpec(uniDesc, orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -211,7 +216,7 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	//Product Specification
 	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
 	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.FillELineProductSpec(lineDesc, orderParams)
+	s.BuildELineProductSpec(lineDesc, orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem
