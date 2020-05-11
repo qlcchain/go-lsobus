@@ -22,13 +22,18 @@ func (s *sonataPOQImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataPOQImpl) NewHTTPClient() *poqcli.APIProductOfferingQualificationManagement {
+	tranCfg := poqcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
-	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
-	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
@@ -52,10 +57,9 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 		reqParams.Limit = &params.Limit
 	}
 
-	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
-	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
@@ -68,10 +72,9 @@ func (s *sonataPOQImpl) SendGetRequest(id string) error {
 	reqParams := poqapi.NewProductOfferingQualificationGetParams()
 	reqParams.ProductOfferingQualificationID = id
 
-	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
-	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
@@ -162,7 +165,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	uniItem.ID = &uniItemID
 	uniItem.Action = poqmod.ProductActionTypeAdd
 
-	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"}
+	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
 
 	uniItem.Product = &poqmod.Product{}
 
@@ -186,7 +189,7 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	lineItem.Action = poqmod.ProductActionTypeAdd
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
-	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetConnection"}
+	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
 	lineItem.Product = &poqmod.Product{}
 
 	//Product Specification

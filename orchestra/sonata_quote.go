@@ -24,11 +24,16 @@ func (s *sonataQuoteImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
+	tranCfg := quocli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
-	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
 	if err != nil {
@@ -57,8 +62,7 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 		reqParams.Limit = &params.Limit
 	}
 
-	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
 	if err != nil {
@@ -73,8 +77,7 @@ func (s *sonataQuoteImpl) SendGetRequest(id string) error {
 	reqParams := quoapi.NewQuoteGetParams()
 	reqParams.ID = id
 
-	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
 	if err != nil {
@@ -175,7 +178,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniItem.ID = &uniItemID
 	uniItem.Action = quomod.ProductActionTypeINSTALL
 
-	uniOfferId := "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"
+	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &quomod.Product{}
@@ -205,7 +208,7 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
 
-	linePoVal := "LSO_Sonata_ProviderOnDemand_EthernetConnection"
+	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = new(quomod.Product)

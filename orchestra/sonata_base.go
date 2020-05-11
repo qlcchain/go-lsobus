@@ -22,17 +22,30 @@ const (
 	MEFSchemaLocationSpecRoot  = MEFSchemaLocationRoot + "/payload_descriptions/ProductSpecDescription"
 	MEFSchemaLocationSpecUNI   = MEFSchemaLocationSpecRoot + "/MEF_UNISpec_v3.json"
 	MEFSchemaLocationSpecELine = MEFSchemaLocationSpecRoot + "/MEF_ELineSpec_v3.json"
+
+	MEFProductOfferingUNI   = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
+	MEFProductOfferingELine = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
 )
 
-var MEFAPIVersionOver = "v3"
-
 type sonataBaseImpl struct {
-	logger  *zap.SugaredLogger
-	itemID  atomic.Int32
+	Scheme  string
+	Host    string
 	Version string
+
+	logger *zap.SugaredLogger
+	itemID atomic.Int32
 }
 
 func (s *sonataBaseImpl) Init() error {
+	if s.Scheme == "" {
+		s.Scheme = "http"
+	}
+	if s.Host == "" {
+		s.Host = "127.0.0.1:8080"
+	}
+	if s.Version == "" {
+		s.Version = "1"
+	}
 	s.logger = log.NewLogger("sonataImpl")
 	return nil
 }

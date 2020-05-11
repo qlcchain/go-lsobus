@@ -19,13 +19,18 @@ func (s *sonataSiteImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataSiteImpl) NewHTTPClient() *sitcli.APIGeographicSiteManagement {
+	tranCfg := sitcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := sitcli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 	reqParams := sitapi.NewGeographicSiteFindParams()
 	//reqParams.GeographicAddressCountry = ""
 	//reqParams.GeographicAddressCity = ""
 
-	tranCfg := sitcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := sitcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteFind(reqParams)
 	if err != nil {
@@ -43,8 +48,7 @@ func (s *sonataSiteImpl) SendGetRequest(id string) error {
 	reqParams := sitapi.NewGeographicSiteGetParams()
 	reqParams.SiteID = id
 
-	tranCfg := sitcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := sitcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteGet(reqParams)
 	if err != nil {

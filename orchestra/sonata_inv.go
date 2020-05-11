@@ -19,6 +19,12 @@ func (s *sonataInvImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataInvImpl) NewHTTPClient() *invcli.APIProductInventoryManagement {
+	tranCfg := invcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := invcli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	reqParams := invapi.NewProductFindParams()
 	if params.BuyerID != "" {
@@ -40,8 +46,7 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 		reqParams.Limit = &params.Limit
 	}
 
-	tranCfg := invcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := invcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductFind(reqParams)
 	if err != nil {
@@ -50,8 +55,6 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	}
 	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
 
-	//rspOrder := rspParams.GetPayload()
-
 	return nil
 }
 
@@ -59,8 +62,7 @@ func (s *sonataInvImpl) SendGetRequest(id string) error {
 	reqParams := invapi.NewProductGetParams()
 	reqParams.ProductID = id
 
-	tranCfg := invcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := invcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductGet(reqParams)
 	if err != nil {

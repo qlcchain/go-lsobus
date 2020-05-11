@@ -24,11 +24,16 @@ func (s *sonataOrderImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
+	tranCfg := ordcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
-	tranCfg := ordcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
 	if err != nil {
@@ -60,8 +65,7 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 		reqParams.Limit = &params.Limit
 	}
 
-	tranCfg := ordcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderFind(reqParams)
 	if err != nil {
@@ -79,8 +83,7 @@ func (s *sonataOrderImpl) SendGetRequest(id string) error {
 	reqParams := ordapi.NewProductOrderGetParams()
 	reqParams.ProductOrderID = id
 
-	tranCfg := ordcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
 	if err != nil {
@@ -196,7 +199,7 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniItem.ID = &uniItemID
 	uniItem.Action = ordmod.ProductActionTypeAdd
 
-	uniOfferId := "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"
+	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &ordmod.Product{}
@@ -237,7 +240,7 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
 
-	linePoVal := "LSO_Sonata_ProviderOnDemand_EthernetConnection"
+	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = &ordmod.Product{}
