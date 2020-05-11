@@ -37,6 +37,49 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
+func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
+	reqParams := poqapi.NewProductOfferingQualificationFindParams()
+	if params.ProjectID != "" {
+		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.State != "" {
+		reqParams.State = &params.State
+	}
+	if params.Offset != "" {
+		reqParams.Offset = &params.Offset
+	}
+	if params.Limit != "" {
+		reqParams.Limit = &params.Limit
+	}
+
+	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
+func (s *sonataPOQImpl) SendGetRequest(id string) error {
+	reqParams := poqapi.NewProductOfferingQualificationGetParams()
+	reqParams.ProductOfferingQualificationID = id
+
+	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
 func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.ProductOfferingQualificationCreateParams {
 	reqParams := poqapi.NewProductOfferingQualificationCreateParams()
 

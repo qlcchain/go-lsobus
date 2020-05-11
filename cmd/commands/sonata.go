@@ -22,17 +22,25 @@ var sonataCmd = &cobra.Command{
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
 	// UNI
-	//cmd.Flags().String("SiteID", "", "ID of geographic site")
+	//cmd.Flags().String("siteID", "", "ID of geographic site")
 	//cmd.Flags().Uint("portSpeed", 1000, "Speed of port, Unit is Mbps")
 
 	// Existing UNI for ELine
-	cmd.Flags().String("srcPortID", "", "Source port ID of connection")
-	cmd.Flags().String("dstPortID", "", "Destination port ID of connection")
+	cmd.Flags().String("srcUniID", "", "Source UNI ID of connection")
+	cmd.Flags().UintSlice("srcVlanID", nil, "Source CE VLAN IDs of UNI")
+	cmd.Flags().String("dstUniID", "", "Destination UNI ID of connection")
+	cmd.Flags().UintSlice("dstVlanID", nil, "Destination CE VLAN IDs of UNI")
 
 	// ELine
 	cmd.Flags().Uint("bandwidth", 0, "Bandwidth of connection, Unit is Mbps")
-	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection, 1-4095")
 	cmd.Flags().String("cosName", "", "class of service name")
+	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
+}
+
+func addFlagsForQueryParams(cmd *cobra.Command) {
+	cmd.Flags().String("projectID", "", "Project ID")
+	cmd.Flags().String("state", "", "Service state or status")
+	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 }
 
 func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command) error {
@@ -48,12 +56,22 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 	*/
-	params.SrcPortID, err = cmd.Flags().GetString("srcPortID")
+	params.SrcPortID, err = cmd.Flags().GetString("srcUniID")
 	if err != nil {
 		return err
 	}
 
-	params.DstPortID, err = cmd.Flags().GetString("dstPortID")
+	params.SrcVlanID, err = cmd.Flags().GetUintSlice("srcVlanID")
+	if err != nil {
+		return err
+	}
+
+	params.DstPortID, err = cmd.Flags().GetString("dstUniID")
+	if err != nil {
+		return err
+	}
+
+	params.DstVlanID, err = cmd.Flags().GetUintSlice("dstVlanID")
 	if err != nil {
 		return err
 	}
@@ -63,12 +81,32 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		return err
 	}
 
+	params.CosName, err = cmd.Flags().GetString("cosName")
+	if err != nil {
+		return err
+	}
+
 	params.SVlanID, err = cmd.Flags().GetUint("sVlanID")
 	if err != nil {
 		return err
 	}
 
-	params.CosName, err = cmd.Flags().GetString("cosName")
+	return nil
+}
+
+func fillQueryParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {
+	var err error
+	params.ProjectID, err = cmd.Flags().GetString("projectID")
+	if err != nil {
+		return err
+	}
+
+	params.State, err = cmd.Flags().GetString("state")
+	if err != nil {
+		return err
+	}
+
+	params.ProductSpecificationID, err = cmd.Flags().GetString("prodSpecID")
 	if err != nil {
 		return err
 	}

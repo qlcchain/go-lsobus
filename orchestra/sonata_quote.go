@@ -40,8 +40,54 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
+func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
+	reqParams := quoapi.NewQuoteFindParams()
+	if params.ProjectID != "" {
+		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.ExternalID != "" {
+		reqParams.ExternalID = &params.ExternalID
+	}
+	if params.State != "" {
+		reqParams.State = &params.State
+	}
+	if params.Offset != "" {
+		reqParams.Offset = &params.Offset
+	}
+	if params.Limit != "" {
+		reqParams.Limit = &params.Limit
+	}
+
+	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
+func (s *sonataQuoteImpl) SendGetRequest(id string) error {
+	reqParams := quoapi.NewQuoteGetParams()
+	reqParams.ID = id
+
+	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
 func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.QuoteCreateParams {
-	reqParams := &quoapi.QuoteCreateParams{}
+	reqParams := quoapi.NewQuoteCreateParams()
 
 	reqParams.Quote = &quomod.QuoteCreate{}
 

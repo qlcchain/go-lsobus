@@ -6,6 +6,7 @@ Virtual Business Application for MEF LSO Framework.
 MEF Sonata API client and models.
 
 ### Orchestra
+
 Orchestra is responsible for making a series of MEF calls to the partner:
 - to determine that the address provided is valid and provide an interface to handle invalid addresses
 - to get a site at the customer address, or allow selection of a new site
@@ -13,6 +14,7 @@ Orchestra is responsible for making a series of MEF calls to the partner:
 - to get a quote for the requested service
 - to create ProductOrder request
 - to check for ProductOrder updates
+
 Orchestra is responsible for managing the responses and update status to chain.
 
 ### Contract
@@ -26,14 +28,18 @@ RPC Server is responsible for providing APIs to Front Web UI.
 ### UNI & E-Line Order
 #### External
 Uploading order to chain:
+
 User -> Front Web UI -> Virtual-LSOBUS -> QLC Chain.
 
 Sending order to partner:
+
 User -> Front Web UI -> Virtual-LSOBUS -> Sonata Server.
 
 #### Internal
 Uploading order to chain:
+
 RPC -> Contract -> QLC Chain.
 
 Sending order to partner:
+
 RPC -> Orchestra -> Sonata Client -> Sonata Server.

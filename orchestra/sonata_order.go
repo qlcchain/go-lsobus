@@ -37,17 +37,78 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 		return err
 	}
 	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	//rspOrder := rspParams.GetPayload()
+
+	return nil
+}
+
+func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
+	reqParams := ordapi.NewProductOrderFindParams()
+	if params.ProjectID != "" {
+		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.BuyerID != "" {
+		reqParams.BuyerID = &params.BuyerID
+	}
+	if params.State != "" {
+		reqParams.State = &params.State
+	}
+	if params.Offset != "" {
+		reqParams.Offset = &params.Offset
+	}
+	if params.Limit != "" {
+		reqParams.Limit = &params.Limit
+	}
+
+	tranCfg := ordcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := httpCli.ProductOrder.ProductOrderFind(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	//rspOrder := rspParams.GetPayload()
+
+	return nil
+}
+
+func (s *sonataOrderImpl) SendGetRequest(id string) error {
+	reqParams := ordapi.NewProductOrderGetParams()
+	reqParams.ProductOrderID = id
+
+	tranCfg := ordcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
+	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+
+	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	//rspOrder := rspParams.GetPayload()
+
 	return nil
 }
 
 func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.ProductOrderCreateParams {
-	reqParams := &ordapi.ProductOrderCreateParams{}
+	reqParams := ordapi.NewProductOrderCreateParams()
 
 	reqParams.ProductOrder = &ordmod.ProductOrderCreate{}
+
+	reqParams.ProductOrder.ProjectID = ""
+	reqParams.ProductOrder.ExternalID = nil
 
 	reqParams.ProductOrder.BuyerRequestDate = &strfmt.DateTime{}
 	reqParams.ProductOrder.BuyerRequestDate.Scan(time.Now())
 	reqParams.ProductOrder.RequestedStartDate.Scan(time.Now().Add(time.Minute))
+	reqParams.ProductOrder.RequestedCompletionDate = &strfmt.DateTime{}
+	reqParams.ProductOrder.RequestedCompletionDate.Scan(time.Now().Add(time.Hour))
+	reqParams.ProductOrder.DesiredResponse = ordmod.DesiredOrderResponsesConfirmationAndEngineeringDesign
 	reqParams.ProductOrder.ExpeditePriority = true
 
 	// Source UNI
@@ -106,6 +167,18 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, lineItem)
 	}
 
+	// Pricing
+	reqParams.ProductOrder.PricingTerm = 12
+	reqParams.ProductOrder.PricingMethod = ordmod.PricingMethodTariff
+
+	// Billing
+	reqParams.ProductOrder.BillingAccount = &ordmod.BillingAccountRef{}
+	reqParams.ProductOrder.BillingAccount.BillingContact = &ordmod.Contact{}
+	//reqParams.ProductOrder.BillingAccount.BillingContact.ContactName = ""
+
+	// Party
+	//reqParams.ProductOrder.RelatedParty = &ordmod.RelatedParty{}
+
 	return reqParams
 }
 
@@ -145,6 +218,13 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	s.FillUNIProductSpec(uniDesc, orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
+	// Price
+	uniItem.PricingMethod = ordmod.PricingMethodTariff
+	//uniItem.PricingTerm = 1
+
+	// Party
+	//uniItem.RelatedParty = &ordmod.RelatedParty{}
+
 	return uniItem
 }
 
@@ -170,6 +250,13 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	lineDesc := &cmnmod.ELineProductSpecification{}
 	s.FillELineProductSpec(lineDesc, orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+
+	// Price
+	lineItem.PricingMethod = ordmod.PricingMethodTariff
+	//lineItem.PricingTerm = 1
+
+	// Party
+	//lineItem.RelatedParty = &ordmod.RelatedParty{}
 
 	return lineItem
 }
