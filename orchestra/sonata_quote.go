@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
-
 	"github.com/go-openapi/strfmt"
 
 	quocli "github.com/iixlabs/virtual-lsobus/sonata/quote/client"
@@ -190,8 +188,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	}
 
 	// UNI Product Specification
-	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.BuildUNIProductSpec(uniDesc, orderParams)
+	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -215,8 +212,7 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.BuildELineProductSpec(lineDesc, orderParams)
+	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem

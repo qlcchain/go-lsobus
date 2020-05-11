@@ -3,7 +3,6 @@ package orchestra
 import (
 	"time"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 	poqcli "github.com/iixlabs/virtual-lsobus/sonata/poq/client"
 	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
 	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
@@ -175,8 +174,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	// UNI Product Specification
 	uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.BuildUNIProductSpec(uniDesc, orderParams)
+	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -194,8 +192,7 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	//Product Specification
 	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.BuildELineProductSpec(lineDesc, orderParams)
+	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem

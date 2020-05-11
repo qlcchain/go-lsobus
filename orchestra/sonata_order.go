@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
-
 	"github.com/go-openapi/strfmt"
 
 	ordcli "github.com/iixlabs/virtual-lsobus/sonata/order/client"
@@ -213,8 +211,7 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	// UNI Product Specification
 	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.BuildUNIProductSpec(uniDesc, orderParams)
+	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	// Price
@@ -248,8 +245,7 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	//Product Specification
 	lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.BuildELineProductSpec(lineDesc, orderParams)
+	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	// Price

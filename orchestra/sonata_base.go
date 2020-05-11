@@ -41,7 +41,8 @@ func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
 }
 
-func (s *sonataBaseImpl) BuildUNIProductSpec(uniSpec *cmnmod.UNIProductSpecification, params *OrderParams) error {
+func (s *sonataBaseImpl) BuildUNIProductSpec(params *OrderParams) *cmnmod.UNISpec {
+	uniSpec := &cmnmod.UNISpec{}
 	uniSpec.SetAtSchemaLocation(MEFSchemaLocationSpecUNI)
 	uniSpec.SetAtType("UNISpec")
 
@@ -55,22 +56,23 @@ func (s *sonataBaseImpl) BuildUNIProductSpec(uniSpec *cmnmod.UNIProductSpecifica
 	uniSpec.MaxServiceFrameSize = 1522
 	uniSpec.NumberOfLinks = 1
 
-	return nil
+	return uniSpec
 }
 
-func (s *sonataBaseImpl) BuildELineProductSpec(lineDesc *cmnmod.ELineProductSpecification, params *OrderParams) error {
-	lineDesc.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
-	lineDesc.SetAtType("ELineSpec")
+func (s *sonataBaseImpl) BuildELineProductSpec(params *OrderParams) *cmnmod.ELineSpec {
+	lineSpec := &cmnmod.ELineSpec{}
+	lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
+	lineSpec.SetAtType("ELineSpec")
 
-	lineDesc.ClassOfServiceName = params.CosName
-	lineDesc.MaximumFrameSize = 1526
-	lineDesc.SVlanID = int32(params.SVlanID)
+	lineSpec.ClassOfServiceName = params.CosName
+	lineSpec.MaximumFrameSize = 1526
+	lineSpec.SVlanID = int32(params.SVlanID)
 	bwMbps := int32(params.Bandwidth)
 	bwProfile := &cmnmod.BandwidthProfile{
 		Cir: &cmnmod.InformationRate{Unit: "Mbps", Amount: &bwMbps},
 	}
-	lineDesc.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
-	lineDesc.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+	lineSpec.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
 
-	return nil
+	return lineSpec
 }

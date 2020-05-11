@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ELineProductSpecification Description of ELineSpec for Ordering - source 57.1.
+// ELineSpec Description of ELineSpec for Ordering - source 57.1.
 //
-// swagger:model ELineProductSpecification
-type ELineProductSpecification struct {
+// swagger:model ELineSpec
+type ELineSpec struct {
 	atReferredTypeField string
 
 	atSchemaLocationField string
@@ -26,36 +26,36 @@ type ELineProductSpecification struct {
 }
 
 // AtReferredType gets the at referred type of this subtype
-func (m *ELineProductSpecification) AtReferredType() string {
+func (m *ELineSpec) AtReferredType() string {
 	return m.atReferredTypeField
 }
 
 // SetAtReferredType sets the at referred type of this subtype
-func (m *ELineProductSpecification) SetAtReferredType(val string) {
+func (m *ELineSpec) SetAtReferredType(val string) {
 	m.atReferredTypeField = val
 }
 
 // AtSchemaLocation gets the at schema location of this subtype
-func (m *ELineProductSpecification) AtSchemaLocation() string {
+func (m *ELineSpec) AtSchemaLocation() string {
 	return m.atSchemaLocationField
 }
 
 // SetAtSchemaLocation sets the at schema location of this subtype
-func (m *ELineProductSpecification) SetAtSchemaLocation(val string) {
+func (m *ELineSpec) SetAtSchemaLocation(val string) {
 	m.atSchemaLocationField = val
 }
 
 // AtType gets the at type of this subtype
-func (m *ELineProductSpecification) AtType() string {
-	return "ELineProductSpecification"
+func (m *ELineSpec) AtType() string {
+	return "ELineSpec"
 }
 
 // SetAtType sets the at type of this subtype
-func (m *ELineProductSpecification) SetAtType(val string) {
+func (m *ELineSpec) SetAtType(val string) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ELineProductSpecification) UnmarshalJSON(raw []byte) error {
+func (m *ELineSpec) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		MEFELineSpecV3
 	}
@@ -84,7 +84,7 @@ func (m *ELineProductSpecification) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result ELineProductSpecification
+	var result ELineSpec
 
 	result.atReferredTypeField = base.AtReferredType
 
@@ -102,7 +102,7 @@ func (m *ELineProductSpecification) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ELineProductSpecification) MarshalJSON() ([]byte, error) {
+func (m ELineSpec) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
@@ -135,8 +135,8 @@ func (m ELineProductSpecification) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this e line product specification
-func (m *ELineProductSpecification) Validate(formats strfmt.Registry) error {
+// Validate validates this e line spec
+func (m *ELineSpec) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	// validation for a type composition with MEFELineSpecV3
@@ -151,7 +151,7 @@ func (m *ELineProductSpecification) Validate(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ELineProductSpecification) MarshalBinary() ([]byte, error) {
+func (m *ELineSpec) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -159,8 +159,8 @@ func (m *ELineProductSpecification) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ELineProductSpecification) UnmarshalBinary(b []byte) error {
-	var res ELineProductSpecification
+func (m *ELineSpec) UnmarshalBinary(b []byte) error {
+	var res ELineSpec
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
