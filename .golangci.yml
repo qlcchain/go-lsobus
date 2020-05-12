@@ -32,7 +32,7 @@ linters-settings:
   lll:
     line-length: 140
   goimports:
-    local-prefixes: github.com/qlcchain/go-sonata-server
+    local-prefixes: github.com/iixlabs/virtual-lsobus
   gocritic:
     enabled-tags:
       - diagnostic
@@ -103,6 +103,7 @@ run:
     - cmd/vm
     - vm/(abi|bench|compiler|engine|exec|media|memory|ngen_misc|platform|resolver|spec|tests|utils)
     - test
+    - rpc/grpc/proto
   skip-files:
     - ".*\\.my\\.go$"
     - "\\w+_gen.go$"

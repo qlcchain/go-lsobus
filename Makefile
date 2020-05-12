@@ -14,7 +14,9 @@ BUILDDIR = $(shell pwd)/build
 VERSION ?= 0.0.1
 GITREV = $(shell git rev-parse --short HEAD)
 BUILDTIME = $(shell date +'%FT%TZ%z')
-LDFLAGS=-ldflags "-X main.version=${VERSION} -X main.commit=${GITREV} -X main.date=${BUILDTIME}"
+LDFLAGS=-ldflags "-X github.com/iixlabs/virtual-lsobus/services/version.Version=${VERSION} \
+				  -X github.com/iixlabs/virtual-lsobus/services/version.GitRev=${GITREV} \
+				  -X github.com/iixlabs/virtual-lsobus/services/version.BuildTime=${BUILDTIME}"
 
 default: build
 

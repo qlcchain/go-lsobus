@@ -22,6 +22,12 @@ func DefaultConfig(dir string) (*Config, error) {
 		DataDir:  dir,
 		LogLevel: "error",
 		ChainUrl: "ws://127.0.0.1:19736",
+		RPC: RPCConfig{
+			Enable:             true,
+			ListenAddress:      "tcp://0.0.0.0:9998",
+			GRPCListenAddress:  "tcp://0.0.0.0:9999",
+			CORSAllowedOrigins: []string{"*"},
+		},
 	}
 	return &cfg, nil
 }
@@ -57,8 +63,4 @@ func (c *Config) LogDir() string {
 
 func TestDataDir() string {
 	return filepath.Join(DefaultDataDir(), "test")
-}
-
-func (c *Config) CDRDataDir() string {
-	return filepath.Join(c.DataDir, "cdr")
 }
