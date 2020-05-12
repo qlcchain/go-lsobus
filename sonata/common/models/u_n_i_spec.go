@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// UNIProductSpecification Description of UNISpec for Ordering - source 57.1.
+// UNISpec Description of UNISpec for Ordering - source 57.1.
 //
-// swagger:model UNIProductSpecification
-type UNIProductSpecification struct {
+// swagger:model UNISpec
+type UNISpec struct {
 	atReferredTypeField string
 
 	atSchemaLocationField string
@@ -26,36 +26,36 @@ type UNIProductSpecification struct {
 }
 
 // AtReferredType gets the at referred type of this subtype
-func (m *UNIProductSpecification) AtReferredType() string {
+func (m *UNISpec) AtReferredType() string {
 	return m.atReferredTypeField
 }
 
 // SetAtReferredType sets the at referred type of this subtype
-func (m *UNIProductSpecification) SetAtReferredType(val string) {
+func (m *UNISpec) SetAtReferredType(val string) {
 	m.atReferredTypeField = val
 }
 
 // AtSchemaLocation gets the at schema location of this subtype
-func (m *UNIProductSpecification) AtSchemaLocation() string {
+func (m *UNISpec) AtSchemaLocation() string {
 	return m.atSchemaLocationField
 }
 
 // SetAtSchemaLocation sets the at schema location of this subtype
-func (m *UNIProductSpecification) SetAtSchemaLocation(val string) {
+func (m *UNISpec) SetAtSchemaLocation(val string) {
 	m.atSchemaLocationField = val
 }
 
 // AtType gets the at type of this subtype
-func (m *UNIProductSpecification) AtType() string {
-	return "UNIProductSpecification"
+func (m *UNISpec) AtType() string {
+	return "UNISpec"
 }
 
 // SetAtType sets the at type of this subtype
-func (m *UNIProductSpecification) SetAtType(val string) {
+func (m *UNISpec) SetAtType(val string) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *UNIProductSpecification) UnmarshalJSON(raw []byte) error {
+func (m *UNISpec) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		MEFUNISpecV3
 	}
@@ -84,7 +84,7 @@ func (m *UNIProductSpecification) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result UNIProductSpecification
+	var result UNISpec
 
 	result.atReferredTypeField = base.AtReferredType
 
@@ -102,7 +102,7 @@ func (m *UNIProductSpecification) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m UNIProductSpecification) MarshalJSON() ([]byte, error) {
+func (m UNISpec) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
@@ -135,8 +135,8 @@ func (m UNIProductSpecification) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this u n i product specification
-func (m *UNIProductSpecification) Validate(formats strfmt.Registry) error {
+// Validate validates this u n i spec
+func (m *UNISpec) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	// validation for a type composition with MEFUNISpecV3
@@ -151,7 +151,7 @@ func (m *UNIProductSpecification) Validate(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *UNIProductSpecification) MarshalBinary() ([]byte, error) {
+func (m *UNISpec) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -159,8 +159,8 @@ func (m *UNIProductSpecification) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *UNIProductSpecification) UnmarshalBinary(b []byte) error {
-	var res UNIProductSpecification
+func (m *UNISpec) UnmarshalBinary(b []byte) error {
+	var res UNISpec
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

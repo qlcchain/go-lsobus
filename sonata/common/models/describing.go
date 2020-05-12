@@ -132,14 +132,14 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 			return nil, err
 		}
 		return &result, nil
-	case "ELineProductSpecification":
-		var result ELineProductSpecification
+	case "ELineSpec":
+		var result ELineSpec
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-	case "UNIProductSpecification":
-		var result UNIProductSpecification
+	case "UNISpec":
+		var result UNISpec
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}

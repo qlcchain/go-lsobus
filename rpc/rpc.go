@@ -5,11 +5,12 @@ import (
 
 	grpcServer "github.com/iixlabs/virtual-lsobus/rpc/grpc/server"
 
+	"go.uber.org/zap"
+
 	"github.com/iixlabs/virtual-lsobus/common/event"
 	"github.com/iixlabs/virtual-lsobus/config"
 	"github.com/iixlabs/virtual-lsobus/log"
 	chainctx "github.com/iixlabs/virtual-lsobus/services/context"
-	"go.uber.org/zap"
 )
 
 type RPC struct {

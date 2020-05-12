@@ -1,11 +1,12 @@
 package config
 
 type Config struct {
-	Version  int       `json:"version"`
-	DataDir  string    `json:"dataDir"`
-	LogLevel string    `json:"logLevel"` //info,warn,debug.
-	ChainUrl string    `json:"chainUrl"` //chain url.
-	RPC      RPCConfig `json:"rpc"`
+	Version  int           `json:"version"`
+	DataDir  string        `json:"dataDir"`
+	LogLevel string        `json:"logLevel"` //info,warn,debug.
+	ChainUrl string        `json:"chainUrl"` //chain url.
+	RPC      RPCConfig     `json:"rpc"`
+	Partners []*PartnerCfg `json:"partners"`
 }
 
 type RPCConfig struct {
@@ -17,4 +18,10 @@ type RPCConfig struct {
 	// TCP or UNIX socket address for the gRPC server to listen on
 	GRPCListenAddress  string   `json:"gRPCListenAddress"`
 	CORSAllowedOrigins []string `json:"httpCors"`
+}
+
+type PartnerCfg struct {
+	Name      string `json:"name"`
+	ID        string `json:"id"`
+	SonataUrl string `json:"sonataUrl"`
 }

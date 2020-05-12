@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
-
 	"github.com/go-openapi/strfmt"
 
 	quocli "github.com/iixlabs/virtual-lsobus/sonata/quote/client"
@@ -18,6 +16,7 @@ type sonataQuoteImpl struct {
 
 func newSonataQuoteImpl() *sonataQuoteImpl {
 	s := &sonataQuoteImpl{}
+	s.Version = MEFAPIVersionQuote
 	return s
 }
 
@@ -25,11 +24,16 @@ func (s *sonataQuoteImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
+	tranCfg := quocli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
-	tranCfg := quocli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
 	if err != nil {
@@ -40,10 +44,58 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
+func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
+	reqParams := quoapi.NewQuoteFindParams()
+	if params.ProjectID != "" {
+		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.ExternalID != "" {
+		reqParams.ExternalID = &params.ExternalID
+	}
+	if params.State != "" {
+		reqParams.State = &params.State
+	}
+	if params.Offset != "" {
+		reqParams.Offset = &params.Offset
+	}
+	if params.Limit != "" {
+		reqParams.Limit = &params.Limit
+	}
+
+	httpCli := s.NewHTTPClient()
+
+	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
+func (s *sonataQuoteImpl) SendGetRequest(id string) error {
+	reqParams := quoapi.NewQuoteGetParams()
+	reqParams.ID = id
+
+	httpCli := s.NewHTTPClient()
+
+	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
 func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.QuoteCreateParams {
-	reqParams := &quoapi.QuoteCreateParams{}
+	reqParams := quoapi.NewQuoteCreateParams()
 
 	reqParams.Quote = &quomod.QuoteCreate{}
+
+	reqParams.Quote.ExternalID = orderParams.ExternalID
+	reqParams.Quote.Description = orderParams.Description
+	reqParams.Quote.ProjectID = orderParams.ProjectID
 
 	isqVal := true
 	reqParams.Quote.InstantSyncQuoting = &isqVal
@@ -126,7 +178,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniItem.ID = &uniItemID
 	uniItem.Action = quomod.ProductActionTypeINSTALL
 
-	uniOfferId := "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"
+	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &quomod.Product{}
@@ -139,8 +191,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	}
 
 	// UNI Product Specification
-	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.FillUNIProductSpec(uniDesc, orderParams)
+	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -157,15 +208,14 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
 
-	linePoVal := "LSO_Sonata_ProviderOnDemand_EthernetConnection"
+	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = new(quomod.Product)
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.FillELineProductSpec(lineDesc, orderParams)
+	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem

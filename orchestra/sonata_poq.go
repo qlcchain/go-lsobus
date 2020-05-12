@@ -3,7 +3,6 @@ package orchestra
 import (
 	"time"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 	poqcli "github.com/iixlabs/virtual-lsobus/sonata/poq/client"
 	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
 	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
@@ -15,6 +14,7 @@ type sonataPOQImpl struct {
 
 func newSonataPOQImpl() *sonataPOQImpl {
 	s := &sonataPOQImpl{}
+	s.Version = MEFAPIVersionPOQ
 	return s
 }
 
@@ -22,13 +22,59 @@ func (s *sonataPOQImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
+func (s *sonataPOQImpl) NewHTTPClient() *poqcli.APIProductOfferingQualificationManagement {
+	tranCfg := poqcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	httpCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	return httpCli
+}
+
 func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
-	tranCfg := poqcli.DefaultTransportConfig().WithHost("localhost").WithSchemes([]string{"http"})
-	poqCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpCli := s.NewHTTPClient()
 
-	rspParams, err := poqCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
+func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
+	reqParams := poqapi.NewProductOfferingQualificationFindParams()
+	if params.ProjectID != "" {
+		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.State != "" {
+		reqParams.State = &params.State
+	}
+	if params.Offset != "" {
+		reqParams.Offset = &params.Offset
+	}
+	if params.Limit != "" {
+		reqParams.Limit = &params.Limit
+	}
+
+	httpCli := s.NewHTTPClient()
+
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
+	if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
+	}
+	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	return nil
+}
+
+func (s *sonataPOQImpl) SendGetRequest(id string) error {
+	reqParams := poqapi.NewProductOfferingQualificationGetParams()
+	reqParams.ProductOfferingQualificationID = id
+
+	httpCli := s.NewHTTPClient()
+
+	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
@@ -41,6 +87,8 @@ func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.Prod
 	reqParams := poqapi.NewProductOfferingQualificationCreateParams()
 
 	reqParams.ProductOfferingQualification = new(poqmod.ProductOfferingQualificationCreate)
+	reqParams.ProductOfferingQualification.ProjectID = orderParams.ProjectID
+
 	isqVal := true
 	reqParams.ProductOfferingQualification.InstantSyncQualification = &isqVal
 	reqParams.ProductOfferingQualification.RequestedResponseDate.Scan(time.Now())
@@ -117,7 +165,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	uniItem.ID = &uniItemID
 	uniItem.Action = poqmod.ProductActionTypeAdd
 
-	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetPort_UNI"}
+	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
 
 	uniItem.Product = &poqmod.Product{}
 
@@ -129,8 +177,7 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	// UNI Product Specification
 	uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := &cmnmod.UNIProductSpecification{}
-	s.FillUNIProductSpec(uniDesc, orderParams)
+	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	return uniItem
@@ -142,14 +189,13 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	lineItem.Action = poqmod.ProductActionTypeAdd
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
-	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: "LSO_Sonata_ProviderOnDemand_EthernetConnection"}
+	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
 	lineItem.Product = &poqmod.Product{}
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineDesc := &cmnmod.ELineProductSpecification{}
-	s.FillELineProductSpec(lineDesc, orderParams)
+	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	return lineItem

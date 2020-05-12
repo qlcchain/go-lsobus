@@ -162,7 +162,7 @@
         }
       }
     },
-    "UNIProductSpecification": {
+    "UNISpec": {
       "description": "Description of UNISpec for Ordering - source 57.1.",
       "allOf": [
         {
@@ -173,7 +173,7 @@
         }
       ]
     },
-    "ELineProductSpecification": {
+    "ELineSpec": {
       "description": "Description of ELineSpec for Ordering - source 57.1.",
       "allOf": [
         {

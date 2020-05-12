@@ -12,10 +12,11 @@ import (
 	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/iixlabs/virtual-lsobus/log"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	"github.com/iixlabs/virtual-lsobus/log"
 )
 
 type GRPCServer struct {

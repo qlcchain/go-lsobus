@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
 	"google.golang.org/grpc"
+
+	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
 )
 
 func main() {
