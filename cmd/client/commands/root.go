@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	endpointP = "ws://0.0.0.0:19736"
+	endpointP = "http://127.0.0.1:9999"
 )
 
 func Execute(osArgs []string) {
@@ -69,4 +69,5 @@ func isInteractive(osArgs []string) bool {
 
 func addcommands() {
 	version()
+	addOrderCmd()
 }
