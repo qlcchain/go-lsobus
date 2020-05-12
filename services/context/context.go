@@ -23,6 +23,7 @@ var cache = hashmap.New(10)
 const (
 	LogService      = "logService"
 	ContractService = "contractService"
+	RPCService      = "rpcService"
 )
 
 type Option func(cm *config.CfgManager) error
