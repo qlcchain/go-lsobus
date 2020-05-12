@@ -1,17 +1,24 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"github.com/iixlabs/virtual-lsobus/orchestra"
 )
 
-func init() {
-	sonataCmd.AddCommand(sonataSiteCmd)
-	sonataCmd.AddCommand(sonataPoqCmd)
-	sonataCmd.AddCommand(sonataQuoteCmd)
-	sonataCmd.AddCommand(sonataOrderCmd)
-	sonataCmd.AddCommand(sonataInvCmd)
+func addSonataCmd(root *cobra.Command) {
+	_ = os.Setenv("SWAGGER_DEBUG", "true")
+	_ = os.Setenv("DEBUG", "true")
+
+	root.AddCommand(sonataCmd)
+
+	addSonataSiteCmd(sonataCmd)
+	addSonataPoqCmd(sonataCmd)
+	addSonataQuoteCmd(sonataCmd)
+	addSonataOrderCmd(sonataCmd)
+	addSonataInvCmd(sonataCmd)
 }
 
 var sonataCmd = &cobra.Command{

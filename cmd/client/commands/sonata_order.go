@@ -6,7 +6,9 @@ import (
 	"github.com/iixlabs/virtual-lsobus/orchestra"
 )
 
-func init() {
+func addSonataOrderCmd(parent *cobra.Command) {
+	parent.AddCommand(sonataOrderCmd)
+
 	addFlagsForOrderParams(sonataOrderCreateCmd)
 	sonataOrderCmd.AddCommand(sonataOrderCreateCmd)
 

@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	"github.com/abiosoft/ishell"
-	"github.com/iixlabs/virtual-lsobus/cmd/util"
 	"google.golang.org/grpc"
+
+	"github.com/iixlabs/virtual-lsobus/cmd/util"
 )
 
 func addCreateOrderCmdByShell(parentCmd *ishell.Cmd) {
