@@ -28,6 +28,11 @@ var sonataCmd = &cobra.Command{
 }
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
+	// Common
+	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
+	cmd.Flags().String("itemAction", "add", "Type of product action, (e.g., add, change, remove)")
+	cmd.Flags().String("productID", "", "Product ID of existing service")
+
 	// UNI
 	//cmd.Flags().String("siteID", "", "ID of geographic site")
 	//cmd.Flags().Uint("portSpeed", 1000, "Speed of port, Unit is Mbps")
@@ -57,8 +62,23 @@ func addFlagsForGetParams(cmd *cobra.Command) {
 func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command) error {
 	var err error
 
-	params.Buyer = &orchestra.Partner{ID: "", Name: "CBC"}
-	params.Seller = &orchestra.Partner{ID: "", Name: "PCCW"}
+	params.OrderActivity, err = cmd.Flags().GetString("orderActivity")
+	if err != nil {
+		return err
+	}
+
+	params.ItemAction, err = cmd.Flags().GetString("itemAction")
+	if err != nil {
+		return err
+	}
+
+	params.ProductID, err = cmd.Flags().GetString("productID")
+	if err != nil {
+		return err
+	}
+
+	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
+	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
 	/*
 		params.SrcSiteID, err = cmd.Flags().GetString("siteID")

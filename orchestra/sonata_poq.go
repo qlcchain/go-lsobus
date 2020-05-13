@@ -23,7 +23,7 @@ func (s *sonataPOQImpl) Init() error {
 }
 
 func (s *sonataPOQImpl) NewHTTPClient() *poqcli.APIProductOfferingQualificationManagement {
-	tranCfg := poqcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	tranCfg := poqcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
 	httpCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
 	return httpCli
 }
@@ -39,6 +39,9 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 		return err
 	}
 	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	orderParams.rspPoq = rspParams.GetPayload()
+
 	return nil
 }
 
@@ -163,11 +166,14 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = poqmod.ProductActionTypeAdd
+	uniItem.Action = poqmod.ProductActionType(orderParams.ItemAction)
 
 	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
 
 	uniItem.Product = &poqmod.Product{}
+	if uniItem.Action != poqmod.ProductActionTypeAdd {
+		uniItem.Product.ID = orderParams.ProductID
+	}
 
 	// UNI Place
 	uniPlace := &poqmod.ReferencedAddress{}
@@ -186,11 +192,17 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.ProductOfferingQualificationItemCreate {
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
-	lineItem.Action = poqmod.ProductActionTypeAdd
+	lineItem.Action = poqmod.ProductActionType(orderParams.ItemAction)
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
+
 	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
+
+	// Product
 	lineItem.Product = &poqmod.Product{}
+	if lineItem.Action != poqmod.ProductActionTypeAdd {
+		lineItem.Product.ID = orderParams.ProductID
+	}
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}

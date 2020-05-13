@@ -24,7 +24,7 @@ const (
 	MEFSchemaLocationSpecELine = MEFSchemaLocationSpecRoot + "/MEF_ELineSpec_v3.json"
 
 	MEFProductOfferingUNI   = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
-	MEFProductOfferingELine = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
+	MEFProductOfferingELine = "LSO_Sonata_DataOnDemand_EthernetConnection"
 )
 
 type sonataBaseImpl struct {
@@ -48,6 +48,14 @@ func (s *sonataBaseImpl) Init() error {
 	}
 	s.logger = log.NewLogger("sonataImpl")
 	return nil
+}
+
+func (s *sonataBaseImpl) GetHost() string {
+	return s.Host
+}
+
+func (s *sonataBaseImpl) GetScheme() string {
+	return s.Scheme
 }
 
 func (s *sonataBaseImpl) NewItemID() string {

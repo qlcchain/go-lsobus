@@ -20,7 +20,7 @@ func (s *sonataInvImpl) Init() error {
 }
 
 func (s *sonataInvImpl) NewHTTPClient() *invcli.APIProductInventoryManagement {
-	tranCfg := invcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	tranCfg := invcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
 	httpCli := invcli.NewHTTPClientWithConfig(nil, tranCfg)
 	return httpCli
 }

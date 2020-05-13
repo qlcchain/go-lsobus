@@ -1,11 +1,21 @@
 package orchestra
 
+import (
+	ordmod "github.com/iixlabs/virtual-lsobus/sonata/order/models"
+	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
+	quomod "github.com/iixlabs/virtual-lsobus/sonata/quote/models"
+)
+
 type Partner struct {
 	ID   string
 	Name string
 }
 
 type OrderParams struct {
+	OrderActivity string
+	ItemAction    string
+	ProductID     string
+
 	ContractID string
 	Buyer      *Partner
 	Seller     *Partner
@@ -27,6 +37,10 @@ type OrderParams struct {
 	Bandwidth uint
 	SVlanID   uint
 	CosName   string
+
+	rspPoq   *poqmod.ProductOfferingQualification
+	rspQuote *quomod.Quote
+	rspOrder *ordmod.ProductOrder
 }
 
 type FindParams struct {

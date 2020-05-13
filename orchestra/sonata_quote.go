@@ -25,7 +25,7 @@ func (s *sonataQuoteImpl) Init() error {
 }
 
 func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
-	tranCfg := quocli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	tranCfg := quocli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
 	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
 	return httpCli
 }
@@ -41,6 +41,9 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 		return err
 	}
 	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	orderParams.rspQuote = rspParams.GetPayload()
+
 	return nil
 }
 
@@ -176,7 +179,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = quomod.ProductActionTypeINSTALL
+	uniItem.Action = quomod.ProductActionType(orderParams.ItemAction)
 
 	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
@@ -194,6 +197,8 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
+	s.BuildItemTerm(uniItem, orderParams)
+
 	return uniItem
 }
 
@@ -203,7 +208,7 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	}
 
 	lineItem := &quomod.QuoteItemCreate{}
-	lineItem.Action = quomod.ProductActionTypeINSTALL
+	lineItem.Action = quomod.ProductActionType(orderParams.ItemAction)
 
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
@@ -218,5 +223,15 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
+	s.BuildItemTerm(lineItem, orderParams)
+
 	return lineItem
+}
+
+func (s *sonataQuoteImpl) BuildItemTerm(item *quomod.QuoteItemCreate, orderParams *OrderParams) {
+	item.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+	item.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+	item.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnitDAY
+	durVal := int32(3)
+	item.RequestedQuoteItemTerm.Duration.Value = &durVal
 }
