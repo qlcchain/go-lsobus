@@ -737,10 +737,6 @@
     "Describing": {
       "description": "Technical structure to describe productSpecification",
       "discriminator": "@type",
-      "required": [
-        "@type",
-        "@schemaLocation"
-      ],
       "type": "object",
       "properties": {
         "@type": {
