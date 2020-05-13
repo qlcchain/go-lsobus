@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/iixlabs/virtual-lsobus/mock"
+
 	"github.com/go-openapi/strfmt"
 
 	quocli "github.com/iixlabs/virtual-lsobus/sonata/quote/client"
@@ -35,12 +37,16 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
+	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.Quote))
+
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		return err
+		s.logger.Errorf("send request, error %s", err)
+		//return err
+		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+
+	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
 	orderParams.rspQuote = rspParams.GetPayload()
 

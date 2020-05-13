@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/iixlabs/virtual-lsobus/mock"
+
 	poqcli "github.com/iixlabs/virtual-lsobus/sonata/poq/client"
 	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
 	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
@@ -33,12 +35,15 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
+	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.ProductOfferingQualification))
+
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		return err
+		s.logger.Errorf("send request, error %s", err)
+		//return err
+		rspParams = mock.SonataGeneratePoqCreateResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
 	orderParams.rspPoq = rspParams.GetPayload()
 

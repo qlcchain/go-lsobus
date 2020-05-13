@@ -1,6 +1,7 @@
 package orchestra
 
 import (
+	"github.com/iixlabs/virtual-lsobus/mock"
 	invcli "github.com/iixlabs/virtual-lsobus/sonata/inventory/client"
 	invapi "github.com/iixlabs/virtual-lsobus/sonata/inventory/client/product"
 )
@@ -51,9 +52,10 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	rspParams, err := httpCli.Product.ProductFind(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		return err
+		//return err
+		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Debug("receive response,", "Payload:", s.DumpValue(rspParams.GetPayload()))
 
 	return nil
 }

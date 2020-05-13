@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/iixlabs/virtual-lsobus/mock"
+
 	"github.com/go-openapi/strfmt"
 
 	ordcli "github.com/iixlabs/virtual-lsobus/sonata/order/client"
@@ -35,12 +37,15 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
+	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
+
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		return err
+		s.logger.Errorf("send request, error %s", err)
+		//return err
+		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
 	orderParams.rspOrder = rspParams.GetPayload()
 

@@ -3,6 +3,8 @@ package orchestra
 import (
 	"strconv"
 
+	"github.com/iixlabs/virtual-lsobus/common/util"
+
 	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 
 	"go.uber.org/atomic"
@@ -96,4 +98,8 @@ func (s *sonataBaseImpl) BuildELineProductSpec(params *OrderParams) *cmnmod.ELin
 	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
 
 	return lineSpec
+}
+
+func (s *sonataBaseImpl) DumpValue(v interface{}) string {
+	return util.ToIndentString(v)
 }
