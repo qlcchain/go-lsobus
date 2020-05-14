@@ -6,6 +6,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/iixlabs/virtual-lsobus/sonata"
+	sitapi "github.com/iixlabs/virtual-lsobus/sonata/site/client/geographic_site"
+	sitmod "github.com/iixlabs/virtual-lsobus/sonata/site/models"
+
 	"github.com/bitly/go-simplejson"
 
 	"github.com/go-openapi/strfmt"
@@ -19,6 +23,34 @@ import (
 	quoapi "github.com/iixlabs/virtual-lsobus/sonata/quote/client/quote"
 	quomod "github.com/iixlabs/virtual-lsobus/sonata/quote/models"
 )
+
+func SonataGenerateSiteFindResponse(reqParams *sitapi.GeographicSiteFindParams) *sitapi.GeographicSiteFindOK {
+	rspParams := sitapi.NewGeographicSiteFindOK()
+
+	site1 := &sitmod.GeographicSiteFindResp{}
+	site1.GeographicAddress = &sitmod.GeographicAddressFindResp{}
+	site1.GeographicAddress.FormattedAddress = &sitmod.FormattedAddress{}
+	site1.GeographicAddress.FormattedAddress.ID = "PCCW-Addr-111"
+	site1.GeographicAddress.FormattedAddress.Country = sonata.NewString("Japan")
+	site1.GeographicAddress.FormattedAddress.City = sonata.NewString("Tokyo")
+	site1.ID = "PCCW-Site-111"
+	site1.SiteName = "DC111"
+	site1.Status = sitmod.StatusExisting
+	rspParams.Payload = append(rspParams.Payload, site1)
+
+	site2 := &sitmod.GeographicSiteFindResp{}
+	site2.GeographicAddress = &sitmod.GeographicAddressFindResp{}
+	site2.GeographicAddress.FormattedAddress = &sitmod.FormattedAddress{}
+	site2.GeographicAddress.FormattedAddress.ID = "PCCW-Addr-222"
+	site2.GeographicAddress.FormattedAddress.Country = sonata.NewString("Korea")
+	site2.GeographicAddress.FormattedAddress.City = sonata.NewString("Seoul")
+	site2.ID = "PCCW-Site-222"
+	site1.SiteName = "DC222"
+	site2.Status = sitmod.StatusExisting
+	rspParams.Payload = append(rspParams.Payload, site2)
+
+	return rspParams
+}
 
 func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.ProductFindOK {
 	rspParams := invapi.NewProductFindOK()

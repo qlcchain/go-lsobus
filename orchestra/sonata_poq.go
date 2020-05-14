@@ -195,6 +195,10 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 }
 
 func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.ProductOfferingQualificationItemCreate {
+	if orderParams.Bandwidth == 0 {
+		return nil
+	}
+
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
 	lineItem.Action = poqmod.ProductActionType(orderParams.ItemAction)

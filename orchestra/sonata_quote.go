@@ -200,6 +200,8 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	}
 
 	// UNI Product Specification
+	uniItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
+	uniItem.Product.ProductSpecification.ID = "UNISpec"
 	uniDesc := s.BuildUNIProductSpec(orderParams)
 	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
@@ -226,6 +228,7 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
+	lineItem.Product.ProductSpecification.ID = "UNISpec"
 	lineDesc := s.BuildELineProductSpec(orderParams)
 	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 

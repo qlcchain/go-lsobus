@@ -34,8 +34,10 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("productID", "", "Product ID of existing service")
 
 	// UNI
-	//cmd.Flags().String("siteID", "", "ID of geographic site")
-	//cmd.Flags().Uint("portSpeed", 1000, "Speed of port, Unit is Mbps")
+	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
+	cmd.Flags().Uint("srcPortSpeed", 1000, "Source Port speed, Unit is Mbps")
+	cmd.Flags().String("dstSiteID", "", "Destination Port geographic site ID")
+	cmd.Flags().Uint("dstPortSpeed", 1000, "Destination Port speed, Unit is Mbps")
 
 	// Existing UNI for ELine
 	cmd.Flags().String("srcUniID", "", "Source UNI ID of connection")
@@ -80,17 +82,25 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
-	/*
-		params.SrcSiteID, err = cmd.Flags().GetString("siteID")
-		if err != nil {
-			return err
-		}
+	params.SrcSiteID, err = cmd.Flags().GetString("srcSiteID")
+	if err != nil {
+		return err
+	}
 
-		params.SrcPortSpeed, err = cmd.Flags().GetUint("portSpeed")
-		if err != nil {
-			return err
-		}
-	*/
+	params.SrcPortSpeed, err = cmd.Flags().GetUint("srcPortSpeed")
+	if err != nil {
+		return err
+	}
+
+	params.DstSiteID, err = cmd.Flags().GetString("dstSiteID")
+	if err != nil {
+		return err
+	}
+
+	params.DstPortSpeed, err = cmd.Flags().GetUint("dstPortSpeed")
+	if err != nil {
+		return err
+	}
 
 	params.SrcPortID, err = cmd.Flags().GetString("srcUniID")
 	if err != nil {

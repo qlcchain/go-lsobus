@@ -51,11 +51,11 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 
 	rspParams, err := httpCli.Product.ProductFind(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
+		s.logger.Errorf("send request, error %s", err)
 		//return err
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	}
-	s.logger.Debug("receive response,", "Payload:", s.DumpValue(rspParams.GetPayload()))
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
 	return nil
 }
@@ -68,10 +68,10 @@ func (s *sonataInvImpl) SendGetRequest(id string) error {
 
 	rspParams, err := httpCli.Product.ProductGet(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
+		s.logger.Errorf("send request, error %s", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload:", s.DumpValue(rspParams.GetPayload()))
 
 	//rspOrder := rspParams.GetPayload()
 

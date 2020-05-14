@@ -9,6 +9,7 @@ import (
 func addSonataSiteCmd(parent *cobra.Command) {
 	parent.AddCommand(sonataSiteCmd)
 
+	addFlagsForFindParams(sonataSiteFindCmd)
 	sonataSiteCmd.AddCommand(sonataSiteFindCmd)
 }
 
