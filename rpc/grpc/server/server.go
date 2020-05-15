@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/iixlabs/virtual-lsobus/contract"
+
 	"github.com/iixlabs/virtual-lsobus/config"
 
 	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
@@ -21,13 +23,15 @@ import (
 
 type GRPCServer struct {
 	rpc    *grpc.Server
+	cs     *contract.ContractService
 	logger *zap.SugaredLogger
 }
 
-func NewGRPCServer() *GRPCServer {
+func NewGRPCServer(cs *contract.ContractService) *GRPCServer {
 	gRpcServer := grpc.NewServer()
 	r := &GRPCServer{
 		rpc:    gRpcServer,
+		cs:     cs,
 		logger: log.NewLogger("rpc"),
 	}
 	return r
@@ -44,7 +48,9 @@ func (g *GRPCServer) Start(cfg *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("failed to listen: %s", err)
 	}
+	orderApi := NewOrderApi(g.cs)
 	pb.RegisterChainAPIServer(g.rpc, &chainApi{})
+	pb.RegisterOrderAPIServer(g.rpc, orderApi)
 	reflection.Register(g.rpc)
 	go func() {
 		if err := g.rpc.Serve(lis); err != nil {

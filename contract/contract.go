@@ -4,15 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/iixlabs/virtual-lsobus/common"
-	"github.com/iixlabs/virtual-lsobus/common/event"
-	"github.com/iixlabs/virtual-lsobus/log"
-
-	qlcchain "github.com/qlcchain/qlc-go-sdk"
-	qlctypes "github.com/qlcchain/qlc-go-sdk/pkg/types"
+	"github.com/qlcchain/go-qlc/common/types"
+	qlcchain "github.com/qlcchain/go-qlc/rpc/api"
+	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	rpc "github.com/qlcchain/jsonrpc2"
 	"go.uber.org/zap"
 
+	"github.com/iixlabs/virtual-lsobus/common"
+	"github.com/iixlabs/virtual-lsobus/common/event"
 	"github.com/iixlabs/virtual-lsobus/config"
+	"github.com/iixlabs/virtual-lsobus/log"
 	ct "github.com/iixlabs/virtual-lsobus/services/context"
 )
 
@@ -23,9 +24,9 @@ const (
 
 type ContractService struct {
 	cfg        *config.Config
-	account    *qlctypes.Account
+	account    *types.Account
 	logger     *zap.SugaredLogger
-	client     *qlcchain.QLCClient
+	client     *rpc.Client
 	ctx        context.Context
 	cancel     context.CancelFunc
 	handlerIds map[common.TopicType]string
@@ -34,7 +35,7 @@ type ContractService struct {
 	quit       chan bool
 }
 
-func NewInteractiveService(cfgFile string) (*ContractService, error) {
+func NewContractService(cfgFile string) (*ContractService, error) {
 	cc := ct.NewServiceContext(cfgFile)
 	cfg, err := cc.Config()
 	if err != nil {
@@ -71,7 +72,9 @@ func (cs *ContractService) checkDoDContract() {
 		case <-cs.ctx.Done():
 			return
 		case <-ticker.C:
-			cs.processDoDContract()
+			if cs.chainReady {
+				cs.processDoDContract()
+			}
 		}
 	}
 }
@@ -85,6 +88,45 @@ func (cs *ContractService) processDoDContract() {
 		4. call dod_settlement_getResponseBlock update contract action(confirm/reject) and sign responseBlock
 		5. call process to process responseBlock
 	*/
+
+	dod := make([]*qlcchain.DoDPendingRequestRsp, 0)
+	addr := cs.account.Address()
+	err := cs.client.Call(&dod, "DoDSettlement_getPendingRequest", &addr)
+	if err != nil || len(dod) == 0 {
+		return
+	}
+	for _, v := range dod {
+		action, err := abi.ParseDoDSettleResponseAction("confirm")
+		if err != nil {
+			cs.logger.Error(err)
+			continue
+		}
+
+		param := &abi.DoDSettleResponseParam{
+			RequestHash: v.Hash,
+			Action:      action,
+		}
+		block := new(types.StateBlock)
+		err = cs.client.Call(&block, "DoDSettlement_getCreateOrderRewardBlock", param)
+		if err != nil {
+			cs.logger.Error(err)
+			continue
+		}
+
+		var w types.Work
+		worker, _ := types.NewWorker(w, block.Root())
+		block.Work = worker.NewWork()
+
+		hash := block.GetHash()
+		block.Signature = cs.account.Sign(hash)
+
+		var h types.Hash
+		err = cs.client.Call(&h, "ledger_process", &block)
+		if err != nil {
+			cs.logger.Error(err)
+			continue
+		}
+	}
 }
 
 func (cs *ContractService) connectRpcServer() {
@@ -96,24 +138,26 @@ func (cs *ContractService) connectRpcServer() {
 		case <-ticker.C:
 			if cs.cfg.ChainUrl != "" {
 				if cs.client == nil {
-					client, err := qlcchain.NewQLCClient(cs.cfg.ChainUrl)
+					client, err := rpc.Dial(cs.cfg.ChainUrl)
 					if err != nil || client == nil {
 						continue
 					} else {
 						cs.client = client
-						s, err := cs.client.Pov.GetPovStatus()
+						var pov qlcchain.PovStatus
+						err := cs.client.Call(&pov, "pov_getPovStatus")
 						if err != nil {
 							continue
-						} else if s.SyncState == 2 {
+						} else if pov.SyncState == 2 {
 							cs.chainReady = true
 							cs.quit <- true
 						}
 					}
 				} else {
-					s, err := cs.client.Pov.GetPovStatus()
+					var pov qlcchain.PovStatus
+					err := cs.client.Call(&pov, "pov_getPovStatus")
 					if err != nil {
 						continue
-					} else if s.SyncState == 2 {
+					} else if pov.SyncState == 2 {
 						cs.chainReady = true
 						cs.quit <- true
 					}
@@ -121,6 +165,16 @@ func (cs *ContractService) connectRpcServer() {
 			}
 		}
 	}
+}
+
+func (cs *ContractService) GetOrderInfoByInternalId(id string) (*abi.DoDSettleOrderInfo, error) {
+	orderInfo := new(abi.DoDSettleOrderInfo)
+	err := cs.client.Call(&orderInfo, "DoDSettlement_getOrderInfoByInternalId", &id)
+	if err != nil {
+		cs.logger.Error(err)
+		return nil, err
+	}
+	return orderInfo, nil
 }
 
 func (cs *ContractService) Stop() error {

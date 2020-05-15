@@ -7,8 +7,8 @@ import (
 func addOrderCmd() {
 	if interactive {
 		orderCmd := &ishell.Cmd{
-			Name: "order",
-			Help: "order commands",
+			Name: "dod_settlement",
+			Help: "dod_settlement commands",
 			Func: func(c *ishell.Context) {
 				c.Println(c.Cmd.HelpText())
 			},

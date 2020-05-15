@@ -1,6 +1,6 @@
 syntax = "proto3";
 package proto;
-option go_package = "proto";
+option go_package = ".;proto";
 
 import "google/api/annotations.proto";
 
@@ -16,6 +16,91 @@ service ChainAPI{
   rpc Version(VersionRequest) returns (VersionResponse){
     option (google.api.http) = {
       post: "/chain/version"
+      body: "*"
+    };
+  }
+}
+
+message User {
+  string address = 1;
+  string name = 2;
+}
+
+message ConnectionStaticParam {
+  string productId = 1;
+  string srcCompanyName = 2 ;
+  string srcRegion = 3;
+  string srcCity = 4;
+  string srcDataCenter = 5;
+  string srcPort = 6;
+  string dstCompanyName = 7;
+  string dstRegion = 8;
+  string dstCity = 9;
+  string dstDataCenter = 10;
+  string dstPort = 11;
+}
+
+message ConnectionDynamicParam {
+  string connectionName = 1;
+  string paymentType = 2;
+  string billingType = 3;
+  string currency = 4;
+  string serviceClass = 5;
+  string bandwidth = 6;
+  string billingUnit = 7;
+  string price = 8;
+  int64 startTime = 9;
+  int64 endTime = 10;
+}
+
+message ConnectionParam {
+    ConnectionStaticParam staticParam = 1;
+    ConnectionDynamicParam dynamicParam = 2;
+}
+
+message CreateOrderParam {
+  User buyer = 1;
+  User seller = 2;
+  repeated ConnectionParam cps = 3;
+}
+
+message CreateOrderRsp {
+  string orderIdOnChain = 1;
+}
+
+message GetOrderInfoByInternalId {
+  string internalId = 1;
+}
+
+message OrderLifeTrack {
+  string contractState = 1;
+  string orderState =2;
+  string reason = 3;
+  int64  time = 4;
+  string Hash = 5;
+}
+
+message OrderInfoRsp {
+  User buyer = 1;
+  User seller = 2;
+  string orderId = 3;
+  string orderType = 4;
+  string orderState = 5;
+  string contractState = 6;
+  repeated ConnectionParam connections = 7;
+  repeated OrderLifeTrack track = 8;
+}
+
+service OrderAPI{
+  rpc CreateOrder(CreateOrderParam) returns (CreateOrderRsp){
+    option (google.api.http) = {
+      post: "/order/create"
+      body: "*"
+    };
+  }
+  rpc OrderInfo(GetOrderInfoByInternalId) returns (OrderInfoRsp){
+    option (google.api.http) = {
+      post: "/order/info"
       body: "*"
     };
   }

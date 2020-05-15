@@ -16,7 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	qlctypes "github.com/qlcchain/qlc-go-sdk/pkg/types"
+	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
 	"github.com/iixlabs/virtual-lsobus/log"
 )
@@ -107,5 +107,5 @@ func trapSignal() {
 		log.Root.Info(err)
 	}
 	time.Sleep(1 * time.Second)
-	log.Root.Info("virtual router closed successfully")
+	log.Root.Info("virtual lsoBus closed successfully")
 }

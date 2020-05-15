@@ -8,6 +8,7 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -197,4 +198,12 @@ func OptsCompleter(args []Flag) func(prefix string, args []string) []string {
 		return completion
 
 	}
+}
+
+func ToIndentString(v interface{}) string {
+	b, err := json.MarshalIndent(&v, "", "\t")
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }

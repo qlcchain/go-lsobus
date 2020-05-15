@@ -10,7 +10,7 @@ import (
 	"github.com/iixlabs/virtual-lsobus/config"
 )
 
-func TestNewRPCService(t *testing.T) {
+func TestNewContractService(t *testing.T) {
 	dir := filepath.Join(config.TestDataDir(), uuid.New().String())
 	cm := config.NewCfgManager(dir)
 	_, err := cm.Load()
@@ -24,34 +24,26 @@ func TestNewRPCService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rpc, err := NewRPCService(cm.ConfigFile, cs)
+	err = cs.Init()
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = rpc.Init()
+	if cs.State() != 2 {
+		t.Fatal("contract init failed")
+	}
+	err = cs.Start()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if rpc.State() != 2 {
-		t.Fatal("rpc init failed")
+	if cs.State() != 4 {
+		t.Fatal("contract start failed")
 	}
-	err = rpc.Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if rpc.State() != 4 {
-		t.Fatal("rpc start failed")
-	}
-	if r := rpc.RPC(); r == nil {
-		t.Fatal()
-	}
-	err = rpc.Stop()
+	err = cs.Stop()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if rpc.Status() != 6 {
-		t.Fatal("stop failed.")
+	if cs.Status() != 6 {
+		t.Fatal("contract stop failed.")
 	}
-
 }

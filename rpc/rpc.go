@@ -3,6 +3,8 @@ package rpc
 import (
 	"context"
 
+	"github.com/iixlabs/virtual-lsobus/contract"
+
 	grpcServer "github.com/iixlabs/virtual-lsobus/rpc/grpc/server"
 
 	"go.uber.org/zap"
@@ -24,7 +26,7 @@ type RPC struct {
 	grpc    *grpcServer.GRPCServer
 }
 
-func NewRPC(cfgFile string) (*RPC, error) {
+func NewRPC(cfgFile string, cs *contract.ContractService) (*RPC, error) {
 	cc := chainctx.NewServiceContext(cfgFile)
 	cfg, _ := cc.Config()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -38,7 +40,7 @@ func NewRPC(cfgFile string) (*RPC, error) {
 		cc:      cc,
 	}
 	if cfg.RPC.Enable {
-		r.grpc = grpcServer.NewGRPCServer()
+		r.grpc = grpcServer.NewGRPCServer(cs)
 	}
 	return &r, nil
 }

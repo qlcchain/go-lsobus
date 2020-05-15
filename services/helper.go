@@ -12,10 +12,15 @@ func RegisterServices(cs *context.ServiceContext) error {
 	_ = cs.Register(context.LogService, logService)
 	_ = logService.Init()
 
-	if rpcService, err := NewRPCService(cfgFile); err != nil {
+	if contractService, err := NewContractService(cfgFile); err != nil {
 		return err
 	} else {
-		_ = cs.Register(context.RPCService, rpcService)
+		_ = cs.Register(context.ContractService, contractService)
+		if rpcService, err := NewRPCService(cfgFile, contractService); err != nil {
+			return err
+		} else {
+			_ = cs.Register(context.RPCService, rpcService)
+		}
 	}
 
 	return nil
