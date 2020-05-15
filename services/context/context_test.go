@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qlcchain/qlc-go-sdk/pkg/types"
+	"github.com/qlcchain/go-qlc/common/types"
 
 	"github.com/iixlabs/virtual-lsobus/common"
 	"github.com/iixlabs/virtual-lsobus/config"

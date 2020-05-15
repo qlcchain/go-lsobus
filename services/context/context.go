@@ -13,7 +13,7 @@ import (
 
 	"github.com/cornelk/hashmap"
 
-	qlctypes "github.com/qlcchain/qlc-go-sdk/pkg/types"
+	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
 	"github.com/iixlabs/virtual-lsobus/config"
 )

@@ -26,7 +26,7 @@ var (
 func init() {
 	defaultLogger, _ := zap.NewDevelopment()
 	logger = defaultLogger
-	Root = defaultLogger.Sugar().Named("vr")
+	Root = defaultLogger.Sugar().Named("vb")
 }
 
 func Setup(cfg *config.Config) (err error) {
