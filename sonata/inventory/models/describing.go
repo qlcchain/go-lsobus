@@ -15,6 +15,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
+
+	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 )
 
 // Describing Technical structure to describe productSpecification
@@ -25,8 +27,8 @@ type Describing interface {
 
 	// An URL to target a description file
 	// Required: true
-	AtSchemaLocation() *string
-	SetAtSchemaLocation(*string)
+	AtSchemaLocation() string
+	SetAtSchemaLocation(string)
 
 	// Type of the resource
 	// Required: true
@@ -38,18 +40,18 @@ type Describing interface {
 }
 
 type describing struct {
-	atSchemaLocationField *string
+	atSchemaLocationField string
 
 	atTypeField string
 }
 
 // AtSchemaLocation gets the at schema location of this polymorphic type
-func (m *describing) AtSchemaLocation() *string {
+func (m *describing) AtSchemaLocation() string {
 	return m.atSchemaLocationField
 }
 
 // SetAtSchemaLocation sets the at schema location of this polymorphic type
-func (m *describing) SetAtSchemaLocation(val *string) {
+func (m *describing) SetAtSchemaLocation(val string) {
 	m.atSchemaLocationField = val
 }
 
@@ -110,6 +112,18 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 	switch getType.AtType {
 	case "Describing":
 		var result describing
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+	case "ELineSpec":
+		var result cmnmod.ELineSpec
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+	case "UNISpec":
+		var result cmnmod.UNISpec
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}

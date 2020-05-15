@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/iixlabs/virtual-lsobus/mock"
+
 	"github.com/go-openapi/strfmt"
 
 	ordcli "github.com/iixlabs/virtual-lsobus/sonata/order/client"
@@ -25,7 +27,7 @@ func (s *sonataOrderImpl) Init() error {
 }
 
 func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
-	tranCfg := ordcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	tranCfg := ordcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
 	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
 	return httpCli
 }
@@ -35,14 +37,17 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
+	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
+
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		return err
+		s.logger.Errorf("send request, error %s", err)
+		//return err
+		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
-	//rspOrder := rspParams.GetPayload()
+	orderParams.rspOrder = rspParams.GetPayload()
 
 	return nil
 }
@@ -108,7 +113,7 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 		reqParams.ProductOrder.ExternalID = &orderParams.ExternalID
 	}
 
-	reqParams.ProductOrder.OrderActivity = ordmod.OrderActivityInstall
+	reqParams.ProductOrder.OrderActivity = ordmod.OrderActivity(orderParams.OrderActivity)
 	reqParams.ProductOrder.BuyerRequestDate = &strfmt.DateTime{}
 	reqParams.ProductOrder.BuyerRequestDate.Scan(time.Now())
 	reqParams.ProductOrder.RequestedStartDate.Scan(time.Now().Add(time.Minute))
@@ -197,12 +202,15 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = ordmod.ProductActionTypeAdd
+	uniItem.Action = ordmod.ProductActionType(orderParams.ItemAction)
 
 	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &ordmod.Product{}
+	if uniItem.Action != ordmod.ProductActionTypeAdd {
+		uniItem.Product.ID = orderParams.ProductID
+	}
 
 	// UNI Place
 	if siteID != "" {
@@ -235,7 +243,7 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	}
 
 	lineItem := &ordmod.ProductOrderItemCreate{}
-	lineItem.Action = ordmod.ProductActionTypeAdd
+	lineItem.Action = ordmod.ProductActionType(orderParams.ItemAction)
 
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
@@ -244,6 +252,9 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = &ordmod.Product{}
+	if lineItem.Action != ordmod.ProductActionTypeAdd {
+		lineItem.Product.ID = orderParams.ProductID
+	}
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
@@ -269,7 +280,10 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	item.PricingReference = params.ContractID
 
 	itemPrice := &ordmod.OrderItemPrice{}
-	itemPrice.PriceType = ordmod.PriceTypeRecurring
+	//itemPrice.PriceType = ordmod.PriceTypeRecurring
+	//itemPrice.RecurringChargePeriod = ordmod.ChargePeriodDay
+	itemPrice.PriceType = ordmod.PriceTypeNonRecurring
+
 	itemPrice.Price = &ordmod.Price{}
 	curUnit := "USA"
 	curVal := float32(12.34)
@@ -279,8 +293,6 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	itemPrice.Price.TaxRate = &taxRate
 	//itemPrice.Price.UnitOfMesure = ""
 	item.OrderItemPrice = append(item.OrderItemPrice, itemPrice)
-
-	itemPrice.RecurringChargePeriod = ordmod.ChargePeriodDay
 }
 
 func (s *sonataOrderImpl) BuildItemRelatedParty(item *ordmod.ProductOrderItemCreate, params *OrderParams) {

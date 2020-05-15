@@ -5,6 +5,8 @@ go 1.13
 require (
 	github.com/abiosoft/ishell v0.0.0-20190613190920-79d20b1325a4
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
+	github.com/bitly/go-simplejson v0.5.0
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cornelk/hashmap v1.0.1
 	github.com/fatih/color v1.9.0
 	github.com/gammazero/workerpool v0.0.0-20200108033143-79b2336fad7a

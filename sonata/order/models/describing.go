@@ -15,6 +15,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
+
+	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 )
 
 // Describing Polymorphic class to describe request product attribute
@@ -108,6 +110,18 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 	switch getType.AtType {
 	case "Describing":
 		var result describing
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+	case "ELineSpec":
+		var result cmnmod.ELineSpec
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+	case "UNISpec":
+		var result cmnmod.UNISpec
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}

@@ -3,6 +3,8 @@ package orchestra
 import (
 	"strconv"
 
+	"github.com/iixlabs/virtual-lsobus/common/util"
+
 	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
 
 	"go.uber.org/atomic"
@@ -24,7 +26,7 @@ const (
 	MEFSchemaLocationSpecELine = MEFSchemaLocationSpecRoot + "/MEF_ELineSpec_v3.json"
 
 	MEFProductOfferingUNI   = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
-	MEFProductOfferingELine = "LSO_Sonata_DataOnDemand_EthernetPort_UNI"
+	MEFProductOfferingELine = "LSO_Sonata_DataOnDemand_EthernetConnection"
 )
 
 type sonataBaseImpl struct {
@@ -48,6 +50,14 @@ func (s *sonataBaseImpl) Init() error {
 	}
 	s.logger = log.NewLogger("sonataImpl")
 	return nil
+}
+
+func (s *sonataBaseImpl) GetHost() string {
+	return s.Host
+}
+
+func (s *sonataBaseImpl) GetScheme() string {
+	return s.Scheme
 }
 
 func (s *sonataBaseImpl) NewItemID() string {
@@ -88,4 +98,8 @@ func (s *sonataBaseImpl) BuildELineProductSpec(params *OrderParams) *cmnmod.ELin
 	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
 
 	return lineSpec
+}
+
+func (s *sonataBaseImpl) DumpValue(v interface{}) string {
+	return util.ToIndentString(v)
 }

@@ -1,6 +1,7 @@
 package orchestra
 
 import (
+	"github.com/iixlabs/virtual-lsobus/mock"
 	sitcli "github.com/iixlabs/virtual-lsobus/sonata/site/client"
 	sitapi "github.com/iixlabs/virtual-lsobus/sonata/site/client/geographic_site"
 )
@@ -20,7 +21,7 @@ func (s *sonataSiteImpl) Init() error {
 }
 
 func (s *sonataSiteImpl) NewHTTPClient() *sitcli.APIGeographicSiteManagement {
-	tranCfg := sitcli.DefaultTransportConfig().WithHost(s.Host).WithSchemes([]string{s.Scheme})
+	tranCfg := sitcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
 	httpCli := sitcli.NewHTTPClientWithConfig(nil, tranCfg)
 	return httpCli
 }
@@ -34,10 +35,11 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteFind(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		return err
+		s.logger.Errorf("send request, error %s", err)
+		//return err
+		rspParams = mock.SonataGenerateSiteFindResponse(reqParams)
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
 	//rspOrder := rspParams.GetPayload()
 
@@ -52,10 +54,10 @@ func (s *sonataSiteImpl) SendGetRequest(id string) error {
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteGet(reqParams)
 	if err != nil {
-		s.logger.Error("send request,", "error:", err)
+		s.logger.Errorf("send request, error %s", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Infof("receive response, payload:", s.DumpValue(rspParams.GetPayload()))
 
 	//rspOrder := rspParams.GetPayload()
 

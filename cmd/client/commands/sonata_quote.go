@@ -6,7 +6,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
+func addSonataQuoteCmd(parent *cobra.Command) {
+	parent.AddCommand(sonataQuoteCmd)
+
 	addFlagsForOrderParams(sonataQuoteCreateCmd)
 	sonataQuoteCmd.AddCommand(sonataQuoteCreateCmd)
 

@@ -6,7 +6,9 @@ import (
 	"github.com/iixlabs/virtual-lsobus/orchestra"
 )
 
-func init() {
+func addSonataInvCmd(parent *cobra.Command) {
+	parent.AddCommand(sonataInvCmd)
+
 	addFlagsForFindParams(sonataInvFindCmd)
 	sonataInvCmd.AddCommand(sonataInvFindCmd)
 

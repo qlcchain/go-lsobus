@@ -10,6 +10,9 @@ GO ?= latest
 BINARY = virtual-lsobus
 MAIN = $(shell pwd)/cmd/main.go
 
+CLIENT_BINARY = virtual-lsobus-client
+CLIENT_MAIN = $(shell pwd)/cmd/client/main.go
+
 BUILDDIR = $(shell pwd)/build
 VERSION ?= 0.0.1
 GITREV = $(shell git rev-parse --short HEAD)
@@ -29,6 +32,10 @@ deps:
 build:
 	go build ${LDFLAGS} -o $(BUILDDIR)/${BINARY} -i $(MAIN)
 	@echo "Build $(BINARY) done."
+
+client:
+	go build ${LDFLAGS} -o $(BUILDDIR)/${CLIENT_BINARY} -i $(CLIENT_MAIN)
+	@echo "Build $(CLIENT_BINARY) done."
 
 changelog:
 	git-chglog $(VERSION) > CHANGELOG.md

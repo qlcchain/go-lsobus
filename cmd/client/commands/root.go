@@ -46,6 +46,7 @@ func Execute(osArgs []string) {
 		}
 		rootCmd.PersistentFlags().StringVarP(&endpointP, "endpoint", "e", endpointP, "endpoint for client")
 		addcommands()
+		addSonataCmd(rootCmd)
 		if err := rootCmd.Execute(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
