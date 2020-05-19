@@ -15,7 +15,7 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/poq/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
 )
 
 // NewHubCreateParams creates a new HubCreateParams object

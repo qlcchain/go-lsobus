@@ -10,8 +10,8 @@ import (
 
 	"github.com/qlcchain/go-qlc/common/types"
 
-	"github.com/iixlabs/virtual-lsobus/common"
-	"github.com/iixlabs/virtual-lsobus/config"
+	"github.com/qlcchain/go-virtual-lsobus/common"
+	"github.com/qlcchain/go-virtual-lsobus/config"
 )
 
 type testService struct {

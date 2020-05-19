@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/iixlabs/virtual-lsobus/services/context"
+	"github.com/qlcchain/go-virtual-lsobus/services/context"
 )
 
 //RegisterServices register services to chain context

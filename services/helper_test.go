@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/iixlabs/virtual-lsobus/config"
-	"github.com/iixlabs/virtual-lsobus/services/context"
+	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-virtual-lsobus/services/context"
 )
 
 func TestRegisterServices(t *testing.T) {

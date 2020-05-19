@@ -10,8 +10,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/address/client/geographic_address"
-	"github.com/iixlabs/virtual-lsobus/sonata/address/client/geographic_address_validation"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/address/client/geographic_address"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/address/client/geographic_address_validation"
 )
 
 // Default API geographic address management HTTP client.

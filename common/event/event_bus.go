@@ -10,7 +10,7 @@ package event
 import (
 	"io"
 
-	"github.com/iixlabs/virtual-lsobus/common"
+	"github.com/qlcchain/go-virtual-lsobus/common"
 )
 
 // subscriber defines subscription-related bus behavior

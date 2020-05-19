@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iixlabs/virtual-lsobus/common"
+	"github.com/qlcchain/go-virtual-lsobus/common"
 
 	"github.com/google/uuid"
 )

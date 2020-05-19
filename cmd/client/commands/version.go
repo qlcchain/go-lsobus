@@ -6,8 +6,8 @@ import (
 	"github.com/abiosoft/ishell"
 	"github.com/spf13/cobra"
 
-	"github.com/iixlabs/virtual-lsobus/cmd/util"
-	version2 "github.com/iixlabs/virtual-lsobus/services/version"
+	"github.com/qlcchain/go-virtual-lsobus/cmd/util"
+	version2 "github.com/qlcchain/go-virtual-lsobus/services/version"
 )
 
 func version() {

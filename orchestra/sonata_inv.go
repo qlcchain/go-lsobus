@@ -1,9 +1,9 @@
 package orchestra
 
 import (
-	"github.com/iixlabs/virtual-lsobus/mock"
-	invcli "github.com/iixlabs/virtual-lsobus/sonata/inventory/client"
-	invapi "github.com/iixlabs/virtual-lsobus/sonata/inventory/client/product"
+	"github.com/qlcchain/go-virtual-lsobus/mock"
+	invcli "github.com/qlcchain/go-virtual-lsobus/sonata/inventory/client"
+	invapi "github.com/qlcchain/go-virtual-lsobus/sonata/inventory/client/product"
 )
 
 type sonataInvImpl struct {

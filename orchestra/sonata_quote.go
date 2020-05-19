@@ -3,13 +3,13 @@ package orchestra
 import (
 	"time"
 
-	"github.com/iixlabs/virtual-lsobus/mock"
+	"github.com/qlcchain/go-virtual-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
 
-	quocli "github.com/iixlabs/virtual-lsobus/sonata/quote/client"
-	quoapi "github.com/iixlabs/virtual-lsobus/sonata/quote/client/quote"
-	quomod "github.com/iixlabs/virtual-lsobus/sonata/quote/models"
+	quocli "github.com/qlcchain/go-virtual-lsobus/sonata/quote/client"
+	quoapi "github.com/qlcchain/go-virtual-lsobus/sonata/quote/client/quote"
+	quomod "github.com/qlcchain/go-virtual-lsobus/sonata/quote/models"
 )
 
 type sonataQuoteImpl struct {

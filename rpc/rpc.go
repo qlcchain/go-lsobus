@@ -3,16 +3,16 @@ package rpc
 import (
 	"context"
 
-	"github.com/iixlabs/virtual-lsobus/contract"
+	"github.com/qlcchain/go-virtual-lsobus/contract"
 
-	grpcServer "github.com/iixlabs/virtual-lsobus/rpc/grpc/server"
+	grpcServer "github.com/qlcchain/go-virtual-lsobus/rpc/grpc/server"
 
 	"go.uber.org/zap"
 
-	"github.com/iixlabs/virtual-lsobus/common/event"
-	"github.com/iixlabs/virtual-lsobus/config"
-	"github.com/iixlabs/virtual-lsobus/log"
-	chainctx "github.com/iixlabs/virtual-lsobus/services/context"
+	"github.com/qlcchain/go-virtual-lsobus/common/event"
+	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-virtual-lsobus/log"
+	chainctx "github.com/qlcchain/go-virtual-lsobus/services/context"
 )
 
 type RPC struct {

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/order/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
 )
 
 // ProductOrderFindReader is a Reader for the ProductOrderFind structure.

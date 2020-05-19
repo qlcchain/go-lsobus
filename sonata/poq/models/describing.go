@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 
-	cmnmod "github.com/iixlabs/virtual-lsobus/sonata/common/models"
+	cmnmod "github.com/qlcchain/go-virtual-lsobus/sonata/common/models"
 )
 
 // Describing Target to the schema describing the product spec resource (and type)

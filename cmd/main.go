@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	client "github.com/iixlabs/virtual-lsobus/cmd/client/commands"
-	server "github.com/iixlabs/virtual-lsobus/cmd/server/commands"
-	"github.com/iixlabs/virtual-lsobus/services/version"
+	client "github.com/qlcchain/go-virtual-lsobus/cmd/client/commands"
+	server "github.com/qlcchain/go-virtual-lsobus/cmd/server/commands"
+	"github.com/qlcchain/go-virtual-lsobus/services/version"
 )
 
 func main() {

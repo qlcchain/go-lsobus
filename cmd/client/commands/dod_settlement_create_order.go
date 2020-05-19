@@ -9,12 +9,12 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
+	pb "github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
 	"github.com/qlcchain/go-qlc/common/types"
 
-	"github.com/iixlabs/virtual-lsobus/cmd/util"
+	"github.com/qlcchain/go-virtual-lsobus/cmd/util"
 )
 
 func addCreateOrderCmdByShell(parentCmd *ishell.Cmd) {

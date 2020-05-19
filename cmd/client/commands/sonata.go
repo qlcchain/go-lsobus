@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/iixlabs/virtual-lsobus/orchestra"
+	"github.com/qlcchain/go-virtual-lsobus/orchestra"
 )
 
 func addSonataCmd(root *cobra.Command) {

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/poq/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
 )
 
 // ProductOfferingQualificationFindReader is a Reader for the ProductOfferingQualificationFind structure.

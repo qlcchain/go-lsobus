@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/order/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
 )
 
 // HubDeleteReader is a Reader for the HubDelete structure.

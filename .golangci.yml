@@ -32,7 +32,7 @@ linters-settings:
   lll:
     line-length: 140
   goimports:
-    local-prefixes: github.com/iixlabs/virtual-lsobus
+    local-prefixes: github.com/qlcchain/go-virtual-lsobus
   gocritic:
     enabled-tags:
       - diagnostic

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/poq/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
 )
 
 // HubCreateReader is a Reader for the HubCreate structure.

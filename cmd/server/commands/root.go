@@ -9,16 +9,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/iixlabs/virtual-lsobus/common/util"
+	"github.com/qlcchain/go-virtual-lsobus/common/util"
 
-	"github.com/iixlabs/virtual-lsobus/services"
-	ct "github.com/iixlabs/virtual-lsobus/services/context"
+	"github.com/qlcchain/go-virtual-lsobus/services"
+	ct "github.com/qlcchain/go-virtual-lsobus/services/context"
 
 	"github.com/spf13/cobra"
 
 	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
-	"github.com/iixlabs/virtual-lsobus/log"
+	"github.com/qlcchain/go-virtual-lsobus/log"
 )
 
 var (

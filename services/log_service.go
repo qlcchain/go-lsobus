@@ -3,11 +3,11 @@ package services
 import (
 	"errors"
 
-	"github.com/iixlabs/virtual-lsobus/config"
-	"github.com/iixlabs/virtual-lsobus/log"
+	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-virtual-lsobus/log"
 
-	"github.com/iixlabs/virtual-lsobus/common"
-	"github.com/iixlabs/virtual-lsobus/services/context"
+	"github.com/qlcchain/go-virtual-lsobus/common"
+	"github.com/qlcchain/go-virtual-lsobus/services/context"
 )
 
 type LogService struct {

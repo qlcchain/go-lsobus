@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/iixlabs/virtual-lsobus/sonata/address/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata/address/models"
 )
 
 // GeographicAddressGetReader is a Reader for the GeographicAddressGet structure.

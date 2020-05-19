@@ -1,9 +1,9 @@
 package orchestra
 
 import (
-	"github.com/iixlabs/virtual-lsobus/mock"
-	sitcli "github.com/iixlabs/virtual-lsobus/sonata/site/client"
-	sitapi "github.com/iixlabs/virtual-lsobus/sonata/site/client/geographic_site"
+	"github.com/qlcchain/go-virtual-lsobus/mock"
+	sitcli "github.com/qlcchain/go-virtual-lsobus/sonata/site/client"
+	sitapi "github.com/qlcchain/go-virtual-lsobus/sonata/site/client/geographic_site"
 )
 
 type sonataSiteImpl struct {

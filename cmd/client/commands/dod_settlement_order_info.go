@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/iixlabs/virtual-lsobus/rpc/grpc/proto"
+	pb "github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
 	"google.golang.org/grpc"
 
-	"github.com/iixlabs/virtual-lsobus/cmd/util"
+	"github.com/qlcchain/go-virtual-lsobus/cmd/util"
 )
 
 func addGetOrderInfoByShell(parentCmd *ishell.Cmd) {

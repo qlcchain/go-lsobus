@@ -6,22 +6,22 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/iixlabs/virtual-lsobus/sonata"
-	sitapi "github.com/iixlabs/virtual-lsobus/sonata/site/client/geographic_site"
-	sitmod "github.com/iixlabs/virtual-lsobus/sonata/site/models"
+	"github.com/qlcchain/go-virtual-lsobus/sonata"
+	sitapi "github.com/qlcchain/go-virtual-lsobus/sonata/site/client/geographic_site"
+	sitmod "github.com/qlcchain/go-virtual-lsobus/sonata/site/models"
 
 	"github.com/bitly/go-simplejson"
 
 	"github.com/go-openapi/strfmt"
 
-	invapi "github.com/iixlabs/virtual-lsobus/sonata/inventory/client/product"
-	invmod "github.com/iixlabs/virtual-lsobus/sonata/inventory/models"
-	ordapi "github.com/iixlabs/virtual-lsobus/sonata/order/client/product_order"
-	ordmod "github.com/iixlabs/virtual-lsobus/sonata/order/models"
-	poqapi "github.com/iixlabs/virtual-lsobus/sonata/poq/client/product_offering_qualification"
-	poqmod "github.com/iixlabs/virtual-lsobus/sonata/poq/models"
-	quoapi "github.com/iixlabs/virtual-lsobus/sonata/quote/client/quote"
-	quomod "github.com/iixlabs/virtual-lsobus/sonata/quote/models"
+	invapi "github.com/qlcchain/go-virtual-lsobus/sonata/inventory/client/product"
+	invmod "github.com/qlcchain/go-virtual-lsobus/sonata/inventory/models"
+	ordapi "github.com/qlcchain/go-virtual-lsobus/sonata/order/client/product_order"
+	ordmod "github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
+	poqapi "github.com/qlcchain/go-virtual-lsobus/sonata/poq/client/product_offering_qualification"
+	poqmod "github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
+	quoapi "github.com/qlcchain/go-virtual-lsobus/sonata/quote/client/quote"
+	quomod "github.com/qlcchain/go-virtual-lsobus/sonata/quote/models"
 )
 
 func SonataGenerateSiteFindResponse(reqParams *sitapi.GeographicSiteFindParams) *sitapi.GeographicSiteFindOK {

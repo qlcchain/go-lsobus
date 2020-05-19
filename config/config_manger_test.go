@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/iixlabs/virtual-lsobus/common/util"
+	"github.com/qlcchain/go-virtual-lsobus/common/util"
 )
 
 var configDir = filepath.Join(TestDataDir(), "config")
