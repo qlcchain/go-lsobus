@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 )
 
 func TestNewRPCService(t *testing.T) {

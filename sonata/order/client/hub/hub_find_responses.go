@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
+	"github.com/qlcchain/go-lsobus/sonata/order/models"
 )
 
 // HubFindReader is a Reader for the HubFind structure.

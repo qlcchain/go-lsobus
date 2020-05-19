@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/quote/models"
+	"github.com/qlcchain/go-lsobus/sonata/quote/models"
 )
 
 // QuoteFindReader is a Reader for the QuoteFind structure.

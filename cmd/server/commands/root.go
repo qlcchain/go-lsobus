@@ -9,16 +9,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/qlcchain/go-virtual-lsobus/common/util"
+	"github.com/qlcchain/go-lsobus/common/util"
 
-	"github.com/qlcchain/go-virtual-lsobus/services"
-	ct "github.com/qlcchain/go-virtual-lsobus/services/context"
+	"github.com/qlcchain/go-lsobus/services"
+	ct "github.com/qlcchain/go-lsobus/services/context"
 
 	"github.com/spf13/cobra"
 
 	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
-	"github.com/qlcchain/go-virtual-lsobus/log"
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 var (
@@ -31,9 +31,9 @@ var (
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	rootCmd := &cobra.Command{
-		Use:   "virtual-lsobus",
-		Short: "virtual lsobus is a agent for MEF Sonata APIs",
-		Long:  `virtual lsobus is a agent for MEF Sonata APIs`,
+		Use:   "lsobus",
+		Short: "LSOBUS is a agent for MEF Sonata APIs",
+		Long:  `LSOBUS is a agent for MEF Sonata APIs`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := start()
 			if err != nil {
@@ -107,5 +107,5 @@ func trapSignal() {
 		log.Root.Info(err)
 	}
 	time.Sleep(1 * time.Second)
-	log.Root.Info("virtual lsoBus closed successfully")
+	log.Root.Info("LSOBUS closed successfully")
 }

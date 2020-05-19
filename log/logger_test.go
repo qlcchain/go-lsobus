@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 )
 
 func TestNewLogger(t *testing.T) {

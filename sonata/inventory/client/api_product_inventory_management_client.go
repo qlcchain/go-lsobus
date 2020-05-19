@@ -10,7 +10,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/inventory/client/product"
+	"github.com/qlcchain/go-lsobus/sonata/inventory/client/product"
 )
 
 // Default API product inventory management HTTP client.

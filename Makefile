@@ -7,19 +7,19 @@ K := $(foreach exec,$(EXECUTABLES),\
 
 GO ?= latest
 
-BINARY = gvlsobus
+BINARY = glsobus
 MAIN = $(shell pwd)/cmd/main.go
 
-CLIENT_BINARY = gvlsobus-client
+CLIENT_BINARY = glsobus-client
 CLIENT_MAIN = $(shell pwd)/cmd/client/main.go
 
 BUILDDIR = $(shell pwd)/build
 VERSION ?= 0.0.1
 GITREV = $(shell git rev-parse --short HEAD)
 BUILDTIME = $(shell date +'%FT%TZ%z')
-LDFLAGS=-ldflags "-X github.com/qlcchain/go-virtual-lsobus/services/version.Version=${VERSION} \
-				  -X github.com/qlcchain/go-virtual-lsobus/services/version.GitRev=${GITREV} \
-				  -X github.com/qlcchain/go-virtual-lsobus/services/version.BuildTime=${BUILDTIME}"
+LDFLAGS=-ldflags "-X github.com/qlcchain/go-lsobus/services/version.Version=${VERSION} \
+				  -X github.com/qlcchain/go-lsobus/services/version.GitRev=${GITREV} \
+				  -X github.com/qlcchain/go-lsobus/services/version.BuildTime=${BUILDTIME}"
 
 default: build
 
@@ -51,7 +51,7 @@ gofmt:
 
 style:
 	gofmt -w .
-	goimports -local github.com/qlcchain/go-virtual-lsobus -w .
+	goimports -local github.com/qlcchain/go-lsobus -w .
 
 snapshot:
 	goreleaser --snapshot --rm-dist

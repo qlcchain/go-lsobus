@@ -10,8 +10,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/quote/client/hub"
-	"github.com/qlcchain/go-virtual-lsobus/sonata/quote/client/quote"
+	"github.com/qlcchain/go-lsobus/sonata/quote/client/hub"
+	"github.com/qlcchain/go-lsobus/sonata/quote/client/quote"
 )
 
 // Default API quote management HTTP client.

@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/notify/quote/models"
+	"github.com/qlcchain/go-lsobus/sonata/notify/quote/models"
 )
 
 // NotificationQuoteAttributeValueChangeNotificationNoContentCode is the HTTP code returned for type NotificationQuoteAttributeValueChangeNotificationNoContent

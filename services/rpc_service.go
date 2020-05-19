@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-virtual-lsobus/common"
-	"github.com/qlcchain/go-virtual-lsobus/log"
-	"github.com/qlcchain/go-virtual-lsobus/rpc"
+	"github.com/qlcchain/go-lsobus/common"
+	"github.com/qlcchain/go-lsobus/log"
+	"github.com/qlcchain/go-lsobus/rpc"
 )
 
 type RPCService struct {

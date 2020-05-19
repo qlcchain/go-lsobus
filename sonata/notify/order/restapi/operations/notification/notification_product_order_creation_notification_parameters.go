@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/notify/order/models"
+	"github.com/qlcchain/go-lsobus/sonata/notify/order/models"
 )
 
 // NewNotificationProductOrderCreationNotificationParams creates a new NotificationProductOrderCreationNotificationParams object

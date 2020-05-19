@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/notify/quote/models"
+	"github.com/qlcchain/go-lsobus/sonata/notify/quote/models"
 )
 
 // NewNotificationQuoteStateChangeNotificationParams creates a new NotificationQuoteStateChangeNotificationParams object

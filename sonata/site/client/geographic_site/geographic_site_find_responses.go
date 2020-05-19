@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/site/models"
+	"github.com/qlcchain/go-lsobus/sonata/site/models"
 )
 
 // GeographicSiteFindReader is a Reader for the GeographicSiteFind structure.

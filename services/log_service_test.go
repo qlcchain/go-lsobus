@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 )
 
 func TestLogService(t *testing.T) {

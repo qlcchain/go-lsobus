@@ -3,14 +3,14 @@ package orchestra
 import (
 	"strconv"
 
-	"github.com/qlcchain/go-virtual-lsobus/common/util"
+	"github.com/qlcchain/go-lsobus/common/util"
 
-	cmnmod "github.com/qlcchain/go-virtual-lsobus/sonata/common/models"
+	cmnmod "github.com/qlcchain/go-lsobus/sonata/common/models"
 
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-virtual-lsobus/log"
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 const (

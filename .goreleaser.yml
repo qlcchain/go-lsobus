@@ -5,11 +5,11 @@ before:
     # you may remove this if you don't need go generate
     # - go generate ./...
 builds:
-  - id: virtual-lsobus-x64
+  - id: go-lsobus-x64
     main: cmd/main.go
-    binary: virtual-lsobus
+    binary: glsobus
     env:
-      - CGO_ENABLED=0
+      #- CGO_ENABLED=0
     ldflags:
       - main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
     goos:

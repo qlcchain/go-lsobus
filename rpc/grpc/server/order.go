@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/qlcchain/go-virtual-lsobus/contract"
-	"github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
+	"github.com/qlcchain/go-lsobus/contract"
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 type OrderApi struct {

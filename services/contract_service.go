@@ -5,10 +5,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-virtual-lsobus/contract"
-	"github.com/qlcchain/go-virtual-lsobus/log"
+	"github.com/qlcchain/go-lsobus/contract"
+	"github.com/qlcchain/go-lsobus/log"
 
-	"github.com/qlcchain/go-virtual-lsobus/common"
+	"github.com/qlcchain/go-lsobus/common"
 )
 
 type ContractService struct {

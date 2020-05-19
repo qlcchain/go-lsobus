@@ -1,5 +1,5 @@
-# Virtual-LSOBUS
-Virtual Business Application for MEF LSO Framework.
+# LSOBUS
+Business Application for MEF LSO Framework.
 
 ## Modules
 ### Sonata
@@ -29,11 +29,11 @@ RPC Server is responsible for providing APIs to Front Web UI.
 #### External
 Uploading order to chain:
 
-User -> Front Web UI -> Virtual-LSOBUS -> QLC Chain.
+User -> Front Web UI -> LSOBUS -> QLC Chain.
 
 Sending order to partner:
 
-User -> Front Web UI -> Virtual-LSOBUS -> Sonata Server.
+User -> Front Web UI -> LSOBUS -> Sonata Server.
 
 #### Internal
 Uploading order to chain:

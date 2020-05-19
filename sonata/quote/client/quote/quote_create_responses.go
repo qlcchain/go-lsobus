@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/quote/models"
+	"github.com/qlcchain/go-lsobus/sonata/quote/models"
 )
 
 // QuoteCreateReader is a Reader for the QuoteCreate structure.

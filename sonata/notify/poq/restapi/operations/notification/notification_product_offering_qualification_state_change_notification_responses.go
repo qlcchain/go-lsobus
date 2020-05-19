@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/notify/poq/models"
+	"github.com/qlcchain/go-lsobus/sonata/notify/poq/models"
 )
 
 // NotificationProductOfferingQualificationStateChangeNotificationNoContentCode is the HTTP code returned for type NotificationProductOfferingQualificationStateChangeNotificationNoContent

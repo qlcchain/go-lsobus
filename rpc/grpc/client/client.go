@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
+	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 func main() {

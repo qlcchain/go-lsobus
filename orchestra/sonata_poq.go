@@ -3,11 +3,11 @@ package orchestra
 import (
 	"time"
 
-	"github.com/qlcchain/go-virtual-lsobus/mock"
+	"github.com/qlcchain/go-lsobus/mock"
 
-	poqcli "github.com/qlcchain/go-virtual-lsobus/sonata/poq/client"
-	poqapi "github.com/qlcchain/go-virtual-lsobus/sonata/poq/client/product_offering_qualification"
-	poqmod "github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
+	poqcli "github.com/qlcchain/go-lsobus/sonata/poq/client"
+	poqapi "github.com/qlcchain/go-lsobus/sonata/poq/client/product_offering_qualification"
+	poqmod "github.com/qlcchain/go-lsobus/sonata/poq/models"
 )
 
 type sonataPOQImpl struct {

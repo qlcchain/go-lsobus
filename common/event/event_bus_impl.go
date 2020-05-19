@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qlcchain/go-virtual-lsobus/common"
+	"github.com/qlcchain/go-lsobus/common"
 
 	"github.com/cornelk/hashmap"
 	"github.com/google/uuid"

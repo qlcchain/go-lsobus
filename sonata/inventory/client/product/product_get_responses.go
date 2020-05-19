@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/inventory/models"
+	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 )
 
 // ProductGetReader is a Reader for the ProductGet structure.

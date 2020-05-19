@@ -10,11 +10,11 @@ import (
 	rpc "github.com/qlcchain/jsonrpc2"
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-virtual-lsobus/common"
-	"github.com/qlcchain/go-virtual-lsobus/common/event"
-	"github.com/qlcchain/go-virtual-lsobus/config"
-	"github.com/qlcchain/go-virtual-lsobus/log"
-	ct "github.com/qlcchain/go-virtual-lsobus/services/context"
+	"github.com/qlcchain/go-lsobus/common"
+	"github.com/qlcchain/go-lsobus/common/event"
+	"github.com/qlcchain/go-lsobus/config"
+	"github.com/qlcchain/go-lsobus/log"
+	ct "github.com/qlcchain/go-lsobus/services/context"
 )
 
 const (

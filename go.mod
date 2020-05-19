@@ -1,4 +1,4 @@
-module github.com/qlcchain/go-virtual-lsobus
+module github.com/qlcchain/go-lsobus
 
 go 1.13
 

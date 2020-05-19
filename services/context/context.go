@@ -6,16 +6,16 @@ import (
 	"path"
 	"sync"
 
-	"github.com/qlcchain/go-virtual-lsobus/common/event"
+	"github.com/qlcchain/go-lsobus/common/event"
 
-	"github.com/qlcchain/go-virtual-lsobus/common"
-	"github.com/qlcchain/go-virtual-lsobus/log"
+	"github.com/qlcchain/go-lsobus/common"
+	"github.com/qlcchain/go-lsobus/log"
 
 	"github.com/cornelk/hashmap"
 
 	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 )
 
 var cache = hashmap.New(10)

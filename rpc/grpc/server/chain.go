@@ -3,9 +3,9 @@ package grpcServer
 import (
 	"context"
 
-	"github.com/qlcchain/go-virtual-lsobus/services/version"
+	"github.com/qlcchain/go-lsobus/services/version"
 
-	"github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 type chainApi struct {

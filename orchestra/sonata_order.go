@@ -3,13 +3,13 @@ package orchestra
 import (
 	"time"
 
-	"github.com/qlcchain/go-virtual-lsobus/mock"
+	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
 
-	ordcli "github.com/qlcchain/go-virtual-lsobus/sonata/order/client"
-	ordapi "github.com/qlcchain/go-virtual-lsobus/sonata/order/client/product_order"
-	ordmod "github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
+	ordcli "github.com/qlcchain/go-lsobus/sonata/order/client"
+	ordapi "github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
+	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
 )
 
 type sonataOrderImpl struct {

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
+	"github.com/qlcchain/go-lsobus/sonata/poq/models"
 )
 
 // ProductOfferingQualificationGetReader is a Reader for the ProductOfferingQualificationGet structure.

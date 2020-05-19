@@ -5,13 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/qlcchain/go-virtual-lsobus/common/util"
+	"github.com/qlcchain/go-lsobus/common/util"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 )
 
 const (

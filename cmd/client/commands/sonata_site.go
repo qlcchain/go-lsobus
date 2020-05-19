@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/qlcchain/go-virtual-lsobus/orchestra"
+	"github.com/qlcchain/go-lsobus/orchestra"
 )
 
 func addSonataSiteCmd(parent *cobra.Command) {

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/qlcchain/go-virtual-lsobus/orchestra"
+	"github.com/qlcchain/go-lsobus/orchestra"
 
 	"github.com/spf13/cobra"
 )

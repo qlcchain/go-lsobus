@@ -31,16 +31,16 @@ func Execute(osArgs []string) {
 			HistorySearchFold: true,
 			//FuncFilterInputRune: filterInput,
 		})
-		shell.Println("Virtual-LSOBus Client")
+		shell.Println("LSOBUS Client")
 		//set common variable
 		addcommands()
 		// run shell
 		shell.Run()
 	} else {
 		rootCmd = &cobra.Command{
-			Use:   "virtual-lsobus",
-			Short: "virtual lsobus is a agent for MEF Sonata APIs",
-			Long:  `virtual lsobus is a agent for MEF Sonata APIs`,
+			Use:   "lsobus",
+			Short: "lsobus is a agent for MEF Sonata APIs",
+			Long:  `lsobus is a agent for MEF Sonata APIs`,
 			Run: func(cmd *cobra.Command, args []string) {
 			},
 		}

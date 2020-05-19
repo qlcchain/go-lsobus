@@ -10,8 +10,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/client/hub"
-	"github.com/qlcchain/go-virtual-lsobus/sonata/poq/client/product_offering_qualification"
+	"github.com/qlcchain/go-lsobus/sonata/poq/client/hub"
+	"github.com/qlcchain/go-lsobus/sonata/poq/client/product_offering_qualification"
 )
 
 // Default API product offering qualification management HTTP client.

@@ -15,7 +15,7 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/address/models"
+	"github.com/qlcchain/go-lsobus/sonata/address/models"
 )
 
 // NewGeographicAddressValidationCreateParams creates a new GeographicAddressValidationCreateParams object

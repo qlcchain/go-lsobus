@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/qlcchain/go-qlc/common/types"
 	abi "github.com/qlcchain/go-qlc/vm/contract/abi"

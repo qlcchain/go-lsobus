@@ -1,9 +1,9 @@
 package orchestra
 
 import (
-	ordmod "github.com/qlcchain/go-virtual-lsobus/sonata/order/models"
-	poqmod "github.com/qlcchain/go-virtual-lsobus/sonata/poq/models"
-	quomod "github.com/qlcchain/go-virtual-lsobus/sonata/quote/models"
+	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
+	poqmod "github.com/qlcchain/go-lsobus/sonata/poq/models"
+	quomod "github.com/qlcchain/go-lsobus/sonata/quote/models"
 )
 
 type Partner struct {

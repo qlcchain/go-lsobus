@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/qlcchain/go-virtual-lsobus/common/util"
+	"github.com/qlcchain/go-lsobus/common/util"
 )
 
 type CfgManager struct {

@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 
-	cmnmod "github.com/qlcchain/go-virtual-lsobus/sonata/common/models"
+	cmnmod "github.com/qlcchain/go-lsobus/sonata/common/models"
 )
 
 // Describing Polymorphic class to describe request product attribute

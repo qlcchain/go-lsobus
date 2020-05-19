@@ -7,18 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/qlcchain/go-virtual-lsobus/contract"
+	"github.com/qlcchain/go-lsobus/contract"
 
-	"github.com/qlcchain/go-virtual-lsobus/config"
+	"github.com/qlcchain/go-lsobus/config"
 
-	pb "github.com/qlcchain/go-virtual-lsobus/rpc/grpc/proto"
+	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/qlcchain/go-virtual-lsobus/log"
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 type GRPCServer struct {

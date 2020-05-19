@@ -10,9 +10,9 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/qlcchain/go-virtual-lsobus/sonata/order/client/cancel_product_order"
-	"github.com/qlcchain/go-virtual-lsobus/sonata/order/client/hub"
-	"github.com/qlcchain/go-virtual-lsobus/sonata/order/client/product_order"
+	"github.com/qlcchain/go-lsobus/sonata/order/client/cancel_product_order"
+	"github.com/qlcchain/go-lsobus/sonata/order/client/hub"
+	"github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
 )
 
 // Default API product order management HTTP client.
