@@ -14,8 +14,9 @@ type sonataPOQImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataPOQImpl() *sonataPOQImpl {
+func newSonataPOQImpl(o *Orchestra) *sonataPOQImpl {
 	s := &sonataPOQImpl{}
+	s.Orch = o
 	s.Version = MEFAPIVersionPOQ
 	return s
 }
@@ -35,7 +36,7 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
-	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.ProductOfferingQualification))
+	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOfferingQualification))
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
 	if err != nil {
@@ -43,9 +44,8 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 		//return err
 		rspParams = mock.SonataGeneratePoqCreateResponse(reqParams)
 	}
-	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
-
-	orderParams.rspPoq = rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	orderParams.RspPoq = rspParams.GetPayload()
 
 	return nil
 }
@@ -72,13 +72,14 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspPoqList = rspParams.GetPayload()
 	return nil
 }
 
-func (s *sonataPOQImpl) SendGetRequest(id string) error {
+func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
 	reqParams := poqapi.NewProductOfferingQualificationGetParams()
-	reqParams.ProductOfferingQualificationID = id
+	reqParams.ProductOfferingQualificationID = params.ID
 
 	httpCli := s.NewHTTPClient()
 
@@ -87,7 +88,8 @@ func (s *sonataPOQImpl) SendGetRequest(id string) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspPoq = rspParams.GetPayload()
 	return nil
 }
 

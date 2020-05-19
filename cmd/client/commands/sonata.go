@@ -172,7 +172,7 @@ func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) er
 }
 
 func getOrchestraInstance() (*orchestra.Orchestra, error) {
-	o := orchestra.NewOrchestra()
+	o := orchestra.NewOrchestra("")
 	err := o.Init()
 	if err != nil {
 		return nil, err

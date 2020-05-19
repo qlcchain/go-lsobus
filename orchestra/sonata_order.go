@@ -16,8 +16,9 @@ type sonataOrderImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOrderImpl() *sonataOrderImpl {
+func newSonataOrderImpl(o *Orchestra) *sonataOrderImpl {
 	s := &sonataOrderImpl{}
+	s.Orch = o
 	s.Version = MEFAPIVersionOrder
 	return s
 }
@@ -37,7 +38,7 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
-	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
+	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
 	if err != nil {
@@ -45,9 +46,8 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 		//return err
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	}
-	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
-
-	orderParams.rspOrder = rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	orderParams.RspOrder = rspParams.GetPayload()
 
 	return nil
 }
@@ -77,16 +77,16 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
 
-	//rspOrder := rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspOrderList = rspParams.GetPayload()
 
 	return nil
 }
 
-func (s *sonataOrderImpl) SendGetRequest(id string) error {
+func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	reqParams := ordapi.NewProductOrderGetParams()
-	reqParams.ProductOrderID = id
+	reqParams.ProductOrderID = params.ID
 
 	httpCli := s.NewHTTPClient()
 
@@ -95,9 +95,8 @@ func (s *sonataOrderImpl) SendGetRequest(id string) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
-
-	//rspOrder := rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspOrder = rspParams.GetPayload()
 
 	return nil
 }
@@ -279,19 +278,29 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	item.PricingMethod = ordmod.PricingMethodContract
 	item.PricingReference = params.ContractID
 
+	if params.BillingParams == nil {
+		return
+	}
+
 	itemPrice := &ordmod.OrderItemPrice{}
-	//itemPrice.PriceType = ordmod.PriceTypeRecurring
-	//itemPrice.RecurringChargePeriod = ordmod.ChargePeriodDay
-	itemPrice.PriceType = ordmod.PriceTypeNonRecurring
+	if params.BillingParams.BillingType == BillingTypeDOD {
+		itemPrice.PriceType = ordmod.PriceTypeNonRecurring
+	} else if params.BillingParams.BillingType == BillingTypePAYG {
+		itemPrice.PriceType = ordmod.PriceTypeRecurring
+		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingParams.BillingUnit)
+	} else if params.BillingParams.BillingType == BillingTypeUsage {
+		itemPrice.PriceType = ordmod.PriceTypeRecurring
+		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingParams.BillingUnit)
+		itemPrice.Price.UnitOfMesure = params.BillingParams.MeasureUnit
+	}
 
 	itemPrice.Price = &ordmod.Price{}
-	curUnit := "USA"
-	curVal := float32(12.34)
+	curUnit := params.BillingParams.CurrencyUnit
+	curVal := float32(params.BillingParams.CurrencyPrice)
 	itemPrice.Price.DutyFreeAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	itemPrice.Price.TaxIncludedAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	taxRate := float32(0)
 	itemPrice.Price.TaxRate = &taxRate
-	//itemPrice.Price.UnitOfMesure = ""
 	item.OrderItemPrice = append(item.OrderItemPrice, itemPrice)
 }
 

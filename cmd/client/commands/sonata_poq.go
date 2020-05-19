@@ -35,8 +35,7 @@ var sonataPoqCreateCmd = &cobra.Command{
 			return
 		}
 
-		o := orchestra.NewOrchestra()
-		err = o.Init()
+		o, err := getOrchestraInstance()
 		if err != nil {
 			cmd.PrintErrln(err)
 			return

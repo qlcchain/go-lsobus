@@ -1,6 +1,8 @@
 package orchestra
 
 import (
+	"fmt"
+	"net/url"
 	"strconv"
 
 	"github.com/qlcchain/go-lsobus/common/util"
@@ -30,6 +32,9 @@ const (
 )
 
 type sonataBaseImpl struct {
+	Orch *Orchestra
+
+	URL     string
 	Scheme  string
 	Host    string
 	Version string
@@ -39,6 +44,16 @@ type sonataBaseImpl struct {
 }
 
 func (s *sonataBaseImpl) Init() error {
+	s.URL = s.Orch.GetSonataUrl("")
+	if s.URL != "" {
+		retUrl, err := url.Parse(s.URL)
+		if err != nil {
+			return fmt.Errorf("sonata url parse err %s", err)
+		}
+		s.Scheme = retUrl.Scheme
+		s.Host = retUrl.Host
+	}
+
 	if s.Scheme == "" {
 		s.Scheme = "http"
 	}

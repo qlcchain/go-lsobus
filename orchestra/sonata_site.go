@@ -10,8 +10,9 @@ type sonataSiteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataSiteImpl() *sonataSiteImpl {
+func newSonataSiteImpl(o *Orchestra) *sonataSiteImpl {
 	s := &sonataSiteImpl{}
+	s.Orch = o
 	s.Version = MEFAPIVersionSite
 	return s
 }
@@ -39,16 +40,15 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 		//return err
 		rspParams = mock.SonataGenerateSiteFindResponse(reqParams)
 	}
-	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
-
-	//rspOrder := rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspSiteList = rspParams.GetPayload()
 
 	return nil
 }
 
-func (s *sonataSiteImpl) SendGetRequest(id string) error {
+func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
 	reqParams := sitapi.NewGeographicSiteGetParams()
-	reqParams.SiteID = id
+	reqParams.SiteID = params.ID
 
 	httpCli := s.NewHTTPClient()
 
@@ -57,9 +57,9 @@ func (s *sonataSiteImpl) SendGetRequest(id string) error {
 		s.logger.Errorf("send request, error %s", err)
 		return err
 	}
-	s.logger.Infof("receive response, payload:", s.DumpValue(rspParams.GetPayload()))
 
-	//rspOrder := rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload:", s.DumpValue(rspParams.GetPayload()))
+	params.RspSite = rspParams.GetPayload()
 
 	return nil
 }

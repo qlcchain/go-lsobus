@@ -10,8 +10,9 @@ type sonataInvImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataInvImpl() *sonataInvImpl {
+func newSonataInvImpl(o *Orchestra) *sonataInvImpl {
 	s := &sonataInvImpl{}
+	s.Orch = o
 	s.Version = MEFAPIVersionInv
 	return s
 }
@@ -56,13 +57,14 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspInvList = rspParams.GetPayload()
 
 	return nil
 }
 
-func (s *sonataInvImpl) SendGetRequest(id string) error {
+func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 	reqParams := invapi.NewProductGetParams()
-	reqParams.ProductID = id
+	reqParams.ProductID = params.ID
 
 	httpCli := s.NewHTTPClient()
 
@@ -71,9 +73,8 @@ func (s *sonataInvImpl) SendGetRequest(id string) error {
 		s.logger.Errorf("send request, error %s", err)
 		return err
 	}
-	s.logger.Infof("receive response, payload:", s.DumpValue(rspParams.GetPayload()))
-
-	//rspOrder := rspParams.GetPayload()
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspInv = rspParams.GetPayload()
 
 	return nil
 }

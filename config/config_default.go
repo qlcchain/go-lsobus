@@ -28,6 +28,13 @@ func DefaultConfig(dir string) (*Config, error) {
 			GRPCListenAddress:  "tcp://0.0.0.0:9999",
 			CORSAllowedOrigins: []string{"*"},
 		},
+		Partners: []*PartnerCfg{
+			{
+				Name:      "PCCW",
+				ID:        "PCCW",
+				SonataUrl: "http://127.0.0.1:7777",
+			},
+		},
 	}
 	return &cfg, nil
 }

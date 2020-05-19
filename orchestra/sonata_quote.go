@@ -16,8 +16,9 @@ type sonataQuoteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataQuoteImpl() *sonataQuoteImpl {
+func newSonataQuoteImpl(o *Orchestra) *sonataQuoteImpl {
 	s := &sonataQuoteImpl{}
+	s.Orch = o
 	s.Version = MEFAPIVersionQuote
 	return s
 }
@@ -37,7 +38,7 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	httpCli := s.NewHTTPClient()
 
-	s.logger.Infof("send request, payload %s", s.DumpValue(reqParams.Quote))
+	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.Quote))
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
 	if err != nil {
@@ -46,9 +47,9 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
 	}
 
-	s.logger.Infof("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 
-	orderParams.rspQuote = rspParams.GetPayload()
+	orderParams.RspQuote = rspParams.GetPayload()
 
 	return nil
 }
@@ -78,13 +79,14 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspQuoteList = rspParams.GetPayload()
 	return nil
 }
 
-func (s *sonataQuoteImpl) SendGetRequest(id string) error {
+func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	reqParams := quoapi.NewQuoteGetParams()
-	reqParams.ID = id
+	reqParams.ID = params.ID
 
 	httpCli := s.NewHTTPClient()
 
@@ -93,7 +95,9 @@ func (s *sonataQuoteImpl) SendGetRequest(id string) error {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
-	s.logger.Info("receive response,", "error:", rspParams.Error(), "Payload:", rspParams.GetPayload())
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
+	params.RspQuote = rspParams.GetPayload()
+
 	return nil
 }
 
@@ -191,6 +195,9 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &quomod.Product{}
+	if uniItem.Action != quomod.ProductActionTypeINSTALL {
+		uniItem.Product.ID = &orderParams.ProductID
+	}
 
 	// UNI Place
 	if siteID != "" {
@@ -225,6 +232,9 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = new(quomod.Product)
+	if lineItem.Action != quomod.ProductActionTypeINSTALL {
+		lineItem.Product.ID = &orderParams.ProductID
+	}
 
 	//Product Specification
 	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
@@ -238,9 +248,11 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 }
 
 func (s *sonataQuoteImpl) BuildItemTerm(item *quomod.QuoteItemCreate, orderParams *OrderParams) {
-	item.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-	item.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-	item.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnitDAY
-	durVal := int32(3)
-	item.RequestedQuoteItemTerm.Duration.Value = &durVal
+	/*
+		item.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+		item.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+		item.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnitYEAR
+		durVal := int32(99)
+		item.RequestedQuoteItemTerm.Duration.Value = &durVal
+	*/
 }
