@@ -175,14 +175,17 @@ func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.Qu
 }
 
 func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *quomod.QuoteItemCreate {
-	var siteID string
-	if isDirSrc {
-		siteID = orderParams.SrcSiteID
-	} else {
-		siteID = orderParams.DstSiteID
-	}
-	if siteID == "" {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
 		return nil
+	}
+
+	var siteID string
+	if orderParams.ItemAction != string(quomod.ProductActionTypeDISCONNECT) {
+		if isDirSrc {
+			siteID = orderParams.SrcSiteID
+		} else {
+			siteID = orderParams.DstSiteID
+		}
 	}
 
 	uniItem := &quomod.QuoteItemCreate{}
@@ -207,10 +210,12 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	}
 
 	// UNI Product Specification
-	uniItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := s.BuildUNIProductSpec(orderParams)
-	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	if uniItem.Action != quomod.ProductActionTypeDISCONNECT {
+		uniItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
+		uniItem.Product.ProductSpecification.ID = "UNISpec"
+		uniDesc := s.BuildUNIProductSpec(orderParams)
+		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	}
 
 	s.BuildItemTerm(uniItem, orderParams)
 
@@ -218,8 +223,14 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 }
 
 func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.QuoteItemCreate {
-	if orderParams.Bandwidth == 0 {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
 		return nil
+	}
+
+	if orderParams.ItemAction != string(quomod.ProductActionTypeDISCONNECT) {
+		if orderParams.Bandwidth == 0 {
+			return nil
+		}
 	}
 
 	lineItem := &quomod.QuoteItemCreate{}
@@ -237,10 +248,12 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 	}
 
 	//Product Specification
-	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-	lineItem.Product.ProductSpecification.ID = "UNISpec"
-	lineDesc := s.BuildELineProductSpec(orderParams)
-	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	if lineItem.Action != quomod.ProductActionTypeDISCONNECT {
+		lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
+		lineItem.Product.ProductSpecification.ID = "UNISpec"
+		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	}
 
 	s.BuildItemTerm(lineItem, orderParams)
 

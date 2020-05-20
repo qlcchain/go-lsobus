@@ -31,6 +31,7 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	// Common
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
 	cmd.Flags().String("itemAction", "add", "Type of product action, (e.g., add, change, remove)")
+	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 	cmd.Flags().String("productID", "", "Product ID of existing service")
 
 	// UNI
@@ -49,6 +50,10 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Uint("bandwidth", 0, "Bandwidth of connection, Unit is Mbps")
 	cmd.Flags().String("cosName", "", "class of service name")
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
+
+	// Price
+	cmd.Flags().String("currency", "USA", "Currency, (e.g., USA, HKD, CNY)")
+	cmd.Flags().Float32("price", 0, "price")
 }
 
 func addFlagsForFindParams(cmd *cobra.Command) {
@@ -63,6 +68,11 @@ func addFlagsForGetParams(cmd *cobra.Command) {
 
 func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command) error {
 	var err error
+
+	params.ProdSpecID, err = cmd.Flags().GetString("prodSpecID")
+	if err != nil {
+		return err
+	}
 
 	params.OrderActivity, err = cmd.Flags().GetString("orderActivity")
 	if err != nil {
@@ -133,6 +143,18 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	}
 
 	params.SVlanID, err = cmd.Flags().GetUint("sVlanID")
+	if err != nil {
+		return err
+	}
+
+	params.BillingParams = &orchestra.BillingParams{}
+	params.BillingParams.BillingType = "DOD"
+	params.BillingParams.Currency, err = cmd.Flags().GetString("currency")
+	if err != nil {
+		return err
+	}
+
+	params.BillingParams.Price, err = cmd.Flags().GetFloat32("price")
 	if err != nil {
 		return err
 	}

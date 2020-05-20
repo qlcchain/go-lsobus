@@ -22,16 +22,17 @@ type Partner struct {
 }
 
 type BillingParams struct {
-	BillingType   string
-	BillingUnit   string    // used for PAYG, etc day/month/year
-	MeasureUnit   string    // used for USAGE, etc minute/hour/Mbps/MByte
-	StartTime     time.Time // used for DOD Duration
-	EndTime       time.Time // used for DOD Duration
-	CurrencyUnit  string    // etc USA/HKD/CNY
-	CurrencyPrice float32
+	BillingType string
+	BillingUnit string    // used for PAYG, etc day/month/year
+	MeasureUnit string    // used for USAGE, etc minute/hour/Mbps/MByte
+	StartTime   time.Time // used for DOD Duration
+	EndTime     time.Time // used for DOD Duration
+	Currency    string    // etc USA/HKD/CNY
+	Price       float32
 }
 
 type OrderParams struct {
+	ProdSpecID    string
 	OrderActivity string
 	ItemAction    string
 	ProductID     string

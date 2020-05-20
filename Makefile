@@ -47,6 +47,10 @@ clean:
 lint:
 	golangci-lint run --fix
 
+style:
+	gofmt -w .
+	goimports -local github.com/iixlabs/virtual-lsobus -w .
+
 snapshot:
 	docker run --rm --privileged \
 		-e PRIVATE_KEY=$(PRIVATE_KEY) \

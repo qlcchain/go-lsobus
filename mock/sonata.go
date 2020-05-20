@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
+
+	cmnmod "github.com/qlcchain/go-lsobus/sonata/common/models"
 
 	"github.com/qlcchain/go-lsobus/sonata"
 	sitapi "github.com/qlcchain/go-lsobus/sonata/site/client/geographic_site"
@@ -59,9 +64,9 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prodItem1 := &invmod.ProductSummary{}
 		rspParams.Payload = append(rspParams.Payload, prodItem1)
 
-		prodID1 := "PCCW-Port-111"
+		prodID1 := uuid.New().String()
 		prodItem1.ID = &prodID1
-		prodItem1.BuyerProductID = "CBC-Port-111"
+		prodItem1.BuyerProductID = uuid.New().String()
 		prodItem1.ProductSpecification = &invmod.ProductSpecificationSummary{}
 		prodSpecID1 := "UNISpec"
 		prodItem1.ProductSpecification.ID = &prodSpecID1
@@ -71,9 +76,9 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prodItem2 := &invmod.ProductSummary{}
 		rspParams.Payload = append(rspParams.Payload, prodItem2)
 
-		prodID2 := "PCCW-Port-222"
+		prodID2 := uuid.New().String()
 		prodItem2.ID = &prodID2
-		prodItem2.BuyerProductID = "CBC-Port-222"
+		prodItem2.BuyerProductID = uuid.New().String()
 		prodItem2.ProductSpecification = &invmod.ProductSpecificationSummary{}
 		prodSpecID2 := "UNISpec"
 		prodItem2.ProductSpecification.ID = &prodSpecID2
@@ -85,9 +90,9 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prodItem1 := &invmod.ProductSummary{}
 		rspParams.Payload = append(rspParams.Payload, prodItem1)
 
-		prodID1 := "PCCW-Connection-111"
+		prodID1 := uuid.New().String()
 		prodItem1.ID = &prodID1
-		prodItem1.BuyerProductID = "CBC-Connection-111"
+		prodItem1.BuyerProductID = uuid.New().String()
 		prodItem1.ProductSpecification = &invmod.ProductSpecificationSummary{}
 		prodSpecID1 := "ELineSpec"
 		prodItem1.ProductSpecification.ID = &prodSpecID1
@@ -133,7 +138,7 @@ func SonataGeneratePoqCreateResponse(reqParams *poqapi.ProductOfferingQualificat
 	}
 
 	// Response generated fields
-	poqID := "PCCW-POQ-111"
+	poqID := uuid.New().String()
 	rspPoq.ID = &poqID
 	rspPoq.State = poqmod.ProductOfferingQualificationStateTypeDone
 	rspPoq.RequestedResponseDate.Scan(reqParams.ProductOfferingQualification.RequestedResponseDate.String() + "T00:00")
@@ -177,7 +182,7 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 	}
 
 	// Response generated fields
-	rspQuote.ID = "PCCW-Quote-111"
+	rspQuote.ID = uuid.New().String()
 	rspQuote.ExpectedQuoteCompletionDate.Scan(time.Now())
 	rspQuote.QuoteDate.Scan(time.Now())
 	rspQuote.State = quomod.QuoteStateTypeREADY
@@ -185,13 +190,43 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 	for _, quoteItem := range rspQuote.QuoteItem {
 		quoteItem.State = quomod.QuoteItemStateTypeREADY
 
+		var uniSpec *cmnmod.UNISpec
+		var lineSpec *cmnmod.ELineSpec
+		if quoteItem.Product != nil && quoteItem.Product.ProductSpecification != nil {
+			specDescVal := quoteItem.Product.ProductSpecification.Describing()
+			specDescType := specDescVal.AtType()
+			specOk := false
+			if specDescType == "UNISpec" {
+				uniSpec, specOk = specDescVal.(*cmnmod.UNISpec)
+			} else if specDescType == "ELineSpec" {
+				lineSpec, specOk = specDescVal.(*cmnmod.ELineSpec)
+			}
+			if !specOk {
+				fmt.Println("Describing to Product Specification error")
+			}
+		}
+
 		itemPrice := &quomod.QuotePrice{}
 		priName := "RENTAL"
 		itemPrice.Name = &priName
 		itemPrice.PriceType = quomod.PriceTypeRECURRING
 		itemPrice.Price = &quomod.Price{}
 		curUnit := "USA"
-		priVal := float32(12.34)
+		priVal := float32(0)
+		if uniSpec != nil {
+			if len(uniSpec.PhysicalLayer) > 0 {
+				if strings.HasPrefix(string(uniSpec.PhysicalLayer[0]), "1000BASE") {
+					priVal = 100
+				} else if strings.HasPrefix(string(uniSpec.PhysicalLayer[0]), "10GBASE") {
+					priVal = 200
+				} else {
+					priVal = 50
+				}
+			}
+		} else if lineSpec != nil {
+			bwCir := lineSpec.UNIIngressBWProfile[0].Cir
+			priVal = 3 * float32(*bwCir.Amount)
+		}
 		itemPrice.Price.PreTaxAmount = &quomod.Money{Unit: &curUnit, Value: &priVal}
 		itemPrice.Price.PriceRange = &quomod.PriceRange{MaxPreTaxAmount: itemPrice.Price.PreTaxAmount, MinPreTaxAmount: itemPrice.Price.PreTaxAmount}
 		itemPrice.RecurringChargePeriod = quomod.ChargePeriodDAY
@@ -223,7 +258,7 @@ func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParam
 	}
 
 	// Response generated fields
-	ordID := "PCCW-Order-111"
+	ordID := uuid.New().String()
 	rspOrder.ID = &ordID
 	rspOrder.State = ordmod.ProductOrderStateTypeCompleted
 	rspOrder.OrderDate = &strfmt.DateTime{}

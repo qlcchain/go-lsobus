@@ -187,14 +187,17 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 }
 
 func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *ordmod.ProductOrderItemCreate {
-	var siteID string
-	if isDirSrc {
-		siteID = orderParams.SrcSiteID
-	} else {
-		siteID = orderParams.DstSiteID
-	}
-	if siteID == "" {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
 		return nil
+	}
+
+	var siteID string
+	if orderParams.ItemAction != string(ordmod.ProductActionTypeRemove) {
+		if isDirSrc {
+			siteID = orderParams.SrcSiteID
+		} else {
+			siteID = orderParams.DstSiteID
+		}
 	}
 
 	uniItem := &ordmod.ProductOrderItemCreate{}
@@ -219,10 +222,12 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	}
 
 	// UNI Product Specification
-	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
-	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := s.BuildUNIProductSpec(orderParams)
-	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	if uniItem.Action != ordmod.ProductActionTypeRemove {
+		uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
+		uniItem.Product.ProductSpecification.ID = "UNISpec"
+		uniDesc := s.BuildUNIProductSpec(orderParams)
+		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	}
 
 	// Price
 	s.BuildItemPrice(uniItem, orderParams)
@@ -237,8 +242,14 @@ func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 }
 
 func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.ProductOrderItemCreate {
-	if orderParams.Bandwidth == 0 {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
 		return nil
+	}
+
+	if orderParams.ItemAction != string(ordmod.ProductActionTypeRemove) {
+		if orderParams.Bandwidth == 0 {
+			return nil
+		}
 	}
 
 	lineItem := &ordmod.ProductOrderItemCreate{}
@@ -256,10 +267,12 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 	}
 
 	//Product Specification
-	lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
-	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineDesc := s.BuildELineProductSpec(orderParams)
-	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	if lineItem.Action != ordmod.ProductActionTypeRemove {
+		lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
+		lineItem.Product.ProductSpecification.ID = "ELineSpec"
+		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	}
 
 	// Price
 	s.BuildItemPrice(lineItem, orderParams)
@@ -274,6 +287,10 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 }
 
 func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
+	if item.Action == ordmod.ProductActionTypeRemove {
+		return
+	}
+
 	// Price
 	item.PricingMethod = ordmod.PricingMethodContract
 	item.PricingReference = params.ContractID
@@ -295,8 +312,8 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	}
 
 	itemPrice.Price = &ordmod.Price{}
-	curUnit := params.BillingParams.CurrencyUnit
-	curVal := float32(params.BillingParams.CurrencyPrice)
+	curUnit := params.BillingParams.Currency
+	curVal := float32(params.BillingParams.Price)
 	itemPrice.Price.DutyFreeAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	itemPrice.Price.TaxIncludedAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	taxRate := float32(0)

@@ -159,14 +159,17 @@ func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.Prod
 }
 
 func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *poqmod.ProductOfferingQualificationItemCreate {
-	var siteID string
-	if isDirSrc {
-		siteID = orderParams.SrcSiteID
-	} else {
-		siteID = orderParams.DstSiteID
-	}
-	if siteID == "" {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
 		return nil
+	}
+
+	var siteID string
+	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
+		if isDirSrc {
+			siteID = orderParams.SrcSiteID
+		} else {
+			siteID = orderParams.DstSiteID
+		}
 	}
 
 	uniItem := &poqmod.ProductOfferingQualificationItemCreate{}
@@ -183,22 +186,32 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	}
 
 	// UNI Place
-	uniPlace := &poqmod.ReferencedAddress{}
-	uniPlace.ReferenceID = &siteID
-	uniItem.Product.SetPlace([]poqmod.RelatedPlaceReforValue{uniPlace})
+	if siteID != "" {
+		uniPlace := &poqmod.ReferencedAddress{}
+		uniPlace.ReferenceID = &siteID
+		uniItem.Product.SetPlace([]poqmod.RelatedPlaceReforValue{uniPlace})
+	}
 
 	// UNI Product Specification
-	uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
-	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := s.BuildUNIProductSpec(orderParams)
-	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	if uniItem.Action != poqmod.ProductActionTypeRemove {
+		uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
+		uniItem.Product.ProductSpecification.ID = "UNISpec"
+		uniDesc := s.BuildUNIProductSpec(orderParams)
+		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	}
 
 	return uniItem
 }
 
 func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.ProductOfferingQualificationItemCreate {
-	if orderParams.Bandwidth == 0 {
+	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
 		return nil
+	}
+
+	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
+		if orderParams.Bandwidth == 0 {
+			return nil
+		}
 	}
 
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
@@ -216,10 +229,12 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	}
 
 	//Product Specification
-	lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
-	lineItem.Product.ProductSpecification.ID = "ELineSpec"
-	lineDesc := s.BuildELineProductSpec(orderParams)
-	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
+		lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
+		lineItem.Product.ProductSpecification.ID = "ELineSpec"
+		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	}
 
 	return lineItem
 }
