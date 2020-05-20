@@ -20,6 +20,7 @@ BUILDTIME = $(shell date +'%FT%TZ%z')
 LDFLAGS=-ldflags "-X github.com/qlcchain/go-lsobus/services/version.Version=${VERSION} \
 				  -X github.com/qlcchain/go-lsobus/services/version.GitRev=${GITREV} \
 				  -X github.com/qlcchain/go-lsobus/services/version.BuildTime=${BUILDTIME}"
+GO_BUILDER_VERSION=v1.14.2
 
 default: build
 
@@ -31,7 +32,7 @@ deps:
 
 build:
 	go build ${LDFLAGS} -o $(BUILDDIR)/${BINARY} -i $(MAIN)
-	@echo "Build $(BINARY) done."
+	@echo 'Build $(BINARY) done.'
 
 client:
 	go build ${LDFLAGS} -o $(BUILDDIR)/${CLIENT_BINARY} -i $(CLIENT_MAIN)
@@ -46,15 +47,21 @@ clean:
 lint:
 	golangci-lint run --fix
 
-gofmt:
-	gofmt -w .
-
-style:
-	gofmt -w .
-	goimports -local github.com/qlcchain/go-lsobus -w .
-
 snapshot:
-	goreleaser --snapshot --rm-dist
+	docker run --rm --privileged \
+		-e PRIVATE_KEY=$(PRIVATE_KEY) \
+		-v $(CURDIR):/go-lsobus \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(GOPATH)/src:/go/src \
+		-w /go-lsobus \
+		goreng/golang-cross:$(GO_BUILDER_VERSION) --snapshot --rm-dist
 
 release: changelog
-	goreleaser --rm-dist --release-notes=CHANGELOG.md
+	docker run --rm --privileged \
+		-e GITHUB_TOKEN=$(GITHUB_TOKEN) \
+		-e PRIVATE_KEY=$(PRIVATE_KEY) \
+		-v $(CURDIR):/go-lsobus \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v $(GOPATH)/src:/go/src \
+		-w /go-lsobus \
+		goreng/golang-cross:$(GO_BUILDER_VERSION) --rm-dist --release-notes=CHANGELOG.md
