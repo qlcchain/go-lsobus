@@ -57,6 +57,7 @@ type ELineItemParams struct {
 	SrcPortID string
 	DstPortID string
 	Bandwidth uint
+	BwUnit    string
 	SVlanID   uint
 	CosName   string
 }

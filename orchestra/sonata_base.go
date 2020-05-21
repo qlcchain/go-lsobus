@@ -107,7 +107,7 @@ func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.
 	lineSpec.SVlanID = int32(params.SVlanID)
 	bwMbps := int32(params.Bandwidth)
 	bwProfile := &cmnmod.BandwidthProfile{
-		Cir: &cmnmod.InformationRate{Unit: "Mbps", Amount: &bwMbps},
+		Cir: &cmnmod.InformationRate{Unit: cmnmod.InformationRateUnit(params.BwUnit), Amount: &bwMbps},
 	}
 	lineSpec.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
 	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}

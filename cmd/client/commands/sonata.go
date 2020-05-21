@@ -162,6 +162,7 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+		lineItem.BwUnit = "Mbps"
 
 		lineItem.CosName, err = cmd.Flags().GetString("cosName")
 		if err != nil {
