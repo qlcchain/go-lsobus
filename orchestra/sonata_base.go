@@ -79,14 +79,14 @@ func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
 }
 
-func (s *sonataBaseImpl) BuildUNIProductSpec(params *OrderParams) *cmnmod.UNISpec {
+func (s *sonataBaseImpl) BuildUNIProductSpec(params *UNIItemParams) *cmnmod.UNISpec {
 	uniSpec := &cmnmod.UNISpec{}
 	uniSpec.SetAtSchemaLocation(MEFSchemaLocationSpecUNI)
 	uniSpec.SetAtType("UNISpec")
 
-	if params.SrcPortSpeed == 1000 {
+	if params.PortSpeed == 1000 {
 		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr1000BASET}
-	} else if params.SrcPortSpeed == 10000 {
+	} else if params.PortSpeed == 10000 {
 		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr10GBASESR}
 	} else {
 		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr100BASETX}
@@ -97,7 +97,7 @@ func (s *sonataBaseImpl) BuildUNIProductSpec(params *OrderParams) *cmnmod.UNISpe
 	return uniSpec
 }
 
-func (s *sonataBaseImpl) BuildELineProductSpec(params *OrderParams) *cmnmod.ELineSpec {
+func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.ELineSpec {
 	lineSpec := &cmnmod.ELineSpec{}
 	lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineSpec.SetAtType("ELineSpec")

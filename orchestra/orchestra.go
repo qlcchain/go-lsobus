@@ -111,6 +111,10 @@ func (o *Orchestra) ExecInventoryFind(params *FindParams) error {
 	return o.sonataInvImpl.SendFindRequest(params)
 }
 
+func (o *Orchestra) ExecInventoryGet(params *GetParams) error {
+	return o.sonataInvImpl.SendGetRequest(params)
+}
+
 func (o *Orchestra) ExecSiteFind(params *FindParams) error {
 	return o.sonataSiteImpl.SendFindRequest(params)
 }

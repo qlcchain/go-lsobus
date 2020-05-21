@@ -1,8 +1,6 @@
 package orchestra
 
 import (
-	"time"
-
 	invmod "github.com/qlcchain/go-lsobus/sonata/inventory/models"
 	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
 	poqmod "github.com/qlcchain/go-lsobus/sonata/poq/models"
@@ -23,43 +21,59 @@ type Partner struct {
 
 type BillingParams struct {
 	BillingType string
-	BillingUnit string    // used for PAYG, etc day/month/year
-	MeasureUnit string    // used for USAGE, etc minute/hour/Mbps/MByte
-	StartTime   time.Time // used for DOD Duration
-	EndTime     time.Time // used for DOD Duration
-	Currency    string    // etc USA/HKD/CNY
+	BillingUnit string // used for PAYG, etc day/month/year
+	MeasureUnit string // used for USAGE, etc minute/hour/Mbps/MByte
+	StartTime   int64  // used for DOD Duration, unix seconds
+	EndTime     int64  // used for DOD Duration, unix seconds
+	Currency    string // etc USA/HKD/CNY
 	Price       float32
 }
 
+type BaseItemParams struct {
+	Action string
+
+	ProdSpecID  string
+	ProdOfferID string
+	ProdQuoteID string
+
+	ProductID   string
+	ExternalID  string
+	Description string
+
+	BillingParams *BillingParams
+}
+
+type UNIItemParams struct {
+	BaseItemParams
+
+	SiteID    string
+	PortSpeed uint
+}
+
+type ELineItemParams struct {
+	BaseItemParams
+
+	SrcPortID string
+	DstPortID string
+	PortSpeed uint
+	Bandwidth uint
+	SVlanID   uint
+	CosName   string
+}
+
 type OrderParams struct {
-	ProdSpecID    string
 	OrderActivity string
-	ItemAction    string
-	ProductID     string
 
 	ContractID string
 	Buyer      *Partner
 	Seller     *Partner
 
-	ExternalID  string
 	Description string
 	ProjectID   string
+	ExternalID  string
 
-	SrcSiteID    string
-	SrcPortSpeed uint
-	DstSiteID    string
-	DstPortSpeed uint
-
-	SrcPortID string
-	SrcVlanID []uint
-	DstPortID string
-	DstVlanID []uint
-
-	Bandwidth uint
-	SVlanID   uint
-	CosName   string
-
-	BillingParams *BillingParams
+	UNIItems   []*UNIItemParams
+	ELineItems []*ELineItemParams
 
 	RspPoq   *poqmod.ProductOfferingQualification
 	RspQuote *quomod.Quote

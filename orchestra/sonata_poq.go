@@ -103,92 +103,82 @@ func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.Prod
 	reqParams.ProductOfferingQualification.InstantSyncQualification = &isqVal
 	reqParams.ProductOfferingQualification.RequestedResponseDate.Scan(time.Now())
 
-	// Source UNI
-	srcUniItem := s.BuildUNIItem(orderParams, true)
-	if srcUniItem != nil {
-		reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, srcUniItem)
-	}
-
-	// Destination UNI
-	dstUniItem := s.BuildUNIItem(orderParams, false)
-	if dstUniItem != nil {
-		reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, dstUniItem)
+	// UNI
+	var allUniItems []*poqmod.ProductOfferingQualificationItemCreate
+	for _, uniParams := range orderParams.UNIItems {
+		uniItem := s.BuildUNIItem(uniParams)
+		if uniItem == nil {
+			continue
+		}
+		reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, uniItem)
+		allUniItems = append(allUniItems, uniItem)
 	}
 
 	// ELine
-	lineItem := s.BuildELineItem(orderParams)
-	if lineItem != nil {
+	var allLineItems []*poqmod.ProductOfferingQualificationItemCreate
+	for _, lineParams := range orderParams.ELineItems {
+		lineItem := s.BuildELineItem(lineParams)
+		if lineItem == nil {
+			continue
+		}
 		reqParams.ProductOfferingQualification.ProductOfferingQualificationItem = append(reqParams.ProductOfferingQualification.ProductOfferingQualificationItem, lineItem)
-
-		// Related Items
-		if srcUniItem != nil {
-			relItem := &poqmod.ProductOfferingQualificationItemRelationship{
-				Type: poqmod.RelationshipTypeReliesOn,
-				ID:   srcUniItem.ID,
-			}
-			lineItem.ProductOfferingQualificationItemRelationship = append(lineItem.ProductOfferingQualificationItemRelationship, relItem)
-		}
-
-		if dstUniItem != nil {
-			relItem := &poqmod.ProductOfferingQualificationItemRelationship{
-				Type: poqmod.RelationshipTypeReliesOn,
-				ID:   dstUniItem.ID,
-			}
-			lineItem.ProductOfferingQualificationItemRelationship = append(lineItem.ProductOfferingQualificationItemRelationship, relItem)
-		}
+		allLineItems = append(allLineItems, lineItem)
 
 		// Related Products
-		if orderParams.SrcPortID != "" {
+		if lineParams.SrcPortID != "" {
 			relProd := &poqmod.ProductRelationship{Type: poqmod.RelationshipTypeReliesOn}
 			relProd.Product = &poqmod.ProductRef{}
-			relProdID := orderParams.SrcPortID
+			relProdID := lineParams.SrcPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
 		}
 
-		if orderParams.DstPortID != "" {
+		if lineParams.DstPortID != "" {
 			relProd := &poqmod.ProductRelationship{Type: poqmod.RelationshipTypeReliesOn}
 			relProd.Product = &poqmod.ProductRef{}
-			relProdID := orderParams.DstPortID
+			relProdID := lineParams.DstPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
+		}
+	}
+
+	// Related Items
+	if len(allLineItems) == 1 {
+		lineItem := allLineItems[0]
+		for _, uniItem := range allUniItems {
+			relItem := &poqmod.ProductOfferingQualificationItemRelationship{
+				Type: poqmod.RelationshipTypeReliesOn,
+				ID:   uniItem.ID,
+			}
+			lineItem.ProductOfferingQualificationItemRelationship = append(lineItem.ProductOfferingQualificationItemRelationship, relItem)
 		}
 	}
 
 	return reqParams
 }
 
-func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *poqmod.ProductOfferingQualificationItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
+func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOfferingQualificationItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
-	}
-
-	var siteID string
-	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
-		if isDirSrc {
-			siteID = orderParams.SrcSiteID
-		} else {
-			siteID = orderParams.DstSiteID
-		}
 	}
 
 	uniItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = poqmod.ProductActionType(orderParams.ItemAction)
+	uniItem.Action = poqmod.ProductActionType(params.Action)
 
 	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
 
 	uniItem.Product = &poqmod.Product{}
 	if uniItem.Action != poqmod.ProductActionTypeAdd {
-		uniItem.Product.ID = orderParams.ProductID
+		uniItem.Product.ID = params.ProductID
 	}
 
 	// UNI Place
-	if siteID != "" {
+	if params.SiteID != "" {
 		uniPlace := &poqmod.ReferencedAddress{}
-		uniPlace.ReferenceID = &siteID
+		uniPlace.ReferenceID = &params.SiteID
 		uniItem.Product.SetPlace([]poqmod.RelatedPlaceReforValue{uniPlace})
 	}
 
@@ -196,27 +186,27 @@ func (s *sonataPOQImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *p
 	if uniItem.Action != poqmod.ProductActionTypeRemove {
 		uniItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 		uniItem.Product.ProductSpecification.ID = "UNISpec"
-		uniDesc := s.BuildUNIProductSpec(orderParams)
+		uniDesc := s.BuildUNIProductSpec(params)
 		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 	}
 
 	return uniItem
 }
 
-func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.ProductOfferingQualificationItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
+func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductOfferingQualificationItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}
 
-	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
-		if orderParams.Bandwidth == 0 {
+	if params.Action != string(poqmod.ProductActionTypeRemove) {
+		if params.Bandwidth == 0 {
 			return nil
 		}
 	}
 
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
-	lineItem.Action = poqmod.ProductActionType(orderParams.ItemAction)
+	lineItem.Action = poqmod.ProductActionType(params.Action)
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
 
@@ -225,14 +215,14 @@ func (s *sonataPOQImpl) BuildELineItem(orderParams *OrderParams) *poqmod.Product
 	// Product
 	lineItem.Product = &poqmod.Product{}
 	if lineItem.Action != poqmod.ProductActionTypeAdd {
-		lineItem.Product.ID = orderParams.ProductID
+		lineItem.Product.ID = params.ProductID
 	}
 
 	//Product Specification
-	if orderParams.ItemAction != string(poqmod.ProductActionTypeRemove) {
+	if params.Action != string(poqmod.ProductActionTypeRemove) {
 		lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineDesc := s.BuildELineProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 

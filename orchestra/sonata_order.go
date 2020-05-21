@@ -121,60 +121,59 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 	reqParams.ProductOrder.DesiredResponse = ordmod.DesiredOrderResponsesConfirmationAndEngineeringDesign
 	reqParams.ProductOrder.ExpeditePriority = true
 
-	// Source UNI
-	srcUniItem := s.BuildUNIItem(orderParams, true)
-	if srcUniItem != nil {
-		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, srcUniItem)
-	}
-
-	// Destination UNI
-	dstUniItem := s.BuildUNIItem(orderParams, false)
-	if dstUniItem != nil {
-		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, dstUniItem)
+	// UNI
+	var uniItemList []*ordmod.ProductOrderItemCreate
+	for _, uniParams := range orderParams.UNIItems {
+		uniItem := s.BuildUNIItem(uniParams)
+		if uniItem == nil {
+			continue
+		}
+		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, uniItem)
+		uniItemList = append(uniItemList, uniItem)
 	}
 
 	// ELine
-	lineItem := s.BuildELineItem(orderParams)
-	if lineItem != nil {
-		// Related Items
-		if srcUniItem != nil {
-			relType := string("RELIES_ON")
-			relItem := &ordmod.OrderItemRelationShip{
-				Type: &relType,
-				ID:   srcUniItem.ID,
-			}
-			lineItem.OrderItemRelationship = append(lineItem.OrderItemRelationship, relItem)
-		}
-
-		if dstUniItem != nil {
-			relType := string("RELIES_ON")
-			relItem := &ordmod.OrderItemRelationShip{
-				Type: &relType,
-				ID:   dstUniItem.ID,
-			}
-			lineItem.OrderItemRelationship = append(lineItem.OrderItemRelationship, relItem)
+	var lineItemList []*ordmod.ProductOrderItemCreate
+	for _, lineParams := range orderParams.ELineItems {
+		lineItem := s.BuildELineItem(lineParams)
+		if lineItem == nil {
+			continue
 		}
 
 		// Related Products
-		if orderParams.SrcPortID != "" {
+		if lineParams.SrcPortID != "" {
 			relType := string("RELIES_ON")
 			relProd := &ordmod.ProductRelationship{Type: &relType}
 			relProd.Product = &ordmod.ProductRef{}
-			relProdID := orderParams.SrcPortID
+			relProdID := lineParams.SrcPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
 		}
 
-		if orderParams.DstPortID != "" {
+		if lineParams.DstPortID != "" {
 			relType := string("RELIES_ON")
 			relProd := &ordmod.ProductRelationship{Type: &relType}
 			relProd.Product = &ordmod.ProductRef{}
-			relProdID := orderParams.DstPortID
+			relProdID := lineParams.DstPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
 		}
 
 		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, lineItem)
+		lineItemList = append(lineItemList, lineItem)
+	}
+
+	// Related Items
+	if len(lineItemList) == 1 && reqParams.ProductOrder.OrderActivity == ordmod.OrderActivityInstall {
+		lineItem := lineItemList[0]
+		for _, uniItem := range uniItemList {
+			relType := string("RELIES_ON")
+			relItem := &ordmod.OrderItemRelationShip{
+				Type: &relType,
+				ID:   uniItem.ID,
+			}
+			lineItem.OrderItemRelationship = append(lineItem.OrderItemRelationship, relItem)
+		}
 	}
 
 	// Billing
@@ -186,74 +185,56 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 	return reqParams
 }
 
-func (s *sonataOrderImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *ordmod.ProductOrderItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
+func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrderItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
 	}
-
-	var siteID string
-	if orderParams.ItemAction != string(ordmod.ProductActionTypeRemove) {
-		if isDirSrc {
-			siteID = orderParams.SrcSiteID
-		} else {
-			siteID = orderParams.DstSiteID
-		}
-	}
-
 	uniItem := &ordmod.ProductOrderItemCreate{}
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = ordmod.ProductActionType(orderParams.ItemAction)
+	uniItem.Action = ordmod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &ordmod.Product{}
 	if uniItem.Action != ordmod.ProductActionTypeAdd {
-		uniItem.Product.ID = orderParams.ProductID
+		uniItem.Product.ID = params.ProductID
 	}
 
 	// UNI Place
-	if siteID != "" {
+	if params.SiteID != "" {
 		uniPlace := &ordmod.ReferencedAddress{}
-		uniPlace.ReferenceID = &siteID
+		uniPlace.ReferenceID = &params.SiteID
 		uniItem.Product.SetPlace([]ordmod.RelatedPlaceReforValue{uniPlace})
 	}
 
 	// UNI Product Specification
-	if uniItem.Action != ordmod.ProductActionTypeRemove {
-		uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
-		uniItem.Product.ProductSpecification.ID = "UNISpec"
-		uniDesc := s.BuildUNIProductSpec(orderParams)
-		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
-	}
+	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
+	uniItem.Product.ProductSpecification.ID = "UNISpec"
+	uniDesc := s.BuildUNIProductSpec(params)
+	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
 	// Price
-	s.BuildItemPrice(uniItem, orderParams)
-
-	// Billing
-	s.BuildItemBilling(uniItem, orderParams)
-
-	// Party
-	s.BuildItemRelatedParty(uniItem, orderParams)
+	s.BuildItemPrice(uniItem, params.BillingParams)
 
 	return uniItem
 }
 
-func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.ProductOrderItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
+func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.ProductOrderItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}
 
-	if orderParams.ItemAction != string(ordmod.ProductActionTypeRemove) {
-		if orderParams.Bandwidth == 0 {
+	if params.Action != string(ordmod.ProductActionTypeRemove) {
+		if params.Bandwidth == 0 {
 			return nil
 		}
 	}
 
 	lineItem := &ordmod.ProductOrderItemCreate{}
-	lineItem.Action = ordmod.ProductActionType(orderParams.ItemAction)
+	lineItem.Action = ordmod.ProductActionType(params.Action)
 
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
@@ -263,57 +244,47 @@ func (s *sonataOrderImpl) BuildELineItem(orderParams *OrderParams) *ordmod.Produ
 
 	lineItem.Product = &ordmod.Product{}
 	if lineItem.Action != ordmod.ProductActionTypeAdd {
-		lineItem.Product.ID = orderParams.ProductID
+		lineItem.Product.ID = params.ProductID
 	}
 
 	//Product Specification
 	if lineItem.Action != ordmod.ProductActionTypeRemove {
 		lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineDesc := s.BuildELineProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 
 	// Price
-	s.BuildItemPrice(lineItem, orderParams)
-
-	// Billing
-	s.BuildItemBilling(lineItem, orderParams)
-
-	// Party
-	s.BuildItemRelatedParty(lineItem, orderParams)
+	s.BuildItemPrice(lineItem, params.BillingParams)
 
 	return lineItem
 }
 
-func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
-	if item.Action == ordmod.ProductActionTypeRemove {
+func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *BillingParams) {
+	if params == nil {
 		return
 	}
 
 	// Price
 	item.PricingMethod = ordmod.PricingMethodContract
-	item.PricingReference = params.ContractID
-
-	if params.BillingParams == nil {
-		return
-	}
+	//item.PricingReference = params.ContractID
 
 	itemPrice := &ordmod.OrderItemPrice{}
-	if params.BillingParams.BillingType == BillingTypeDOD {
+	if params.BillingType == BillingTypeDOD {
 		itemPrice.PriceType = ordmod.PriceTypeNonRecurring
-	} else if params.BillingParams.BillingType == BillingTypePAYG {
+	} else if params.BillingType == BillingTypePAYG {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
-		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingParams.BillingUnit)
-	} else if params.BillingParams.BillingType == BillingTypeUsage {
+		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
+	} else if params.BillingType == BillingTypeUsage {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
-		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingParams.BillingUnit)
-		itemPrice.Price.UnitOfMesure = params.BillingParams.MeasureUnit
+		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
+		itemPrice.Price.UnitOfMesure = params.MeasureUnit
 	}
 
 	itemPrice.Price = &ordmod.Price{}
-	curUnit := params.BillingParams.Currency
-	curVal := float32(params.BillingParams.Price)
+	curUnit := params.Currency
+	curVal := float32(params.Price)
 	itemPrice.Price.DutyFreeAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	itemPrice.Price.TaxIncludedAmount = &ordmod.Money{Unit: &curUnit, Value: &curVal}
 	taxRate := float32(0)
@@ -321,16 +292,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	item.OrderItemPrice = append(item.OrderItemPrice, itemPrice)
 }
 
-func (s *sonataOrderImpl) BuildItemRelatedParty(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
-}
-
-func (s *sonataOrderImpl) BuildItemBilling(item *ordmod.ProductOrderItemCreate, params *OrderParams) {
-}
-
 func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreate, params *OrderParams) {
-}
-
-func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
 	if params.Buyer != nil {
 		partBuy := &ordmod.RelatedParty{}
 		partBuy.Role = []string{"Buyer"}
@@ -346,4 +308,7 @@ func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, pa
 		partSell.Name = &params.Seller.Name
 		order.RelatedParty = append(order.RelatedParty, partSell)
 	}
+}
+
+func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
 }

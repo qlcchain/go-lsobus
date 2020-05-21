@@ -117,95 +117,85 @@ func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.Qu
 	reqParams.Quote.RequestedQuoteCompletionDate = &strfmt.DateTime{}
 	reqParams.Quote.RequestedQuoteCompletionDate.Scan(time.Now().Add(time.Minute))
 
-	// Source UNI
-	srcUniItem := s.BuildUNIItem(orderParams, true)
-	if srcUniItem != nil {
-		reqParams.Quote.QuoteItem = append(reqParams.Quote.QuoteItem, srcUniItem)
-	}
-
-	// Destination UNI
-	dstUniItem := s.BuildUNIItem(orderParams, false)
-	if dstUniItem != nil {
-		reqParams.Quote.QuoteItem = append(reqParams.Quote.QuoteItem, dstUniItem)
+	// UNI
+	var allUniItems []*quomod.QuoteItemCreate
+	for _, uniParams := range orderParams.UNIItems {
+		uniItem := s.BuildUNIItem(uniParams)
+		if uniItem == nil {
+			continue
+		}
+		reqParams.Quote.QuoteItem = append(reqParams.Quote.QuoteItem, uniItem)
+		allUniItems = append(allUniItems, uniItem)
 	}
 
 	// ELine
-	lineItem := s.BuildELineItem(orderParams)
-	if lineItem != nil {
-		// Related Items
-		if srcUniItem != nil {
-			relItem := &quomod.QuoteItemRelationship{
-				Type: quomod.RelationshipTypeRELIESON,
-				ID:   srcUniItem.ID,
-			}
-			lineItem.QuoteItemRelationship = append(lineItem.QuoteItemRelationship, relItem)
+	var allLineItems []*quomod.QuoteItemCreate
+	for _, lineParams := range orderParams.ELineItems {
+		lineItem := s.BuildELineItem(lineParams)
+		if lineItem == nil {
+			continue
 		}
-
-		if dstUniItem != nil {
-			relItem := &quomod.QuoteItemRelationship{
-				Type: quomod.RelationshipTypeRELIESON,
-				ID:   dstUniItem.ID,
-			}
-			lineItem.QuoteItemRelationship = append(lineItem.QuoteItemRelationship, relItem)
-		}
+		reqParams.Quote.QuoteItem = append(reqParams.Quote.QuoteItem, lineItem)
+		allLineItems = append(allUniItems, lineItem)
 
 		// Related Products
-		if orderParams.SrcPortID != "" {
+		if lineParams.SrcPortID != "" {
 			relType := string(quomod.RelationshipTypeRELIESON)
 			relProd := &quomod.ProductRelationship{Type: &relType}
 			relProd.Product = &quomod.ProductRef{}
-			relProdID := orderParams.SrcPortID
+			relProdID := lineParams.SrcPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
 		}
 
-		if orderParams.DstPortID != "" {
+		if lineParams.DstPortID != "" {
 			relType := string(quomod.RelationshipTypeRELIESON)
 			relProd := &quomod.ProductRelationship{Type: &relType}
 			relProd.Product = &quomod.ProductRef{}
-			relProdID := orderParams.DstPortID
+			relProdID := lineParams.DstPortID
 			relProd.Product.ID = &relProdID
 			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
 		}
+	}
 
-		reqParams.Quote.QuoteItem = append(reqParams.Quote.QuoteItem, lineItem)
+	// Related Items
+	if len(allLineItems) == 1 {
+		lineItem := allLineItems[0]
+		for _, uniItem := range allUniItems {
+			relItem := &quomod.QuoteItemRelationship{
+				Type: quomod.RelationshipTypeRELIESON,
+				ID:   uniItem.ID,
+			}
+			lineItem.QuoteItemRelationship = append(lineItem.QuoteItemRelationship, relItem)
+		}
 	}
 
 	return reqParams
 }
 
-func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) *quomod.QuoteItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "UNISpec" {
+func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
-	}
-
-	var siteID string
-	if orderParams.ItemAction != string(quomod.ProductActionTypeDISCONNECT) {
-		if isDirSrc {
-			siteID = orderParams.SrcSiteID
-		} else {
-			siteID = orderParams.DstSiteID
-		}
 	}
 
 	uniItem := &quomod.QuoteItemCreate{}
 
 	uniItemID := s.NewItemID()
 	uniItem.ID = &uniItemID
-	uniItem.Action = quomod.ProductActionType(orderParams.ItemAction)
+	uniItem.Action = quomod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &quomod.Product{}
 	if uniItem.Action != quomod.ProductActionTypeINSTALL {
-		uniItem.Product.ID = &orderParams.ProductID
+		uniItem.Product.ID = &params.ProductID
 	}
 
 	// UNI Place
-	if siteID != "" {
+	if params.SiteID != "" {
 		uniPlace := &quomod.ReferencedAddress{}
-		uniPlace.ReferenceID = &siteID
+		uniPlace.ReferenceID = &params.SiteID
 		uniItem.Product.SetPlace([]quomod.RelatedPlaceRefOrValue{uniPlace})
 	}
 
@@ -213,28 +203,26 @@ func (s *sonataQuoteImpl) BuildUNIItem(orderParams *OrderParams, isDirSrc bool) 
 	if uniItem.Action != quomod.ProductActionTypeDISCONNECT {
 		uniItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
 		uniItem.Product.ProductSpecification.ID = "UNISpec"
-		uniDesc := s.BuildUNIProductSpec(orderParams)
+		uniDesc := s.BuildUNIProductSpec(params)
 		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 	}
-
-	s.BuildItemTerm(uniItem, orderParams)
 
 	return uniItem
 }
 
-func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.QuoteItemCreate {
-	if orderParams.ProdSpecID != "" && orderParams.ProdSpecID != "ELineSpec" {
+func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteItemCreate {
+	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}
 
-	if orderParams.ItemAction != string(quomod.ProductActionTypeDISCONNECT) {
-		if orderParams.Bandwidth == 0 {
+	if params.Action != string(quomod.ProductActionTypeDISCONNECT) {
+		if params.Bandwidth == 0 {
 			return nil
 		}
 	}
 
 	lineItem := &quomod.QuoteItemCreate{}
-	lineItem.Action = quomod.ProductActionType(orderParams.ItemAction)
+	lineItem.Action = quomod.ProductActionType(params.Action)
 
 	lineItemID := s.NewItemID()
 	lineItem.ID = &lineItemID
@@ -244,28 +232,16 @@ func (s *sonataQuoteImpl) BuildELineItem(orderParams *OrderParams) *quomod.Quote
 
 	lineItem.Product = new(quomod.Product)
 	if lineItem.Action != quomod.ProductActionTypeINSTALL {
-		lineItem.Product.ID = &orderParams.ProductID
+		lineItem.Product.ID = &params.ProductID
 	}
 
 	//Product Specification
 	if lineItem.Action != quomod.ProductActionTypeDISCONNECT {
 		lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "UNISpec"
-		lineDesc := s.BuildELineProductSpec(orderParams)
+		lineDesc := s.BuildELineProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 
-	s.BuildItemTerm(lineItem, orderParams)
-
 	return lineItem
-}
-
-func (s *sonataQuoteImpl) BuildItemTerm(item *quomod.QuoteItemCreate, orderParams *OrderParams) {
-	/*
-		item.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-		item.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-		item.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnitYEAR
-		durVal := int32(99)
-		item.RequestedQuoteItemTerm.Duration.Value = &durVal
-	*/
 }

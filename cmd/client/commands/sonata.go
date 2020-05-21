@@ -69,7 +69,7 @@ func addFlagsForGetParams(cmd *cobra.Command) {
 func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command) error {
 	var err error
 
-	params.ProdSpecID, err = cmd.Flags().GetString("prodSpecID")
+	prodSpecID, err := cmd.Flags().GetString("prodSpecID")
 	if err != nil {
 		return err
 	}
@@ -79,84 +79,134 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		return err
 	}
 
-	params.ItemAction, err = cmd.Flags().GetString("itemAction")
-	if err != nil {
-		return err
-	}
-
-	params.ProductID, err = cmd.Flags().GetString("productID")
-	if err != nil {
-		return err
-	}
-
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
-	params.SrcSiteID, err = cmd.Flags().GetString("srcSiteID")
+	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
 		return err
 	}
 
-	params.SrcPortSpeed, err = cmd.Flags().GetUint("srcPortSpeed")
+	productID, err := cmd.Flags().GetString("productID")
 	if err != nil {
 		return err
 	}
 
-	params.DstSiteID, err = cmd.Flags().GetString("dstSiteID")
+	// Create or Update UNI (Source)
+	srcSiteID, err := cmd.Flags().GetString("srcSiteID")
 	if err != nil {
 		return err
 	}
+	if srcSiteID != "" {
+		uniItem := &orchestra.UNIItemParams{}
+		uniItem.Action = itemAction
+		uniItem.ProductID = productID
+		uniItem.SiteID = srcSiteID
+		uniItem.PortSpeed, err = cmd.Flags().GetUint("srcPortSpeed")
+		if err != nil {
+			return err
+		}
+		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
-	params.DstPortSpeed, err = cmd.Flags().GetUint("dstPortSpeed")
+		params.UNIItems = append(params.UNIItems, uniItem)
+	}
+
+	// Create or Update UNI (Destination)
+	dstSiteID, err := cmd.Flags().GetString("dstSiteID")
 	if err != nil {
 		return err
 	}
+	if dstSiteID != "" {
+		uniItem := &orchestra.UNIItemParams{}
+		uniItem.Action = itemAction
+		uniItem.ProductID = productID
+		uniItem.SiteID = dstSiteID
+		uniItem.PortSpeed, err = cmd.Flags().GetUint("dstPortSpeed")
+		if err != nil {
+			return err
+		}
+		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
-	params.SrcPortID, err = cmd.Flags().GetString("srcUniID")
+		params.UNIItems = append(params.UNIItems, uniItem)
+	}
+
+	// Disconnect UNI
+	if len(params.UNIItems) == 0 && prodSpecID == "UNISpec" {
+		uniItem := &orchestra.UNIItemParams{}
+		uniItem.Action = itemAction
+		uniItem.ProductID = productID
+		params.UNIItems = append(params.UNIItems, uniItem)
+	}
+
+	// Create or Update ELine
+	lineBw, err := cmd.Flags().GetUint("bandwidth")
 	if err != nil {
 		return err
 	}
+	if lineBw > 0 {
+		lineItem := &orchestra.ELineItemParams{}
+		lineItem.Action = itemAction
+		lineItem.ProductID = productID
 
-	params.SrcVlanID, err = cmd.Flags().GetUintSlice("srcVlanID")
-	if err != nil {
-		return err
+		lineItem.SrcPortID, err = cmd.Flags().GetString("srcUniID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.DstPortID, err = cmd.Flags().GetString("dstUniID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.Bandwidth, err = cmd.Flags().GetUint("bandwidth")
+		if err != nil {
+			return err
+		}
+
+		lineItem.CosName, err = cmd.Flags().GetString("cosName")
+		if err != nil {
+			return err
+		}
+
+		lineItem.SVlanID, err = cmd.Flags().GetUint("sVlanID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
+
+		params.ELineItems = append(params.ELineItems, lineItem)
 	}
 
-	params.DstPortID, err = cmd.Flags().GetString("dstUniID")
-	if err != nil {
-		return err
+	// Disconnect ELine
+	if len(params.ELineItems) == 0 && prodSpecID == "ELineSpec" {
+		lineItem := &orchestra.ELineItemParams{}
+		lineItem.Action = itemAction
+		lineItem.ProductID = productID
+		params.ELineItems = append(params.ELineItems, lineItem)
 	}
 
-	params.DstVlanID, err = cmd.Flags().GetUintSlice("dstVlanID")
+	return nil
+}
+
+func fillBillingParamsByCmdFlags(cmd *cobra.Command) *orchestra.BillingParams {
+	currency, err := cmd.Flags().GetString("currency")
 	if err != nil {
-		return err
+		return nil
 	}
 
-	params.Bandwidth, err = cmd.Flags().GetUint("bandwidth")
+	price, err := cmd.Flags().GetFloat32("price")
 	if err != nil {
-		return err
+		return nil
 	}
 
-	params.CosName, err = cmd.Flags().GetString("cosName")
-	if err != nil {
-		return err
-	}
+	if currency != "" && price > 0 {
+		params := &orchestra.BillingParams{}
+		params.BillingType = "DOD"
+		params.Price = price
+		params.Currency = currency
 
-	params.SVlanID, err = cmd.Flags().GetUint("sVlanID")
-	if err != nil {
-		return err
-	}
-
-	params.BillingParams = &orchestra.BillingParams{}
-	params.BillingParams.BillingType = "DOD"
-	params.BillingParams.Currency, err = cmd.Flags().GetString("currency")
-	if err != nil {
-		return err
-	}
-
-	params.BillingParams.Price, err = cmd.Flags().GetFloat32("price")
-	if err != nil {
-		return err
+		return params
 	}
 
 	return nil
