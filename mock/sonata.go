@@ -106,6 +106,21 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 	return rspParams
 }
 
+func SonataGenerateInvGetResponse(reqParams *invapi.ProductGetParams) *invapi.ProductGetOK {
+	rspParams := invapi.NewProductGetOK()
+
+	prodItem := &invmod.Product{}
+	prodItem.ID = &reqParams.ProductID
+	prodItem.Status = invmod.ProductStatusActive
+	prodItem.LastUpdateDate.Scan(time.Now())
+	prodItem.ProductSpecification = &invmod.ProductSpecificationRef{}
+	prodItem.ProductSpecification.ID = sonata.NewString("ELineSpec")
+
+	rspParams.Payload = prodItem
+
+	return rspParams
+}
+
 func SonataGeneratePoqCreateResponse(reqParams *poqapi.ProductOfferingQualificationCreateParams) *poqapi.ProductOfferingQualificationCreateCreated {
 	rspPoq := &poqmod.ProductOfferingQualification{}
 
@@ -239,6 +254,23 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 	return rspParams
 }
 
+func SonataGenerateQuoteGetResponse(reqParams *quoapi.QuoteGetParams) *quoapi.QuoteGetOK {
+	rspParams := quoapi.NewQuoteGetOK()
+
+	quote := &quomod.Quote{}
+	quote.ID = reqParams.ID
+	quote.InstantSyncQuoting = true
+	quote.State = quomod.QuoteStateTypeREADY
+	lineItem := &quomod.QuoteItem{}
+	lineItem.State = quomod.QuoteItemStateTypeREADY
+	quote.QuoteItem = append(quote.QuoteItem, lineItem)
+	quote.QuoteDate.Scan(time.Now())
+
+	rspParams.Payload = quote
+
+	return rspParams
+}
+
 func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParams) *ordapi.ProductOrderCreateCreated {
 	rspOrder := &ordmod.ProductOrder{}
 
@@ -271,6 +303,21 @@ func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParam
 
 	rspParams := ordapi.NewProductOrderCreateCreated()
 	rspParams.Payload = rspOrder
+
+	return rspParams
+}
+
+func SonataGenerateOrderGetResponse(reqParams *ordapi.ProductOrderGetParams) *ordapi.ProductOrderGetOK {
+	rspParams := ordapi.NewProductOrderGetOK()
+
+	order := &ordmod.ProductOrder{}
+	order.ID = &reqParams.ProductOrderID
+	order.State = ordmod.ProductOrderStateTypeCompleted
+	lineItem := &ordmod.OrderItem{}
+	lineItem.State = ordmod.ProductOrderItemStateTypeCompleted
+	order.OrderItem = append(order.OrderItem, lineItem)
+
+	rspParams.Payload = order
 
 	return rspParams
 }

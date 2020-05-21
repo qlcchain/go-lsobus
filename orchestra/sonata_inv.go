@@ -71,7 +71,8 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 	rspParams, err := httpCli.Product.ProductGet(reqParams)
 	if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		return err
+		//return err
+		rspParams = mock.SonataGenerateInvGetResponse(reqParams)
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspInv = rspParams.GetPayload()

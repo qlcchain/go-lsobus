@@ -93,7 +93,8 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		return err
+		//return err
+		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspOrder = rspParams.GetPayload()

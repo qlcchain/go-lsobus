@@ -62,5 +62,17 @@ var sonataInvGetCmd = &cobra.Command{
 			cmd.PrintErrln(err)
 			return
 		}
+
+		o, err := getOrchestraInstance()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		err = o.ExecInventoryGet(params)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
 	},
 }

@@ -78,6 +78,7 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
+		//rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuoteList = rspParams.GetPayload()
@@ -93,7 +94,8 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
 	if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		return err
+		//return err
+		rspParams = mock.SonataGenerateQuoteGetResponse(reqParams)
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuote = rspParams.GetPayload()

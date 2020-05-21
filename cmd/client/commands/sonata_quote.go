@@ -14,6 +14,9 @@ func addSonataQuoteCmd(parent *cobra.Command) {
 
 	addFlagsForFindParams(sonataQuoteFindCmd)
 	sonataQuoteCmd.AddCommand(sonataQuoteFindCmd)
+
+	addFlagsForGetParams(sonataQuoteGetCmd)
+	sonataQuoteCmd.AddCommand(sonataQuoteGetCmd)
 }
 
 var sonataQuoteCmd = &cobra.Command{
@@ -70,6 +73,34 @@ var sonataQuoteFindCmd = &cobra.Command{
 		}
 
 		err = o.ExecQuoteFind(params)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+	},
+}
+
+var sonataQuoteGetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "retrieve product quoting item",
+	Long:  `retrieve product quoting item`,
+	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+
+		params := &orchestra.GetParams{}
+		err = fillGetParamsByCmdFlags(params, cmd)
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		o, err := getOrchestraInstance()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+
+		err = o.ExecQuoteGet(params)
 		if err != nil {
 			cmd.PrintErrln(err)
 			return
