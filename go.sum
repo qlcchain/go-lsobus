@@ -667,6 +667,8 @@ github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7z
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/qlcchain/go-qlc v1.3.3-0.20200513154104-527a8f0e9a50 h1:llKNdJfIcuJLbhFkS2HpZfi57rFbXs4jltrGHJ6KEhM=
 github.com/qlcchain/go-qlc v1.3.3-0.20200513154104-527a8f0e9a50/go.mod h1:e9XZE1IYZOXFgcLWRq4UEqyJuvraK+OkWl8BeNoTaUs=
+github.com/qlcchain/go-qlc v1.3.3-0.20200520142335-8ca73f82501f h1:FvR9IiczRpJzafqUmqbRgtBNqEMURnVZjUj05clFcTE=
+github.com/qlcchain/go-qlc v1.3.3-0.20200520142335-8ca73f82501f/go.mod h1:e9XZE1IYZOXFgcLWRq4UEqyJuvraK+OkWl8BeNoTaUs=
 github.com/qlcchain/jsonrpc2 v0.0.7 h1:ZcySG/jZ76vupXRrmCAKunyu6ZLmWqo0vNxRRviBjd8=
 github.com/qlcchain/jsonrpc2 v0.0.7/go.mod h1:VwJvudc0L888gtEldst7bZdZxvk3wubZs18yO0CI0Zc=
 github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 h1:eUm8ma4+yPknhXtkYlWh3tMkE6gBjXZToDned9s2gbQ=

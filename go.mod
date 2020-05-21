@@ -18,7 +18,7 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0
-	github.com/qlcchain/go-qlc v1.3.3-0.20200513154104-527a8f0e9a50
+	github.com/qlcchain/go-qlc v1.3.3-0.20200520142335-8ca73f82501f
 	github.com/qlcchain/jsonrpc2 v0.0.7
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.0.0

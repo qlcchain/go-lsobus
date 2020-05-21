@@ -24,7 +24,7 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 	*/
 	addr := cs.account.Address().String()
 	if addr == param.Buyer.Address {
-		op, err := cs.convertProtoToOrderParam(param)
+		op, err := cs.convertProtoToCreateOrderParam(param)
 		if err != nil {
 			return "", err
 		}
@@ -55,7 +55,7 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 	return "", errors.New("buyer address not match")
 }
 
-func (cs *ContractService) convertProtoToOrderParam(param *proto.CreateOrderParam) (*abi.DoDSettleCreateOrderParam, error) {
+func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*abi.DoDSettleCreateOrderParam, error) {
 	sellerAddr, _ := types.HexToAddress(param.Seller.Address)
 	buyAddr, _ := types.HexToAddress(param.Buyer.Address)
 	op := new(abi.DoDSettleCreateOrderParam)

@@ -18,12 +18,32 @@ func NewOrderApi(cs *contract.ContractService) *OrderApi {
 	}
 }
 
-func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.CreateOrderRsp, error) {
+func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderRsp, error) {
 	id, err := oa.cs.GetCreateOrderBlock(param)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.CreateOrderRsp{
+	return &proto.OrderRsp{
+		OrderIdOnChain: id,
+	}, nil
+}
+
+func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderRsp, error) {
+	id, err := oa.cs.GetChangeOrderBlock(param)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.OrderRsp{
+		OrderIdOnChain: id,
+	}, nil
+}
+
+func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderRsp, error) {
+	id, err := oa.cs.GetTerminateOrderBlock(param)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.OrderRsp{
 		OrderIdOnChain: id,
 	}, nil
 }

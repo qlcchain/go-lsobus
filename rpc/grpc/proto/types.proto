@@ -59,12 +59,13 @@ message ConnectionParam {
 }
 
 message CreateOrderParam {
-  User buyer = 1;
-  User seller = 2;
-  repeated ConnectionParam cps = 3;
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  repeated ConnectionParam cps = 4;
 }
 
-message CreateOrderRsp {
+message OrderRsp {
   string orderIdOnChain = 1;
 }
 
@@ -91,8 +92,33 @@ message OrderInfoRsp {
   repeated OrderLifeTrack track = 8;
 }
 
+message ContractPrivacyParam {
+  string privateFrom = 1;
+  repeated string privateFor =2;
+  string privateGroupID = 3;
+}
+
+message ChangeConnectionParam {
+  string productId = 1;
+  ConnectionDynamicParam dynamicParam = 2;
+}
+
+message ChangeOrderParam {
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  repeated ChangeConnectionParam changeConnectionParam = 4;
+}
+
+message TerminateOrderParam {
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  repeated string productId = 4;
+}
+
 service OrderAPI{
-  rpc CreateOrder(CreateOrderParam) returns (CreateOrderRsp){
+  rpc CreateOrder(CreateOrderParam) returns (OrderRsp){
     option (google.api.http) = {
       post: "/order/create"
       body: "*"
@@ -104,6 +130,17 @@ service OrderAPI{
       body: "*"
     };
   }
+  rpc ChangeOrder(ChangeOrderParam) returns (OrderRsp){
+    option (google.api.http) = {
+      post: "/order/info"
+      body: "*"
+    };
+  }
+  rpc TerminateOrder(TerminateOrderParam) returns (OrderRsp){
+    option (google.api.http) = {
+      post: "/order/info"
+      body: "*"
+    };
+  }
 }
-
 

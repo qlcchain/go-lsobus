@@ -48,7 +48,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoCreateOrderRsp"
+              "$ref": "#/definitions/protoOrderRsp"
             }
           }
         },
@@ -69,12 +69,12 @@
     },
     "/order/info": {
       "post": {
-        "operationId": "OrderInfo",
+        "operationId": "TerminateOrder",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoOrderInfoRsp"
+              "$ref": "#/definitions/protoOrderRsp"
             }
           }
         },
@@ -84,7 +84,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetOrderInfoByInternalId"
+              "$ref": "#/definitions/protoTerminateOrderParam"
             }
           }
         ],
@@ -95,6 +95,37 @@
     }
   },
   "definitions": {
+    "protoChangeConnectionParam": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "dynamicParam": {
+          "$ref": "#/definitions/protoConnectionDynamicParam"
+        }
+      }
+    },
+    "protoChangeOrderParam": {
+      "type": "object",
+      "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
+        "buyer": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "seller": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "changeConnectionParam": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoChangeConnectionParam"
+          }
+        }
+      }
+    },
     "protoConnectionDynamicParam": {
       "type": "object",
       "properties": {
@@ -181,9 +212,29 @@
         }
       }
     },
+    "protoContractPrivacyParam": {
+      "type": "object",
+      "properties": {
+        "privateFrom": {
+          "type": "string"
+        },
+        "privateFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "privateGroupID": {
+          "type": "string"
+        }
+      }
+    },
     "protoCreateOrderParam": {
       "type": "object",
       "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
         "buyer": {
           "$ref": "#/definitions/protoUser"
         },
@@ -195,14 +246,6 @@
           "items": {
             "$ref": "#/definitions/protoConnectionParam"
           }
-        }
-      }
-    },
-    "protoCreateOrderRsp": {
-      "type": "object",
-      "properties": {
-        "orderIdOnChain": {
-          "type": "string"
         }
       }
     },
@@ -267,6 +310,34 @@
         },
         "Hash": {
           "type": "string"
+        }
+      }
+    },
+    "protoOrderRsp": {
+      "type": "object",
+      "properties": {
+        "orderIdOnChain": {
+          "type": "string"
+        }
+      }
+    },
+    "protoTerminateOrderParam": {
+      "type": "object",
+      "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
+        "buyer": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "seller": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "productId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
