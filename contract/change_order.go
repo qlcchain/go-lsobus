@@ -2,7 +2,6 @@ package contract
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 	"github.com/qlcchain/go-qlc/common/types"
@@ -80,11 +79,6 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 			return nil, err
 		}
 
-		price, err := strconv.ParseFloat(v.DynamicParam.Price, 64)
-		if err != nil {
-			return nil, err
-		}
-
 		serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
 		if err != nil {
 			return nil, err
@@ -94,7 +88,7 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 				ConnectionName: v.DynamicParam.ConnectionName,
 				Bandwidth:      v.DynamicParam.Bandwidth,
 				BillingUnit:    billingUnit,
-				Price:          price,
+				Price:          float64(v.DynamicParam.Price),
 				ServiceClass:   serviceClass,
 				PaymentType:    paymentType,
 				BillingType:    billingType,

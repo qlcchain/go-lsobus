@@ -52,7 +52,7 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
 
 	// Price
-	cmd.Flags().String("currency", "USA", "Currency, (e.g., USA, HKD, CNY)")
+	cmd.Flags().String("currency", "USD", "Currency, (e.g., USD, HKD, CNY)")
 	cmd.Flags().Float32("price", 0, "price")
 }
 

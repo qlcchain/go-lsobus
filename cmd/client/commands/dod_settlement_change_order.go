@@ -169,6 +169,10 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 			return err
 		}
 	}
+	price, err := strconv.ParseFloat(priceP, 64)
+	if err != nil {
+		return err
+	}
 
 	param := &pb.ChangeOrderParam{
 		Buyer: &pb.User{
@@ -193,7 +197,7 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 				DynamicParam: &pb.ConnectionDynamicParam{
 					Bandwidth:   bandwidthP,
 					BillingUnit: billingUnit.String(),
-					Price:       priceP,
+					Price:       float32(price),
 				},
 			}
 		} else {
@@ -203,7 +207,7 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 					Bandwidth: bandwidthP,
 					StartTime: startTime,
 					EndTime:   endTime,
-					Price:     priceP,
+					Price:     float32(price),
 				},
 			}
 		}

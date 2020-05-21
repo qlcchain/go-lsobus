@@ -151,7 +151,8 @@
           "type": "string"
         },
         "price": {
-          "type": "string"
+          "type": "number",
+          "format": "float"
         },
         "startTime": {
           "type": "string",

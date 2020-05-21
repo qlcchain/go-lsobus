@@ -42,7 +42,7 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
 	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
+		//		s.logger.Errorf("send request, error %s", err)
 		//return err
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	}

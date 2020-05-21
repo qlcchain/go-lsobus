@@ -318,16 +318,16 @@ type ConnectionDynamicParam struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConnectionName string `protobuf:"bytes,1,opt,name=connectionName,proto3" json:"connectionName,omitempty"`
-	PaymentType    string `protobuf:"bytes,2,opt,name=paymentType,proto3" json:"paymentType,omitempty"`
-	BillingType    string `protobuf:"bytes,3,opt,name=billingType,proto3" json:"billingType,omitempty"`
-	Currency       string `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
-	ServiceClass   string `protobuf:"bytes,5,opt,name=serviceClass,proto3" json:"serviceClass,omitempty"`
-	Bandwidth      string `protobuf:"bytes,6,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
-	BillingUnit    string `protobuf:"bytes,7,opt,name=billingUnit,proto3" json:"billingUnit,omitempty"`
-	Price          string `protobuf:"bytes,8,opt,name=price,proto3" json:"price,omitempty"`
-	StartTime      int64  `protobuf:"varint,9,opt,name=startTime,proto3" json:"startTime,omitempty"`
-	EndTime        int64  `protobuf:"varint,10,opt,name=endTime,proto3" json:"endTime,omitempty"`
+	ConnectionName string  `protobuf:"bytes,1,opt,name=connectionName,proto3" json:"connectionName,omitempty"`
+	PaymentType    string  `protobuf:"bytes,2,opt,name=paymentType,proto3" json:"paymentType,omitempty"`
+	BillingType    string  `protobuf:"bytes,3,opt,name=billingType,proto3" json:"billingType,omitempty"`
+	Currency       string  `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
+	ServiceClass   string  `protobuf:"bytes,5,opt,name=serviceClass,proto3" json:"serviceClass,omitempty"`
+	Bandwidth      string  `protobuf:"bytes,6,opt,name=bandwidth,proto3" json:"bandwidth,omitempty"`
+	BillingUnit    string  `protobuf:"bytes,7,opt,name=billingUnit,proto3" json:"billingUnit,omitempty"`
+	Price          float32 `protobuf:"fixed32,8,opt,name=price,proto3" json:"price,omitempty"`
+	StartTime      int64   `protobuf:"varint,9,opt,name=startTime,proto3" json:"startTime,omitempty"`
+	EndTime        int64   `protobuf:"varint,10,opt,name=endTime,proto3" json:"endTime,omitempty"`
 }
 
 func (x *ConnectionDynamicParam) Reset() {
@@ -411,11 +411,11 @@ func (x *ConnectionDynamicParam) GetBillingUnit() string {
 	return ""
 }
 
-func (x *ConnectionDynamicParam) GetPrice() string {
+func (x *ConnectionDynamicParam) GetPrice() float32 {
 	if x != nil {
 		return x.Price
 	}
-	return ""
+	return 0
 }
 
 func (x *ConnectionDynamicParam) GetStartTime() int64 {
@@ -1151,7 +1151,7 @@ var file_types_proto_rawDesc = []byte{
 	0x64, 0x77, 0x69, 0x64, 0x74, 0x68, 0x12, 0x20, 0x0a, 0x0b, 0x62, 0x69, 0x6c, 0x6c, 0x69, 0x6e,
 	0x67, 0x55, 0x6e, 0x69, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x62, 0x69, 0x6c,
 	0x6c, 0x69, 0x6e, 0x67, 0x55, 0x6e, 0x69, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x69, 0x63,
-	0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x12, 0x1c,
+	0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x70, 0x72, 0x69, 0x63, 0x65, 0x12, 0x1c,
 	0x0a, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x09, 0x20, 0x01, 0x28,
 	0x03, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07,
 	0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x03, 0x52, 0x07, 0x65,

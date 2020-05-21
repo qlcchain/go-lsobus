@@ -48,7 +48,7 @@ message ConnectionDynamicParam {
   string serviceClass = 5;
   string bandwidth = 6;
   string billingUnit = 7;
-  string price = 8;
+  float price = 8;
   int64 startTime = 9;
   int64 endTime = 10;
 }

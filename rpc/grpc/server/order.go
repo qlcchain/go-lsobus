@@ -2,7 +2,6 @@ package grpcServer
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/qlcchain/go-lsobus/contract"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
@@ -69,6 +68,7 @@ func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInter
 	for _, v := range orderInfo.Connections {
 		conn := &proto.ConnectionParam{
 			StaticParam: &proto.ConnectionStaticParam{
+				ProductId:      v.ProductId,
 				SrcCompanyName: v.SrcCompanyName,
 				SrcRegion:      v.SrcRegion,
 				SrcCity:        v.SrcCity,
@@ -84,7 +84,7 @@ func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInter
 				ConnectionName: v.ConnectionName,
 				Bandwidth:      v.Bandwidth,
 				BillingUnit:    v.BillingUnit.String(),
-				Price:          strconv.FormatFloat(v.Price, 'E', -1, 64),
+				Price:          float32(v.Price),
 				ServiceClass:   v.ServiceClass.String(),
 				PaymentType:    v.PaymentType.String(),
 				BillingType:    v.BillingType.String(),

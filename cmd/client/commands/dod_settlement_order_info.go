@@ -21,7 +21,7 @@ func addGetOrderInfoByShell(parentCmd *ishell.Cmd) {
 	}
 	args := []util.Flag{internalId}
 	c := &ishell.Cmd{
-		Name:                "info",
+		Name:                "orderInfo",
 		Help:                "order info",
 		CompleterWithPrefix: util.OptsCompleter(args),
 		Func: func(c *ishell.Context) {

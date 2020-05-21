@@ -2,7 +2,6 @@ package contract
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
@@ -47,11 +46,11 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 		}
 		cs.logger.Infof("process hash %s success", h.String())
 		internalId := block.Previous.String()
+		cs.orderIdOnChain.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
 	}
-	//	go cs.CheckCreateOrderContractConfirmed(block.Previous.String())
 	return "", errors.New("buyer address not match")
 }
 
@@ -83,11 +82,6 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 			return nil, err
 		}
 
-		price, err := strconv.ParseFloat(v.DynamicParam.Price, 64)
-		if err != nil {
-			return nil, err
-		}
-
 		serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
 		if err != nil {
 			return nil, err
@@ -110,11 +104,11 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				ConnectionName: v.DynamicParam.ConnectionName,
 				Bandwidth:      v.DynamicParam.Bandwidth,
 				BillingUnit:    billingUnit,
-				Price:          price,
+				Price:          float64(v.DynamicParam.Price),
 				ServiceClass:   serviceClass,
 				PaymentType:    paymentType,
 				BillingType:    billingType,
-				Currency:       v.DynamicParam.ConnectionName,
+				Currency:       v.DynamicParam.Currency,
 				StartTime:      v.DynamicParam.StartTime,
 				EndTime:        v.DynamicParam.EndTime,
 			},

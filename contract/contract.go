@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -26,7 +27,7 @@ import (
 )
 
 const (
-	checkNeedSignContractInterval = 1 * time.Minute
+	checkNeedSignContractInterval = 30 * time.Second
 	checkContractStatusInterval   = 5 * time.Second
 	checkOrderStatusInterval      = 5 * time.Second
 	connectRpcServerInterval      = 5 * time.Second
@@ -82,7 +83,7 @@ func (cs *ContractService) Start() error {
 	go cs.checkDoDContract()
 	go cs.connectRpcServer()
 	go cs.checkContractStatus()
-	go cs.checkOrderStatus()
+	//	go cs.checkOrderStatus()
 	return nil
 }
 
@@ -121,7 +122,7 @@ func (cs *ContractService) getOrderStatus() {
 					continue
 				}
 				if gp.RspInv.Status == models.ProductStatusActive {
-					cs.logger.Infof("product %s is active", v)
+					cs.logger.Infof("product %s is active", value.ProductId)
 					value.Active = true
 					productActive = append(productActive, value.ProductId)
 				}
@@ -132,21 +133,21 @@ func (cs *ContractService) getOrderStatus() {
 			cs.logger.Error(err)
 		}
 	}
-	for _, v := range id {
-		orderReady := true
-		for _, value := range v.Products {
-			if !value.Active {
-				orderReady = false
-				break
-			}
-		}
-		if orderReady {
-			err = cs.updateOrderCompleteStatusToChain(addr, v)
-			if err != nil {
-				cs.logger.Error(err)
-			}
-		}
-	}
+	//for _, v := range id {
+	//	orderReady := true
+	//	for _, value := range v.Products {
+	//		if !value.Active {
+	//			orderReady = false
+	//			break
+	//		}
+	//	}
+	//	if orderReady {
+	//		err = cs.updateOrderCompleteStatusToChain(addr, v)
+	//		if err != nil {
+	//			cs.logger.Error(err)
+	//		}
+	//	}
+	//}
 }
 
 func (cs *ContractService) updateProductStatusToChain(addr types.Address, orderId string, products []string) error {
@@ -241,12 +242,18 @@ func (cs *ContractService) getContractStatus() {
 			cs.logger.Info(" call sonata API to place order")
 			orderId, productId, err := cs.createOrderToSonataServer(internalId, orderInfo)
 			if err != nil {
+				cs.logger.Error(err)
 				return true
 			}
-			err = cs.updateOrderInfoToChain(orderId, internalId, productId)
+			var id []string
+			id = append(id, productId[0])
+			cs.logger.Infof("place order success ,orderId is %s,productId is %s", orderId, id[0])
+			err = cs.updateOrderInfoToChain(orderId, internalId, id)
 			if err != nil {
+				cs.logger.Error(err)
 				return true
 			}
+			cs.logger.Infof("update order info to chain success ,orderId is %s,productId is %s", orderId, id[0])
 			cs.orderIdOnChain.Delete(internalId)
 		}
 		return true
@@ -256,7 +263,11 @@ func (cs *ContractService) getContractStatus() {
 func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *abi.DoDSettleOrderInfo) (string, []string, error) {
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
-		bw, err := strconv.Atoi(v.Bandwidth)
+		bws := strings.Split(v.Bandwidth, " ")
+		if len(bws) != 2 {
+			return "", nil, errors.New("bandwidth error")
+		}
+		bw, err := strconv.Atoi(bws[0])
 		if err != nil {
 			return "", nil, err
 		}
@@ -264,6 +275,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			SrcPortID: v.SrcPort,
 			DstPortID: v.DstPort,
 			Bandwidth: uint(bw),
+			BwUnit:    bws[1],
 			CosName:   v.ServiceClass.String(),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams: &orchestra.BillingParams{
@@ -377,6 +389,7 @@ func (cs *ContractService) processDoDContract() {
 		return
 	}
 	for _, v := range dod {
+		cs.logger.Infof("find a dod settlement need sign,request hash is %s", v.Hash.String())
 		b := cs.verifyOrderInfoFromSonata(v.Order)
 		if !b {
 			continue
@@ -420,23 +433,19 @@ func (cs *ContractService) processDoDContract() {
 			cs.logger.Error(err)
 			continue
 		}
-		var hashStrList []string
-		var rspInfo []*qlcchain.APIBlock
-		hashStrList = append(hashStrList, v.Hash.String())
-		err = cs.client.Call(&rspInfo, "ledger_confirmedBlocksInfo", hashStrList)
-
-		if err != nil {
-			cs.logger.Error(err)
-			continue
-		}
-		cs.orderIdOnChain.Store(rspInfo[0].Previous.String(), v.Order)
+		cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
 	}
 }
 
 func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderInfo) bool {
 	op := &orchestra.OrderParams{}
 	for _, conn := range order.Connections {
-		bw, err := strconv.Atoi(conn.Bandwidth)
+		bws := strings.Split(conn.Bandwidth, " ")
+		if len(bws) != 2 {
+			cs.logger.Error("bandwidth error")
+			return false
+		}
+		bw, err := strconv.Atoi(bws[0])
 		if err != nil {
 			cs.logger.Error(err)
 			return false
@@ -444,6 +453,7 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderIn
 
 		lineItem := &orchestra.ELineItemParams{
 			Bandwidth: uint(bw),
+			BwUnit:    bws[1],
 			SrcPortID: conn.SrcPort,
 			DstPortID: conn.DstPort,
 			CosName:   conn.ServiceClass.String(),
@@ -466,12 +476,12 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderIn
 		return false
 	}
 	if op.RspQuote == nil {
-		cs.logger.Infof("order information verify fail, empty quote response")
+		cs.logger.Errorf("order information verify fail, empty quote response")
 		return false
 	}
 
 	if len(op.RspQuote.QuoteItem) != len(order.Connections) {
-		cs.logger.Infof("order information verify fail, item count not equal")
+		cs.logger.Errorf("order information verify fail, item count not equal")
 		return false
 	}
 
@@ -479,17 +489,17 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderIn
 		conn := order.Connections[idx]
 		quote := op.RspQuote.QuoteItem[idx]
 		if len(quote.QuoteItemPrice) == 0 {
-			cs.logger.Infof("order information verify fail, empty price")
+			cs.logger.Errorf("order information verify fail, empty price")
 			return false
 		}
 		quotePrice := quote.QuoteItemPrice[0]
 		if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
-			cs.logger.Infof("order information verify fail, invalid price")
+			cs.logger.Errorf("order information verify fail, invalid price")
 			return false
 		}
 
 		if *quotePrice.Price.PreTaxAmount.Unit != conn.Currency || *quotePrice.Price.PreTaxAmount.Value != float32(conn.Price) {
-			cs.logger.Infof("order information verify fail")
+			cs.logger.Errorf("order information verify fail")
 			return false
 		}
 	}

@@ -226,7 +226,7 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 		itemPrice.Name = &priName
 		itemPrice.PriceType = quomod.PriceTypeRECURRING
 		itemPrice.Price = &quomod.Price{}
-		curUnit := "USA"
+		curUnit := "USD"
 		priVal := float32(0)
 		if uniSpec != nil {
 			if len(uniSpec.PhysicalLayer) > 0 {

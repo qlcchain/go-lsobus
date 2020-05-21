@@ -158,6 +158,10 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 	if err != nil {
 		return err
 	}
+	price, err := strconv.ParseFloat(priceP, 64)
+	if err != nil {
+		return err
+	}
 	param := &pb.CreateOrderParam{
 		Buyer: &pb.User{
 			Address: acc.Address().String(),
@@ -187,7 +191,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			ConnectionName: fmt.Sprintf("connection%d", rand.Int()),
 			Bandwidth:      bandwidthP,
 			BillingUnit:    billingUnitP,
-			Price:          priceP,
+			Price:          float32(price),
 			ServiceClass:   "gold",
 			PaymentType:    "invoice",
 			BillingType:    billingTypeP,

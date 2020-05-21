@@ -42,7 +42,7 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
 	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
+		//		s.logger.Errorf("send request, error %s", err)
 		//return err
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
 	}
