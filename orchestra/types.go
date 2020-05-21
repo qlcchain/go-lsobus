@@ -30,6 +30,7 @@ type BillingParams struct {
 }
 
 type BaseItemParams struct {
+	ItemID string
 	Action string
 
 	ProdSpecID  string
@@ -89,6 +90,8 @@ type FindParams struct {
 	State      string
 
 	ProductSpecificationID string
+	ProductOfferingID      string
+	ProductOrderID         string
 
 	RspSiteList  []*sitmod.GeographicSiteFindResp
 	RspPoqList   []*poqmod.ProductOfferingQualificationFind

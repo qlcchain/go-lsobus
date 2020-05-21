@@ -41,6 +41,12 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	if params.ProductSpecificationID != "" {
 		reqParams.ProductSpecificationID = &params.ProductSpecificationID
 	}
+	if params.ProductOfferingID != "" {
+		reqParams.ProductOfferingID = &params.ProductOfferingID
+	}
+	if params.ProductOrderID != "" {
+		reqParams.ProductOrderID = &params.ProductOrderID
+	}
 	if params.Offset != "" {
 		reqParams.Offset = &params.Offset
 	}

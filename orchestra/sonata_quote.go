@@ -182,8 +182,13 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 
 	uniItem := &quomod.QuoteItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = quomod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
@@ -226,8 +231,12 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	lineItem := &quomod.QuoteItemCreate{}
 	lineItem.Action = quomod.ProductActionType(params.Action)
 
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}

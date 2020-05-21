@@ -164,8 +164,13 @@ func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOffer
 
 	uniItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = poqmod.ProductActionType(params.Action)
 
 	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
@@ -207,8 +212,12 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
 	lineItem.Action = poqmod.ProductActionType(params.Action)
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
 

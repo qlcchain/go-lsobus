@@ -57,6 +57,9 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 	if params.ProjectID != "" {
 		reqParams.ProjectID = &params.ProjectID
 	}
+	if params.ExternalID != "" {
+		reqParams.ExternalID = &params.ExternalID
+	}
 	if params.BuyerID != "" {
 		reqParams.BuyerID = &params.BuyerID
 	}
@@ -192,8 +195,13 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	}
 	uniItem := &ordmod.ProductOrderItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = ordmod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
@@ -237,8 +245,12 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	lineItem := &ordmod.ProductOrderItemCreate{}
 	lineItem.Action = ordmod.ProductActionType(params.Action)
 
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
