@@ -261,6 +261,19 @@ func (cs *ContractService) getContractStatus() {
 }
 
 func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *abi.DoDSettleOrderInfo) (string, []string, error) {
+	orderActivity := ""
+	itemAction := ""
+	if orderInfo.OrderType == abi.DoDSettleOrderTypeCreate {
+		orderActivity = "install"
+		itemAction = "add"
+	} else if orderInfo.OrderType == abi.DoDSettleOrderTypeChange {
+		orderActivity = "change"
+		itemAction = "change"
+	} else if orderInfo.OrderType == abi.DoDSettleOrderTypeChange {
+		orderActivity = "disconnect"
+		itemAction = "remove"
+	}
+
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
 		bws := strings.Split(v.Bandwidth, " ")
@@ -289,9 +302,11 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 				},
 			},
 		}
+		eLine.Action = itemAction
 		eLines = append(eLines, eLine)
 	}
 	op := &orchestra.OrderParams{
+		OrderActivity: orderActivity,
 		Buyer: &orchestra.Partner{
 			ID:   orderInfo.Buyer.Address.String(),
 			Name: orderInfo.Buyer.Name,

@@ -221,17 +221,19 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 		uniItem.Product.SetPlace([]ordmod.RelatedPlaceReforValue{uniPlace})
 	}
 
-	// UNI Product Specification
-	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
-	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := s.BuildUNIProductSpec(params)
-	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	if uniItem.Action != ordmod.ProductActionTypeRemove {
+		// UNI Product Specification
+		uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
+		uniItem.Product.ProductSpecification.ID = "UNISpec"
+		uniDesc := s.BuildUNIProductSpec(params)
+		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 
-	// Price
-	s.BuildItemPrice(uniItem, params.BillingParams)
+		// Price
+		s.BuildItemPrice(uniItem, params.BillingParams)
 
-	// Term
-	uniItem.PricingTerm = sonata.NewInt32(36)
+		// Term
+		uniItem.PricingTerm = sonata.NewInt32(36)
+	}
 
 	return uniItem
 }
@@ -265,19 +267,19 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 		lineItem.Product.ID = params.ProductID
 	}
 
-	//Product Specification
 	if lineItem.Action != ordmod.ProductActionTypeRemove {
+		//Product Specification
 		lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
 		lineDesc := s.BuildELineProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+
+		// Price
+		s.BuildItemPrice(lineItem, params.BillingParams)
+
+		// Term
+		lineItem.PricingTerm = sonata.NewInt32(36)
 	}
-
-	// Price
-	s.BuildItemPrice(lineItem, params.BillingParams)
-
-	// Term
-	lineItem.PricingTerm = sonata.NewInt32(36)
 
 	return lineItem
 }
