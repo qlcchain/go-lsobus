@@ -3,6 +3,7 @@ module github.com/qlcchain/go-lsobus
 go 1.13
 
 require (
+	github.com/abice/go-enum v0.2.3 // indirect
 	github.com/abiosoft/ishell v0.0.0-20190613190920-79d20b1325a4
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/bitly/go-simplejson v0.5.0
@@ -18,13 +19,12 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0
-	github.com/qlcchain/go-qlc v1.3.3-0.20200520142335-8ca73f82501f
+	github.com/qlcchain/go-qlc v1.3.3-0.20200521141857-c40d447d5291
 	github.com/qlcchain/jsonrpc2 v0.0.7
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.0.0
 	go.uber.org/atomic v1.6.0
-	go.uber.org/multierr v1.5.0 // indirect
-	go.uber.org/zap v1.10.0
+	go.uber.org/zap v1.14.1
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.22.0

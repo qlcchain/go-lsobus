@@ -42,6 +42,7 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 		}
 		cs.logger.Infof("process hash %s success", h.String())
 		internalId := block.Previous.String()
+		cs.orderIdOnChain.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)

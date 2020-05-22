@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 
@@ -17,7 +18,7 @@ import (
 	"github.com/qlcchain/go-qlc/vm/contract/abi"
 )
 
-func addChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
+func addDSChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
 	buyerAddress := util.Flag{
 		Name:  "buyerAddress",
 		Must:  true,
@@ -84,8 +85,15 @@ func addChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
 		Usage: "productId (separate by comma)",
 		Value: "",
 	}
+	quoteId := util.Flag{
+		Name:  "quoteId",
+		Must:  true,
+		Usage: "quoteId",
+		Value: "",
+	}
 
-	args := []util.Flag{buyerAddress, buyerName, sellerAddress, sellerName, billingType, bandwidth, billingUnit, price, startTime, endTime, productId}
+	args := []util.Flag{buyerAddress, buyerName, sellerAddress, sellerName, billingType, bandwidth, billingUnit, price,
+		startTime, endTime, productId, quoteId}
 	cmd := &ishell.Cmd{
 		Name:                "changeOrder",
 		Help:                "create a change order request",
@@ -111,9 +119,10 @@ func addChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
 			startTimeP := util.StringVar(c.Args, startTime)
 			endTimeP := util.StringVar(c.Args, endTime)
 			productIdP := util.StringVar(c.Args, productId)
+			quoteIdP := util.StringVar(c.Args, quoteId)
 
-			if err := ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTimeP, endTimeP,
-				billingTypeP, bandwidthP, billingUnitP, priceP, productIdP); err != nil {
+			if err := DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTimeP, endTimeP,
+				billingTypeP, bandwidthP, billingUnitP, priceP, productIdP, quoteIdP); err != nil {
 				util.Warn(err)
 				return
 			}
@@ -122,8 +131,8 @@ func addChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
 	parentCmd.AddCmd(cmd)
 }
 
-func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTimeP, endTimeP, billingTypeP,
-	bandwidthP, billingUnitP, priceP, productIdP string) error {
+func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTimeP, endTimeP, billingTypeP,
+	bandwidthP, billingUnitP, priceP, productIdP, quoteIdP string) error {
 	cn, err := grpc.Dial(endpointP, grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)
@@ -150,6 +159,12 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 	if err != nil {
 		return err
 	}
+
+	price, err := strconv.ParseFloat(priceP, 64)
+	if err != nil {
+		return err
+	}
+
 	var startTime, endTime int64
 	var billingUnit abi.DoDSettleBillingUnit
 
@@ -169,10 +184,6 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 			return err
 		}
 	}
-	price, err := strconv.ParseFloat(priceP, 64)
-	if err != nil {
-		return err
-	}
 
 	param := &pb.ChangeOrderParam{
 		Buyer: &pb.User{
@@ -183,6 +194,7 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 			Address: sellerAddress.String(),
 			Name:    sellerNameP,
 		},
+		QuoteId:               quoteIdP,
 		ChangeConnectionParam: make([]*pb.ChangeConnectionParam, 0),
 	}
 
@@ -193,7 +205,6 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 
 		if billingType == abi.DoDSettleBillingTypePAYG {
 			conn = &pb.ChangeConnectionParam{
-				ProductId: productId,
 				DynamicParam: &pb.ConnectionDynamicParam{
 					Bandwidth:   bandwidthP,
 					BillingUnit: billingUnit.String(),
@@ -202,7 +213,6 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 			}
 		} else {
 			conn = &pb.ChangeConnectionParam{
-				ProductId: productId,
 				DynamicParam: &pb.ConnectionDynamicParam{
 					Bandwidth: bandwidthP,
 					StartTime: startTime,
@@ -212,9 +222,10 @@ func ChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, startTi
 			}
 		}
 
+		conn.ProductId = productId
+		conn.QuoteItemId = fmt.Sprintf("quoteItem%d", rand.Int())
 		param.ChangeConnectionParam = append(param.ChangeConnectionParam, conn)
 	}
-
 	c := pb.NewOrderAPIClient(cn)
 	internalId, err := c.ChangeOrder(context.Background(), param)
 	if err != nil {

@@ -77,41 +77,78 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 			return nil, err
 		}
 
-		billingUnit, err := abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
-		if err != nil {
-			return nil, err
+		var billingUnit abi.DoDSettleBillingUnit
+		if len(v.DynamicParam.BillingUnit) > 0 {
+			billingUnit, err = abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
 		if err != nil {
 			return nil, err
 		}
-		conn := &abi.DoDSettleConnectionParam{
-			DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
-				ProductId:      v.StaticParam.ProductId,
-				SrcCompanyName: v.StaticParam.SrcCompanyName,
-				SrcRegion:      v.StaticParam.SrcRegion,
-				SrcCity:        v.StaticParam.SrcCity,
-				SrcDataCenter:  v.StaticParam.SrcDataCenter,
-				SrcPort:        v.StaticParam.SrcPort,
-				DstCompanyName: v.StaticParam.DstCompanyName,
-				DstRegion:      v.StaticParam.DstRegion,
-				DstCity:        v.StaticParam.DstCity,
-				DstDataCenter:  v.StaticParam.DstDataCenter,
-				DstPort:        v.StaticParam.DstPort,
-			},
-			DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
-				ConnectionName: v.DynamicParam.ConnectionName,
-				Bandwidth:      v.DynamicParam.Bandwidth,
-				BillingUnit:    billingUnit,
-				Price:          float64(v.DynamicParam.Price),
-				ServiceClass:   serviceClass,
-				PaymentType:    paymentType,
-				BillingType:    billingType,
-				Currency:       v.DynamicParam.Currency,
-				StartTime:      v.DynamicParam.StartTime,
-				EndTime:        v.DynamicParam.EndTime,
-			},
+		var conn *abi.DoDSettleConnectionParam
+		if billingType == abi.DoDSettleBillingTypePAYG {
+			conn = &abi.DoDSettleConnectionParam{
+				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
+					ItemId:         v.StaticParam.ItemId,
+					ProductId:      v.StaticParam.ProductId,
+					SrcCompanyName: v.StaticParam.SrcCompanyName,
+					SrcRegion:      v.StaticParam.SrcRegion,
+					SrcCity:        v.StaticParam.SrcCity,
+					SrcDataCenter:  v.StaticParam.SrcDataCenter,
+					SrcPort:        v.StaticParam.SrcPort,
+					DstCompanyName: v.StaticParam.DstCompanyName,
+					DstRegion:      v.StaticParam.DstRegion,
+					DstCity:        v.StaticParam.DstCity,
+					DstDataCenter:  v.StaticParam.DstDataCenter,
+					DstPort:        v.StaticParam.DstPort,
+				},
+				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
+					OrderId:        v.DynamicParam.OrderId,
+					QuoteItemId:    v.DynamicParam.QuoteItemId,
+					ConnectionName: v.DynamicParam.ConnectionName,
+					Bandwidth:      v.DynamicParam.Bandwidth,
+					BillingUnit:    billingUnit,
+					Price:          float64(v.DynamicParam.Price),
+					ServiceClass:   serviceClass,
+					PaymentType:    paymentType,
+					BillingType:    billingType,
+					Currency:       v.DynamicParam.Currency,
+				},
+			}
+		} else {
+			conn = &abi.DoDSettleConnectionParam{
+				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
+					ItemId:         v.StaticParam.ItemId,
+					ProductId:      v.StaticParam.ProductId,
+					SrcCompanyName: v.StaticParam.SrcCompanyName,
+					SrcRegion:      v.StaticParam.SrcRegion,
+					SrcCity:        v.StaticParam.SrcCity,
+					SrcDataCenter:  v.StaticParam.SrcDataCenter,
+					SrcPort:        v.StaticParam.SrcPort,
+					DstCompanyName: v.StaticParam.DstCompanyName,
+					DstRegion:      v.StaticParam.DstRegion,
+					DstCity:        v.StaticParam.DstCity,
+					DstDataCenter:  v.StaticParam.DstDataCenter,
+					DstPort:        v.StaticParam.DstPort,
+				},
+				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
+					OrderId:        v.DynamicParam.OrderId,
+					QuoteItemId:    v.DynamicParam.QuoteItemId,
+					ConnectionName: v.DynamicParam.ConnectionName,
+					Bandwidth:      v.DynamicParam.Bandwidth,
+					Price:          float64(v.DynamicParam.Price),
+					ServiceClass:   serviceClass,
+					PaymentType:    paymentType,
+					BillingType:    billingType,
+					Currency:       v.DynamicParam.Currency,
+					StartTime:      v.DynamicParam.StartTime,
+					EndTime:        v.DynamicParam.EndTime,
+				},
+			}
 		}
 		op.Connections = append(op.Connections, conn)
 	}

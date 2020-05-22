@@ -14,7 +14,7 @@ import (
 	"github.com/qlcchain/go-qlc/common/types"
 )
 
-func addTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
+func addDSTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 	buyerAddress := util.Flag{
 		Name:  "buyerAddress",
 		Must:  true,
@@ -67,7 +67,7 @@ func addTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 			sellerNameP := util.StringVar(c.Args, sellerName)
 			productIdP := util.StringVar(c.Args, productId)
 
-			if err := TerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP); err != nil {
+			if err := DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP); err != nil {
 				util.Warn(err)
 				return
 			}
@@ -76,7 +76,7 @@ func addTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 	parentCmd.AddCmd(cmd)
 }
 
-func TerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP string) error {
+func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP string) error {
 	cn, err := grpc.Dial(endpointP, grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)

@@ -27,30 +27,33 @@ message User {
 }
 
 message ConnectionStaticParam {
-  string productId = 1;
-  string srcCompanyName = 2 ;
-  string srcRegion = 3;
-  string srcCity = 4;
-  string srcDataCenter = 5;
-  string srcPort = 6;
-  string dstCompanyName = 7;
-  string dstRegion = 8;
-  string dstCity = 9;
-  string dstDataCenter = 10;
-  string dstPort = 11;
+  string itemId = 1;
+  string productId = 2;
+  string srcCompanyName = 3;
+  string srcRegion = 4;
+  string srcCity = 5;
+  string srcDataCenter = 6;
+  string srcPort = 7;
+  string dstCompanyName = 8;
+  string dstRegion = 9;
+  string dstCity = 10;
+  string dstDataCenter = 11;
+  string dstPort = 12;
 }
 
 message ConnectionDynamicParam {
-  string connectionName = 1;
-  string paymentType = 2;
-  string billingType = 3;
-  string currency = 4;
-  string serviceClass = 5;
-  string bandwidth = 6;
-  string billingUnit = 7;
-  float price = 8;
-  int64 startTime = 9;
-  int64 endTime = 10;
+  string orderId = 1;
+  string quoteItemId =2;
+  string connectionName = 3;
+  string paymentType = 4;
+  string billingType = 5;
+  string currency = 6;
+  string serviceClass = 7;
+  string bandwidth = 8;
+  string billingUnit = 9;
+  float price = 10;
+  int64 startTime = 11;
+  int64 endTime = 12;
 }
 
 message ConnectionParam {
@@ -62,7 +65,8 @@ message CreateOrderParam {
   ContractPrivacyParam privacy = 1;
   User buyer = 2;
   User seller = 3;
-  repeated ConnectionParam cps = 4;
+  string quoteId = 4;
+  repeated ConnectionParam cps = 5;
 }
 
 message OrderRsp {
@@ -100,14 +104,16 @@ message ContractPrivacyParam {
 
 message ChangeConnectionParam {
   string productId = 1;
-  ConnectionDynamicParam dynamicParam = 2;
+  string quoteItemId = 2;
+  ConnectionDynamicParam dynamicParam = 3;
 }
 
 message ChangeOrderParam {
   ContractPrivacyParam privacy = 1;
   User buyer = 2;
   User seller = 3;
-  repeated ChangeConnectionParam changeConnectionParam = 4;
+  string quoteId = 4;
+  repeated ChangeConnectionParam changeConnectionParam = 5;
 }
 
 message TerminateOrderParam {

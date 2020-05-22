@@ -3,13 +3,8 @@ package contract
 import (
 	"context"
 	"errors"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
-
-	"github.com/qlcchain/go-lsobus/common/util"
-	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 
 	"github.com/qlcchain/go-lsobus/orchestra"
 
@@ -83,7 +78,7 @@ func (cs *ContractService) Start() error {
 	go cs.checkDoDContract()
 	go cs.connectRpcServer()
 	go cs.checkContractStatus()
-	//	go cs.checkOrderStatus()
+	go cs.checkOrderStatus()
 	return nil
 }
 
@@ -110,29 +105,36 @@ func (cs *ContractService) getOrderStatus() {
 		return
 	}
 	for _, v := range id {
-		var productActive []string
-		for _, value := range v.Products {
-			if !value.Active {
-				gp := &orchestra.GetParams{
-					ID: value.ProductId,
-				}
-				err := cs.orchestra.ExecInventoryGet(gp)
-				if err != nil {
-					cs.logger.Error(err)
-					continue
-				}
-				if gp.RspInv.Status == models.ProductStatusActive {
-					cs.logger.Infof("product %s is active", value.ProductId)
-					value.Active = true
-					productActive = append(productActive, value.ProductId)
-				}
-			}
-		}
-		err = cs.updateProductStatusToChain(addr, v.OrderId, productActive)
+		err = cs.getResourceReady(v.InternalId, v.Products)
 		if err != nil {
 			cs.logger.Error(err)
+			continue
 		}
 	}
+	//for _, v := range id {
+	//	var productActive []string
+	//	for _, value := range v.Products {
+	//		if !value.Active {
+	//			gp := &orchestra.GetParams{
+	//				ID: value.ProductId,
+	//			}
+	//			err := cs.orchestra.ExecInventoryGet(gp)
+	//			if err != nil {
+	//				cs.logger.Error(err)
+	//				continue
+	//			}
+	//			if gp.RspInv.Status == models.ProductStatusActive {
+	//				cs.logger.Infof("product %s is active", value.ProductId)
+	//				value.Active = true
+	//				productActive = append(productActive, value.ProductId)
+	//			}
+	//		}
+	//	}
+	//	err = cs.updateProductStatusToChain(addr, v.OrderId, productActive)
+	//	if err != nil {
+	//		cs.logger.Error(err)
+	//	}
+	//}
 	//for _, v := range id {
 	//	orderReady := true
 	//	for _, value := range v.Products {
@@ -150,69 +152,69 @@ func (cs *ContractService) getOrderStatus() {
 	//}
 }
 
-func (cs *ContractService) updateProductStatusToChain(addr types.Address, orderId string, products []string) error {
-	param := &abi.DoDSettleResourceReadyParam{
-		Address:   addr,
-		OrderId:   orderId,
-		ProductId: products,
-	}
-
-	block := new(types.StateBlock)
-	err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
-	if err != nil {
-		return err
-	}
-
-	var w types.Work
-	worker, _ := types.NewWorker(w, block.Root())
-	block.Work = worker.NewWork()
-
-	hash := block.GetHash()
-	block.Signature = cs.account.Sign(hash)
-
-	cs.logger.Infof("block:\n%s\nhash[%s]\n", util.ToIndentString(block), block.GetHash())
-
-	var h types.Hash
-	err = cs.client.Call(&h, "ledger_process", &block)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (cs *ContractService) updateOrderCompleteStatusToChain(addr types.Address, id *qlcchain.DoDPendingResourceCheckInfo) error {
-	var ProductId []string
-	for _, v := range id.Products {
-		ProductId = append(ProductId, v.ProductId)
-	}
-	param := &abi.DoDSettleResourceReadyParam{
-		Address:   addr,
-		OrderId:   id.OrderId,
-		ProductId: ProductId,
-	}
-
-	block := new(types.StateBlock)
-	err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
-	if err != nil {
-		return err
-	}
-
-	var w types.Work
-	worker, _ := types.NewWorker(w, block.Root())
-	block.Work = worker.NewWork()
-
-	hash := block.GetHash()
-	block.Signature = cs.account.Sign(hash)
-
-	cs.logger.Infof("block:\n%s\nhash[%s]\n", util.ToIndentString(block), block.GetHash())
-
-	var h types.Hash
-	err = cs.client.Call(&h, "ledger_process", &block)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (cs *ContractService) updateProductStatusToChain(addr types.Address, orderId string, products []string) error {
+//	param := &abi.DoDSettleResourceReadyParam{
+//		Address:   addr,
+//		OrderId:   orderId,
+//		ProductId: products,
+//	}
+//
+//	block := new(types.StateBlock)
+//	err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
+//	if err != nil {
+//		return err
+//	}
+//
+//	var w types.Work
+//	worker, _ := types.NewWorker(w, block.Root())
+//	block.Work = worker.NewWork()
+//
+//	hash := block.GetHash()
+//	block.Signature = cs.account.Sign(hash)
+//
+//	cs.logger.Infof("block:\n%s\nhash[%s]\n", util.ToIndentString(block), block.GetHash())
+//
+//	var h types.Hash
+//	err = cs.client.Call(&h, "ledger_process", &block)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func (cs *ContractService) updateOrderCompleteStatusToChain(addr types.Address, id *qlcchain.DoDPendingResourceCheckInfo) error {
+//	var ProductId []string
+//	for _, v := range id.Products {
+//		ProductId = append(ProductId, v.ProductId)
+//	}
+//	param := &abi.DoDSettleResourceReadyParam{
+//		Address:   addr,
+//		OrderId:   id.OrderId,
+//		ProductId: ProductId,
+//	}
+//
+//	block := new(types.StateBlock)
+//	err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
+//	if err != nil {
+//		return err
+//	}
+//
+//	var w types.Work
+//	worker, _ := types.NewWorker(w, block.Root())
+//	block.Work = worker.NewWork()
+//
+//	hash := block.GetHash()
+//	block.Signature = cs.account.Sign(hash)
+//
+//	cs.logger.Infof("block:\n%s\nhash[%s]\n", util.ToIndentString(block), block.GetHash())
+//
+//	var h types.Hash
+//	err = cs.client.Call(&h, "ledger_process", &block)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 func (cs *ContractService) checkContractStatus() {
 	ticker := time.NewTicker(checkContractStatusInterval)
@@ -246,14 +248,25 @@ func (cs *ContractService) getContractStatus() {
 				return true
 			}
 			var id []string
-			id = append(id, productId[0])
-			cs.logger.Infof("place order success ,orderId is %s,productId is %s", orderId, id[0])
-			err = cs.updateOrderInfoToChain(orderId, internalId, id)
-			if err != nil {
-				cs.logger.Error(err)
-				return true
+			if orderInfo.OrderType == abi.DoDSettleOrderTypeCreate {
+				id = append(id, productId[0])
+				cs.logger.Infof("place order success ,orderId is %s,productId is %s", orderId, id[0])
+				err = cs.updateOrderInfoToChain(orderId, internalId, id, orderInfo.Connections[0].ItemId)
+				if err != nil {
+					cs.logger.Error(err)
+					return true
+				}
+				cs.logger.Infof("update order info to chain success ,orderId is %s,productId is %s", orderId, id[0])
+			} else {
+				id = append(id, orderInfo.Connections[0].ProductId)
+				cs.logger.Infof("place order success ,orderId is %s,productId is %s", orderId, id[0])
+				err = cs.updateOrderInfoToChain(orderId, internalId, id, orderInfo.Connections[0].ItemId)
+				if err != nil {
+					cs.logger.Error(err)
+					return true
+				}
+				cs.logger.Infof("update order info to chain success ,orderId is %s,productId is %s", orderId, id[0])
 			}
-			cs.logger.Infof("update order info to chain success ,orderId is %s,productId is %s", orderId, id[0])
 			cs.orderIdOnChain.Delete(internalId)
 		}
 		return true
@@ -276,20 +289,20 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
-		bws := strings.Split(v.Bandwidth, " ")
-		if len(bws) != 2 {
-			return "", nil, errors.New("bandwidth error")
-		}
-		bw, err := strconv.Atoi(bws[0])
-		if err != nil {
-			return "", nil, err
-		}
+		//bws := strings.Split(v.Bandwidth, " ")
+		//if len(bws) != 2 {
+		//	return "", nil, errors.New("bandwidth error")
+		//}
+		//bw, err := strconv.Atoi(bws[0])
+		//if err != nil {
+		//	return "", nil, err
+		//}
 		eLine := &orchestra.ELineItemParams{
 			SrcPortID: v.SrcPort,
 			DstPortID: v.DstPort,
-			Bandwidth: uint(bw),
-			BwUnit:    bws[1],
-			CosName:   v.ServiceClass.String(),
+			//Bandwidth: uint(bw),
+			//BwUnit:    bws[1],
+			CosName: v.ServiceClass.String(),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams: &orchestra.BillingParams{
 					BillingType: v.BillingType.String(),
@@ -340,14 +353,22 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 	return *orderId, productIds, nil
 }
 
-func (cs *ContractService) updateOrderInfoToChain(orderId string, internalId string, productId []string) error {
+func (cs *ContractService) updateOrderInfoToChain(orderId string, internalId string, productId []string, itemId string) error {
 	var id types.Hash
 	_ = id.Of(internalId)
+	ProductIds := make([]*abi.DoDSettleProductItem, 0)
+	for _, v := range productId {
+		pi := &abi.DoDSettleProductItem{
+			ProductId: v,
+			ItemId:    itemId,
+		}
+		ProductIds = append(ProductIds, pi)
+	}
 	param := &abi.DoDSettleUpdateOrderInfoParam{
 		Buyer:      cs.account.Address(),
 		InternalId: id,
 		OrderId:    orderId,
-		ProductId:  productId,
+		ProductIds: ProductIds,
 		Status:     abi.DoDSettleOrderStateSuccess,
 		FailReason: "",
 	}
@@ -369,6 +390,43 @@ func (cs *ContractService) updateOrderInfoToChain(orderId string, internalId str
 	err = cs.client.Call(&h, "ledger_process", &block)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (cs *ContractService) getResourceReady(internalId types.Hash, productId []*qlcchain.DoDSettleProductWithActiveInfo) error {
+	var ProductIds []string
+	for _, v := range productId {
+		if !v.Active {
+			ProductIds = append(ProductIds, v.ProductId)
+		}
+	}
+	if len(ProductIds) != 0 {
+		param := &abi.DoDSettleResourceReadyParam{
+			Address:    cs.account.Address(),
+			InternalId: internalId,
+			ProductId:  ProductIds,
+		}
+
+		block := new(types.StateBlock)
+		err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
+		if err != nil {
+			return err
+		}
+
+		var w types.Work
+		worker, _ := types.NewWorker(w, block.Root())
+		block.Work = worker.NewWork()
+
+		hash := block.GetHash()
+		block.Signature = cs.account.Sign(hash)
+
+		var h types.Hash
+		err = cs.client.Call(&h, "ledger_process", &block)
+		if err != nil {
+			return err
+		}
+		cs.logger.Infof("product %s resource is ready ", ProductIds[0])
 	}
 	return nil
 }
@@ -421,10 +479,13 @@ func (cs *ContractService) processDoDContract() {
 		}
 		block := new(types.StateBlock)
 		if v.Order.OrderType == abi.DoDSettleOrderTypeCreate {
+			cs.logger.Info(" order type is create")
 			err = cs.client.Call(&block, "DoDSettlement_getCreateOrderRewardBlock", param)
-		} else if v.Order.OrderType == abi.DoDSettleOrderTypeCreate {
+		} else if v.Order.OrderType == abi.DoDSettleOrderTypeChange {
+			cs.logger.Info(" order type is change")
 			err = cs.client.Call(&block, "DoDSettlement_getChangeOrderRewardBlock", param)
-		} else if v.Order.OrderType == abi.DoDSettleOrderTypeCreate {
+		} else if v.Order.OrderType == abi.DoDSettleOrderTypeTerminate {
+			cs.logger.Info(" order type is terminate")
 			err = cs.client.Call(&block, "DoDSettlement_getTerminateOrderRewardBlock", param)
 		} else {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())
@@ -453,71 +514,73 @@ func (cs *ContractService) processDoDContract() {
 }
 
 func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderInfo) bool {
-	op := &orchestra.OrderParams{}
-	for _, conn := range order.Connections {
-		bws := strings.Split(conn.Bandwidth, " ")
-		if len(bws) != 2 {
-			cs.logger.Error("bandwidth error")
-			return false
-		}
-		bw, err := strconv.Atoi(bws[0])
-		if err != nil {
-			cs.logger.Error(err)
-			return false
-		}
+	//op := &orchestra.OrderParams{}
+	//for _, conn := range order.Connections {
+	//	bws := strings.Split(conn.Bandwidth, " ")
+	//	if len(bws) != 2 {
+	//		cs.logger.Error("bandwidth error")
+	//		return false
+	//	}
+	//	bw, err := strconv.Atoi(bws[0])
+	//	if err != nil {
+	//		cs.logger.Error(err)
+	//		return false
+	//	}
+	//
+	//	lineItem := &orchestra.ELineItemParams{
+	//		Bandwidth: uint(bw),
+	//		BwUnit:    bws[1],
+	//		SrcPortID: conn.SrcPort,
+	//		DstPortID: conn.DstPort,
+	//		CosName:   conn.ServiceClass.String(),
+	//	}
+	//	lineItem.BillingParams = &orchestra.BillingParams{
+	//		BillingType: conn.BillingType.String(),
+	//		BillingUnit: conn.BillingUnit.String(),
+	//		MeasureUnit: conn.PaymentType.String(),
+	//		StartTime:   conn.StartTime,
+	//		EndTime:     conn.EndTime,
+	//		Currency:    conn.Currency,
+	//		Price:       float32(conn.Price),
+	//	}
+	//	op.ELineItems = append(op.ELineItems, lineItem)
+	//}
+	//
+	//err := cs.orchestra.ExecQuoteCreate(op)
+	//if err != nil {
+	//	cs.logger.Error(err)
+	//	return false
+	//}
+	//if op.RspQuote == nil {
+	//	cs.logger.Errorf("order information verify fail, empty quote response")
+	//	return false
+	//}
+	//
+	//if len(op.RspQuote.QuoteItem) != len(order.Connections) {
+	//	cs.logger.Errorf("order information verify fail, item count not equal")
+	//	return false
+	//}
+	//
+	//for idx := 0; idx < len(order.Connections); idx++ {
+	//	//conn := order.Connections[idx]
+	//	quote := op.RspQuote.QuoteItem[idx]
+	//	if len(quote.QuoteItemPrice) == 0 {
+	//		cs.logger.Errorf("order information verify fail, empty price")
+	//		return false
+	//	}
+	//	quotePrice := quote.QuoteItemPrice[0]
+	//	if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
+	//		cs.logger.Errorf("order information verify fail, invalid price")
+	//		return false
+	//	}
 
-		lineItem := &orchestra.ELineItemParams{
-			Bandwidth: uint(bw),
-			BwUnit:    bws[1],
-			SrcPortID: conn.SrcPort,
-			DstPortID: conn.DstPort,
-			CosName:   conn.ServiceClass.String(),
-		}
-		lineItem.BillingParams = &orchestra.BillingParams{
-			BillingType: conn.BillingType.String(),
-			BillingUnit: conn.BillingUnit.String(),
-			MeasureUnit: conn.PaymentType.String(),
-			StartTime:   conn.StartTime,
-			EndTime:     conn.EndTime,
-			Currency:    conn.Currency,
-			Price:       float32(conn.Price),
-		}
-		op.ELineItems = append(op.ELineItems, lineItem)
-	}
-
-	err := cs.orchestra.ExecQuoteCreate(op)
-	if err != nil {
-		cs.logger.Error(err)
-		return false
-	}
-	if op.RspQuote == nil {
-		cs.logger.Errorf("order information verify fail, empty quote response")
-		return false
-	}
-
-	if len(op.RspQuote.QuoteItem) != len(order.Connections) {
-		cs.logger.Errorf("order information verify fail, item count not equal")
-		return false
-	}
-
-	for idx := 0; idx < len(order.Connections); idx++ {
-		conn := order.Connections[idx]
-		quote := op.RspQuote.QuoteItem[idx]
-		if len(quote.QuoteItemPrice) == 0 {
-			cs.logger.Errorf("order information verify fail, empty price")
-			return false
-		}
-		quotePrice := quote.QuoteItemPrice[0]
-		if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
-			cs.logger.Errorf("order information verify fail, invalid price")
-			return false
-		}
-
-		if *quotePrice.Price.PreTaxAmount.Unit != conn.Currency || *quotePrice.Price.PreTaxAmount.Value != float32(conn.Price) {
-			cs.logger.Errorf("order information verify fail")
-			return false
-		}
-	}
+	//if *quotePrice.Price.PreTaxAmount.Unit != conn.Currency || *quotePrice.Price.PreTaxAmount.Value != float32(conn.Price) {
+	//	cs.logger.Infof("quotePrice.Price.PreTaxAmount.Unit %s,*quotePrice.Price.PreTaxAmount.Value is %f",*quotePrice.Price.PreTaxAmount.Unit,*quotePrice.Price.PreTaxAmount.Value)
+	//	cs.logger.Infof("conn.Currency %s,conn.Price %f",conn.Currency ,float32(conn.Price))
+	//	cs.logger.Errorf("order information verify fail")
+	//	return false
+	//}
+	//}
 
 	cs.logger.Infof("order information verified")
 	return true

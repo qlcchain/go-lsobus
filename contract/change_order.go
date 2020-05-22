@@ -44,6 +44,7 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 		}
 		cs.logger.Infof("process hash %s success", h.String())
 		internalId := block.Previous.String()
+		cs.orderIdOnChain.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
@@ -64,35 +65,15 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		Name:    param.Seller.Name,
 	}
 	for _, v := range param.ChangeConnectionParam {
-		paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
-		if err != nil {
-			return nil, err
-		}
 
-		billingType, err := abi.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
-		if err != nil {
-			return nil, err
-		}
-
-		billingUnit, err := abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
-		if err != nil {
-			return nil, err
-		}
-
-		serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
-		if err != nil {
-			return nil, err
-		}
-		conn := &abi.DoDSettleChangeConnectionParam{
+		var conn *abi.DoDSettleChangeConnectionParam
+		conn = &abi.DoDSettleChangeConnectionParam{
+			ProductId:   v.ProductId,
+			QuoteItemId: v.QuoteItemId,
 			DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
 				ConnectionName: v.DynamicParam.ConnectionName,
 				Bandwidth:      v.DynamicParam.Bandwidth,
-				BillingUnit:    billingUnit,
 				Price:          float64(v.DynamicParam.Price),
-				ServiceClass:   serviceClass,
-				PaymentType:    paymentType,
-				BillingType:    billingType,
-				Currency:       v.DynamicParam.ConnectionName,
 				StartTime:      v.DynamicParam.StartTime,
 				EndTime:        v.DynamicParam.EndTime,
 			},

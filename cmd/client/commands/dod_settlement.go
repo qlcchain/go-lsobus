@@ -14,9 +14,9 @@ func addOrderCmd() {
 			},
 		}
 		shell.AddCmd(orderCmd)
-		addCreateOrderCmdByShell(orderCmd)
-		addChangeOrderCmdByShell(orderCmd)
+		addDSCreateOrderCmdByShell(orderCmd)
+		addDSChangeOrderCmdByShell(orderCmd)
 		addGetOrderInfoByShell(orderCmd)
-		addTerminateOrderCmdByShell(orderCmd)
+		addDSTerminateOrderCmdByShell(orderCmd)
 	}
 }

@@ -101,6 +101,9 @@
         "productId": {
           "type": "string"
         },
+        "quoteItemId": {
+          "type": "string"
+        },
         "dynamicParam": {
           "$ref": "#/definitions/protoConnectionDynamicParam"
         }
@@ -118,6 +121,9 @@
         "seller": {
           "$ref": "#/definitions/protoUser"
         },
+        "quoteId": {
+          "type": "string"
+        },
         "changeConnectionParam": {
           "type": "array",
           "items": {
@@ -129,6 +135,12 @@
     "protoConnectionDynamicParam": {
       "type": "object",
       "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "quoteItemId": {
+          "type": "string"
+        },
         "connectionName": {
           "type": "string"
         },
@@ -178,6 +190,9 @@
     "protoConnectionStaticParam": {
       "type": "object",
       "properties": {
+        "itemId": {
+          "type": "string"
+        },
         "productId": {
           "type": "string"
         },
@@ -241,6 +256,9 @@
         },
         "seller": {
           "$ref": "#/definitions/protoUser"
+        },
+        "quoteId": {
+          "type": "string"
         },
         "cps": {
           "type": "array",
