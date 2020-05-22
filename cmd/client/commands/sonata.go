@@ -34,6 +34,9 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 	cmd.Flags().String("productID", "", "Product ID of existing service")
 
+	cmd.Flags().String("durationUnit", "DAY", "Duration unit, (e.g., YEAR, MONTH, DAY, HOUR)")
+	cmd.Flags().Uint("durationAmount", 1, "Duration amount")
+
 	// UNI
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
 	cmd.Flags().Uint("srcPortSpeed", 1000, "Source Port speed, Unit is Mbps")
@@ -106,6 +109,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+
+		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
 		params.UNIItems = append(params.UNIItems, uniItem)
@@ -125,6 +138,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+
+		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
 		params.UNIItems = append(params.UNIItems, uniItem)
@@ -170,6 +193,15 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		}
 
 		lineItem.SVlanID, err = cmd.Flags().GetUint("sVlanID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		lineItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
 		if err != nil {
 			return err
 		}

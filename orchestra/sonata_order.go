@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/sonata"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -228,6 +230,9 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	// Price
 	s.BuildItemPrice(uniItem, params.BillingParams)
 
+	// Term
+	uniItem.PricingTerm = sonata.NewInt32(36)
+
 	return uniItem
 }
 
@@ -270,6 +275,9 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 
 	// Price
 	s.BuildItemPrice(lineItem, params.BillingParams)
+
+	// Term
+	lineItem.PricingTerm = sonata.NewInt32(36)
 
 	return lineItem
 }

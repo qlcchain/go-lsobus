@@ -41,6 +41,9 @@ type BaseItemParams struct {
 	ExternalID  string
 	Description string
 
+	DurationUnit   string
+	DurationAmount uint
+
 	BillingParams *BillingParams
 }
 

@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/sonata"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -214,6 +216,12 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 	}
 
+	// Term
+	uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+	uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+	uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+	uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+
 	return uniItem
 }
 
@@ -253,6 +261,12 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 		lineDesc := s.BuildELineProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
+
+	// Term
+	lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+	lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+	lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+	lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
 
 	return lineItem
 }
