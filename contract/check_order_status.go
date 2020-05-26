@@ -93,8 +93,6 @@ func (cs *ContractService) updateProductStatusToChain(addr types.Address, Intern
 	hash := block.GetHash()
 	block.Signature = cs.account.Sign(hash)
 
-	cs.logger.Infof("block:\n%s\nhash[%s]\n", util.ToIndentString(block), block.GetHash())
-
 	var h types.Hash
 	err = cs.client.Call(&h, "ledger_process", &block)
 	if err != nil {
@@ -120,8 +118,6 @@ func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash types.Ha
 
 	hash := block.GetHash()
 	block.Signature = cs.account.Sign(hash)
-
-	cs.logger.Infof("block:%s hash[%s]", util.ToIndentString(block), block.GetHash())
 
 	var h types.Hash
 	err = cs.client.Call(&h, "ledger_process", &block)
