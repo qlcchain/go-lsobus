@@ -50,14 +50,6 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 	return "", errors.New("buyer address not match")
 }
 
-func (cs *ContractService) CheckTerminateOrderContractSignStatus(internalId string) bool {
-	return true
-}
-
-func (cs *ContractService) CheckTerminateOrderResourceReady(externalId string) bool {
-	return true
-}
-
 func (cs *ContractService) convertProtoToTerminateOrderParam(param *proto.TerminateOrderParam) (*abi.DoDSettleTerminateOrderParam, error) {
 	sellerAddr, _ := types.HexToAddress(param.Seller.Address)
 	buyAddr, _ := types.HexToAddress(param.Buyer.Address)

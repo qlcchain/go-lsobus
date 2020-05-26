@@ -23,7 +23,7 @@ func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderPar
 		return nil, err
 	}
 	return &proto.OrderRsp{
-		OrderIdOnChain: id,
+		InternalId: id,
 	}, nil
 }
 
@@ -33,7 +33,7 @@ func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderPar
 		return nil, err
 	}
 	return &proto.OrderRsp{
-		OrderIdOnChain: id,
+		InternalId: id,
 	}, nil
 }
 
@@ -43,7 +43,7 @@ func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOr
 		return nil, err
 	}
 	return &proto.OrderRsp{
-		OrderIdOnChain: id,
+		InternalId: id,
 	}, nil
 }
 

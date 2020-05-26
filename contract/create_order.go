@@ -11,16 +11,6 @@ import (
 )
 
 func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (string, error) {
-	/* TODO: Generate a block to create an order
-		1. call dod_settlement_getCreateOrderBlock to creat an order,it will return an internal id
-	    2. sign orderBlock and process it to the chain
-		3. periodically check whether this order has been signed and confirmed through internal id
-		4. if order has been signed and confirmed,call orchestra interface to order at the sonata service,
-	       will return an external order id
-		5. call dod_settlement_getUpdateOrderInfoBlock to update real orderId to qlc chain
-		6. call orchestra interface to periodically check whether the resource of this order has been ready?
-		7. if resource is ready,call dod_settlement_getResourceReadyBlock periodically check whether the resource of this order has been ready?
-	*/
 	addr := cs.account.Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToCreateOrderParam(param)
@@ -66,7 +56,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
-	for _, v := range param.Cps {
+	for _, v := range param.ConnectionParam {
 		paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
 		if err != nil {
 			return nil, err
@@ -171,8 +161,4 @@ func (cs *ContractService) CheckCreateOrderContractConfirmed(internalId string) 
 			}
 		}
 	}
-}
-
-func (cs *ContractService) CheckCreateOrderResourceReady(externalId string) bool {
-	return true
 }

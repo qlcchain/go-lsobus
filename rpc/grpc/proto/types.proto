@@ -66,11 +66,11 @@ message CreateOrderParam {
   User buyer = 2;
   User seller = 3;
   string quoteId = 4;
-  repeated ConnectionParam cps = 5;
+  repeated ConnectionParam connectionParam = 5;
 }
 
 message OrderRsp {
-  string orderIdOnChain = 1;
+  string internalId = 1;
 }
 
 message GetOrderInfoByInternalId {

@@ -82,11 +82,3 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 	}
 	return op, nil
 }
-
-func (cs *ContractService) CheckChangeOrderContractSignStatus(internalId string) bool {
-	return true
-}
-
-func (cs *ContractService) CheckChangeOrderResourceReady(externalId string) bool {
-	return true
-}

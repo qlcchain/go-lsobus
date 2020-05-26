@@ -260,7 +260,7 @@
         "quoteId": {
           "type": "string"
         },
-        "cps": {
+        "connectionParam": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoConnectionParam"
@@ -335,7 +335,7 @@
     "protoOrderRsp": {
       "type": "object",
       "properties": {
-        "orderIdOnChain": {
+        "internalId": {
           "type": "string"
         }
       }
