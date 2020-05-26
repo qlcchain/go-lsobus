@@ -205,6 +205,11 @@ func SonataGeneratePoqGetResponse(reqParams *poqapi.ProductOfferingQualification
 	rspParams.Payload = &poqmod.ProductOfferingQualification{}
 	rspParams.Payload.ID = &reqParams.ProductOfferingQualificationID
 	rspParams.Payload.State = poqmod.ProductOfferingQualificationStateTypeDone
+	poqItem1 := &poqmod.ProductOfferingQualificationItem{}
+	itemId1 := "1"
+	poqItem1.ID = &itemId1
+	poqItem1.State = poqmod.ProductOfferingQualificationItemStateTypeDone
+	rspParams.Payload.ProductOfferingQualificationItem = append(rspParams.Payload.ProductOfferingQualificationItem, poqItem1)
 
 	return rspParams
 }
@@ -310,6 +315,8 @@ func SonataGenerateQuoteGetResponse(reqParams *quoapi.QuoteGetParams) *quoapi.Qu
 	quote.InstantSyncQuoting = true
 	quote.State = quomod.QuoteStateTypeREADY
 	lineItem := &quomod.QuoteItem{}
+	lineId := "1"
+	lineItem.ID = &lineId
 	lineItem.State = quomod.QuoteItemStateTypeREADY
 	quote.QuoteItem = append(quote.QuoteItem, lineItem)
 	quote.QuoteDate.Scan(time.Now())
@@ -380,6 +387,8 @@ func SonataGenerateOrderGetResponse(reqParams *ordapi.ProductOrderGetParams) *or
 	order.ID = &reqParams.ProductOrderID
 	order.State = ordmod.ProductOrderStateTypeCompleted
 	lineItem := &ordmod.OrderItem{}
+	lineId := "1"
+	lineItem.ID = &lineId
 	lineItem.State = ordmod.ProductOrderItemStateTypeCompleted
 	order.OrderItem = append(order.OrderItem, lineItem)
 
