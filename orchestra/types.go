@@ -37,9 +37,9 @@ type BaseItemParams struct {
 	ProdOfferID string
 	ProdQuoteID string
 
-	ProductID   string
-	ExternalID  string
-	Description string
+	ProductID      string
+	BuyerProductID string
+	Description    string
 
 	DurationUnit   string
 	DurationAmount uint

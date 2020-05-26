@@ -213,6 +213,7 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &ordmod.Product{}
+	uniItem.Product.BuyerProductID = params.BuyerProductID
 	if uniItem.Action != ordmod.ProductActionTypeAdd {
 		uniItem.Product.ID = params.ProductID
 	}
@@ -266,6 +267,7 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = &ordmod.Product{}
+	lineItem.Product.BuyerProductID = params.BuyerProductID
 	if lineItem.Action != ordmod.ProductActionTypeAdd {
 		lineItem.Product.ID = params.ProductID
 	}
