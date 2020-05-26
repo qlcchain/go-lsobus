@@ -17,42 +17,42 @@ func NewOrderApi(cs *contract.ContractService) *OrderApi {
 	}
 }
 
-func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderRsp, error) {
+func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderId, error) {
 	id, err := oa.cs.GetCreateOrderBlock(param)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.OrderRsp{
+	return &proto.OrderId{
 		InternalId: id,
 	}, nil
 }
 
-func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderRsp, error) {
+func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderId, error) {
 	id, err := oa.cs.GetChangeOrderBlock(param)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.OrderRsp{
+	return &proto.OrderId{
 		InternalId: id,
 	}, nil
 }
 
-func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderRsp, error) {
+func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderId, error) {
 	id, err := oa.cs.GetTerminateOrderBlock(param)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.OrderRsp{
+	return &proto.OrderId{
 		InternalId: id,
 	}, nil
 }
 
-func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfoRsp, error) {
+func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfo, error) {
 	orderInfo, err := oa.cs.GetOrderInfoByInternalId(id.InternalId)
 	if err != nil {
 		return nil, err
 	}
-	info := new(proto.OrderInfoRsp)
+	info := new(proto.OrderInfo)
 	info.Buyer = &proto.User{
 		Address: orderInfo.Buyer.Address.String(),
 		Name:    orderInfo.Buyer.Name,

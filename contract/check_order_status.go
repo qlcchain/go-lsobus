@@ -51,23 +51,24 @@ func (cs *ContractService) getOrderStatus() {
 				}
 			}
 		}
-		err = cs.updateProductStatusToChain(addr, v.InternalId, productActive)
-		if err != nil {
-			cs.logger.Error(err)
-		}
-	}
-	for _, v := range id {
-		orderReady := true
-		for _, value := range v.Products {
-			if !value.Active {
-				orderReady = false
-				break
-			}
-		}
-		if orderReady {
-			err = cs.updateOrderCompleteStatusToChain(v.SendHash)
+		if len(productActive) != 0 {
+			err = cs.updateProductStatusToChain(addr, v.InternalId, productActive)
 			if err != nil {
 				cs.logger.Error(err)
+			}
+			orderReady := true
+			for _, value := range v.Products {
+				if !value.Active {
+					orderReady = false
+					break
+				}
+			}
+			if orderReady {
+				err = cs.updateOrderCompleteStatusToChain(v.SendHash)
+				if err != nil {
+					cs.logger.Error(err)
+				}
+				cs.logger.Infof("update order %s complete status to chain success", v.OrderId)
 			}
 		}
 	}
@@ -119,7 +120,7 @@ func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash types.Ha
 	hash := block.GetHash()
 	block.Signature = cs.account.Sign(hash)
 
-	var h types.Hash
+	h := block.GetHash()
 	err = cs.client.Call(&h, "ledger_process", &block)
 	if err != nil {
 		return err

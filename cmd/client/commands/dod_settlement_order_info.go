@@ -54,7 +54,7 @@ func getOrderInfo(internalId string) error {
 		InternalId: internalId,
 	}
 	c := pb.NewOrderAPIClient(cn)
-	orderInfo, err := c.OrderInfo(context.Background(), id)
+	orderInfo, err := c.GetOrderInfo(context.Background(), id)
 	if err != nil {
 		fmt.Println(err)
 	}

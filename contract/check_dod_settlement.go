@@ -115,20 +115,21 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderIn
 			}
 		}
 		if quote != nil {
-			if len(quote.QuoteItemPrice) == 0 {
-				cs.logger.Errorf("order information verify fail, empty price")
-				return false
-			}
-			quotePrice := quote.QuoteItemPrice[0]
-			if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
-				cs.logger.Errorf("order information verify fail, invalid price")
-				return false
-			}
+			//if len(quote.QuoteItemPrice) == 0 {
+			//	cs.logger.Errorf("order information verify fail, empty price")
+			//	return false
+			//}
+			//quotePrice := quote.QuoteItemPrice[0]
+			//if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
+			//	cs.logger.Errorf("order information verify fail, invalid price")
+			//	return false
+			//}
 			if quote.State != qm.QuoteItemStateTypeREADY {
 				cs.logger.Error("order information verify fail")
 			}
 		} else {
 			cs.logger.Errorf("order information verify fail,can not find quote item id %s", conn.QuoteItemId)
+			return false
 		}
 	}
 

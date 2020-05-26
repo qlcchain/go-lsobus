@@ -41,6 +41,32 @@
         ]
       }
     },
+    "/order/change": {
+      "post": {
+        "operationId": "ChangeOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrderId"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoChangeOrderParam"
+            }
+          }
+        ],
+        "tags": [
+          "OrderAPI"
+        ]
+      }
+    },
     "/order/create": {
       "post": {
         "operationId": "CreateOrder",
@@ -48,7 +74,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoOrderRsp"
+              "$ref": "#/definitions/protoOrderId"
             }
           }
         },
@@ -69,12 +95,38 @@
     },
     "/order/info": {
       "post": {
+        "operationId": "GetOrderInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrderInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoGetOrderInfoByInternalId"
+            }
+          }
+        ],
+        "tags": [
+          "OrderAPI"
+        ]
+      }
+    },
+    "/order/terminate": {
+      "post": {
         "operationId": "TerminateOrder",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoOrderRsp"
+              "$ref": "#/definitions/protoOrderId"
             }
           }
         },
@@ -276,7 +328,15 @@
         }
       }
     },
-    "protoOrderInfoRsp": {
+    "protoOrderId": {
+      "type": "object",
+      "properties": {
+        "internalId": {
+          "type": "string"
+        }
+      }
+    },
+    "protoOrderInfo": {
       "type": "object",
       "properties": {
         "buyer": {
@@ -328,14 +388,6 @@
           "format": "int64"
         },
         "Hash": {
-          "type": "string"
-        }
-      }
-    },
-    "protoOrderRsp": {
-      "type": "object",
-      "properties": {
-        "internalId": {
           "type": "string"
         }
       }

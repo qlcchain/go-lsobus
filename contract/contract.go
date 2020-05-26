@@ -2,7 +2,6 @@ package contract
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"time"
 
@@ -57,6 +56,7 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	or := orchestra.NewOrchestra(cfgFile)
+	or.SetFakeMode(true)
 	cs := &ContractService{
 		cfg:               cfg,
 		account:           cc.Account(),
@@ -88,28 +88,6 @@ func (cs *ContractService) Start() error {
 	go cs.checkOrderStatus()
 	go cs.checkProduct()
 	return nil
-}
-
-func (cs *ContractService) inventoryFind(orderId string) ([]*Product, error) {
-	fp := &orchestra.FindParams{
-		ProductOrderID: orderId,
-	}
-	err := cs.orchestra.ExecInventoryFind(fp)
-	if err != nil {
-		return nil, err
-	}
-	var productIds []*Product
-	if len(fp.RspInvList) == 0 {
-		return nil, errors.New("no inventory list ")
-	}
-	for _, v := range fp.RspInvList {
-		pt := &Product{
-			buyerProductID: v.BuyerProductID,
-			productID:      *v.ID,
-		}
-		productIds = append(productIds, pt)
-	}
-	return productIds, nil
 }
 
 func (cs *ContractService) GetOrderInfoByInternalId(id string) (*abi.DoDSettleOrderInfo, error) {

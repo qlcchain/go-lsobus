@@ -64,6 +64,7 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
+	op.QuoteId = param.QuoteId
 	for _, v := range param.ChangeConnectionParam {
 
 		var conn *abi.DoDSettleChangeConnectionParam

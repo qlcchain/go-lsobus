@@ -2,7 +2,6 @@ package contract
 
 import (
 	"errors"
-	"time"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
@@ -56,6 +55,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
+	op.QuoteId = param.QuoteId
 	for _, v := range param.ConnectionParam {
 		paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
 		if err != nil {
@@ -143,22 +143,4 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		op.Connections = append(op.Connections, conn)
 	}
 	return op, nil
-}
-
-func (cs *ContractService) CheckCreateOrderContractConfirmed(internalId string) {
-	ticker := time.NewTicker(connectRpcServerInterval)
-	for {
-		select {
-		case <-ticker.C:
-			orderInfo := new(abi.DoDSettleOrderInfo)
-			err := cs.client.Call(&orderInfo, "DoDSettlement_getOrderInfoByInternalId", &internalId)
-			if err != nil {
-				cs.logger.Error(err)
-			}
-			if orderInfo.ContractState == abi.DoDSettleContractStateConfirmed {
-				cs.logger.Infof(" order %s has been sign by seller", internalId)
-				return
-			}
-		}
-	}
 }
