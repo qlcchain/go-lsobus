@@ -67,6 +67,7 @@ func addFlagsForFindParams(cmd *cobra.Command) {
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
+	cmd.Flags().String("prodOrderID", "", "Production order ID")
 }
 
 func addFlagsForGetParams(cmd *cobra.Command) {
@@ -265,6 +266,11 @@ func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) 
 	}
 
 	params.ProductSpecificationID, err = cmd.Flags().GetString("prodSpecID")
+	if err != nil {
+		return err
+	}
+
+	params.ProductOrderID, err = cmd.Flags().GetString("prodOrderID")
 	if err != nil {
 		return err
 	}
