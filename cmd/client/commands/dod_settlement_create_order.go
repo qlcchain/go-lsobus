@@ -212,8 +212,8 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			Address: sellerAddress.String(),
 			Name:    sellerNameP,
 		},
-		QuoteId: quoteIdP,
-		Cps:     make([]*pb.ConnectionParam, 0),
+		QuoteId:         quoteIdP,
+		ConnectionParam: make([]*pb.ConnectionParam, 0),
 	}
 
 	var conn *pb.ConnectionParam
@@ -285,7 +285,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			}
 		}
 
-		param.Cps = append(param.Cps, conn)
+		param.ConnectionParam = append(param.ConnectionParam, conn)
 	}
 
 	c := pb.NewOrderAPIClient(cn)
