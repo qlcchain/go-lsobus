@@ -812,6 +812,8 @@ github.com/qlcchain/go-qlc v1.3.3-0.20200521141857-c40d447d5291 h1:TS3Te5ZmYGq9f
 github.com/qlcchain/go-qlc v1.3.3-0.20200521141857-c40d447d5291/go.mod h1:zHEi6w7u4LFoG0DFZwz+/IIeAXxmVw+otLn5Hc3DGQI=
 github.com/qlcchain/go-qlc v1.3.3-0.20200522074034-e7596143807e h1:nvMGm7yhei36upL+bWDZrjg6Nm5lB6yMV4DgsB6Dbnw=
 github.com/qlcchain/go-qlc v1.3.3-0.20200522074034-e7596143807e/go.mod h1:zHEi6w7u4LFoG0DFZwz+/IIeAXxmVw+otLn5Hc3DGQI=
+github.com/qlcchain/go-qlc v1.3.3-0.20200526123245-6588ff327aaa h1:GomHUASUCeuG/2aZpZp0CbgZTYfnnK4r4s35WHaGvVI=
+github.com/qlcchain/go-qlc v1.3.3-0.20200526123245-6588ff327aaa/go.mod h1:zHEi6w7u4LFoG0DFZwz+/IIeAXxmVw+otLn5Hc3DGQI=
 github.com/qlcchain/jsonrpc2 v0.0.7 h1:ZcySG/jZ76vupXRrmCAKunyu6ZLmWqo0vNxRRviBjd8=
 github.com/qlcchain/jsonrpc2 v0.0.7/go.mod h1:VwJvudc0L888gtEldst7bZdZxvk3wubZs18yO0CI0Zc=
 github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 h1:eUm8ma4+yPknhXtkYlWh3tMkE6gBjXZToDned9s2gbQ=

@@ -83,15 +83,27 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByIn
 			DynamicParam: &proto.ConnectionDynamicParam{
 				ConnectionName: v.ConnectionName,
 				Bandwidth:      v.Bandwidth,
-				BillingUnit:    v.BillingUnit.String(),
-				Price:          float32(v.Price),
-				ServiceClass:   v.ServiceClass.String(),
-				PaymentType:    v.PaymentType.String(),
-				BillingType:    v.BillingType.String(),
-				Currency:       v.Currency,
-				StartTime:      v.StartTime,
-				EndTime:        v.EndTime,
+				//BillingUnit:    v.BillingUnit.String(),
+				Price: float32(v.Price),
+				//ServiceClass:   v.ServiceClass.String(),
+				//PaymentType:    v.PaymentType.String(),
+				//BillingType:    v.BillingType.String(),
+				Currency:  v.Currency,
+				StartTime: v.StartTime,
+				EndTime:   v.EndTime,
 			},
+		}
+		if v.BillingUnit.String() != "null" {
+			conn.DynamicParam.BillingUnit = v.BillingUnit.String()
+		}
+		if v.ServiceClass.String() != "null" {
+			conn.DynamicParam.ServiceClass = v.ServiceClass.String()
+		}
+		if v.PaymentType.String() != "null" {
+			conn.DynamicParam.PaymentType = v.PaymentType.String()
+		}
+		if v.BillingType.String() != "null" {
+			conn.DynamicParam.BillingType = v.BillingType.String()
 		}
 		info.Connections = append(info.Connections, conn)
 	}

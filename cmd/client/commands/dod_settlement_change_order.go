@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"strings"
 
@@ -223,7 +222,7 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 		}
 
 		conn.ProductId = productId
-		conn.QuoteItemId = fmt.Sprintf("quoteItem%d", rand.Int())
+		conn.QuoteItemId = "1"
 		param.ChangeConnectionParam = append(param.ChangeConnectionParam, conn)
 	}
 	c := pb.NewOrderAPIClient(cn)
