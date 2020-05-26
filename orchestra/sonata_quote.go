@@ -265,8 +265,8 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	//Product Specification
 	if lineItem.Action != quomod.ProductActionTypeDISCONNECT {
 		lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-		lineItem.Product.ProductSpecification.ID = "UNISpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineItem.Product.ProductSpecification.ID = "PCCWConnSpec"
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 

@@ -236,7 +236,7 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 	if params.Action != string(poqmod.ProductActionTypeRemove) {
 		lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 

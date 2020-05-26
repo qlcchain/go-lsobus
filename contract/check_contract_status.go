@@ -73,16 +73,19 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			return "", err
 		}
 		eLine := &orchestra.ELineItemParams{
-			SrcPortID: v.SrcPort,
-			DstPortID: v.DstPort,
-			Bandwidth: uint(bw),
-			BwUnit:    bws[1],
-			CosName:   v.ServiceClass.String(),
+			SrcPortID:     v.SrcPort,
+			DstPortID:     v.DstPort,
+			SrcLocationID: v.SrcDataCenter,
+			DstLocationID: v.DstDataCenter,
+			Bandwidth:     uint(bw),
+			BwUnit:        bws[1],
+			CosName:       v.ServiceClass.String(),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams: &orchestra.BillingParams{
+					PaymentType: v.PaymentType.String(),
 					BillingType: v.BillingType.String(),
 					BillingUnit: v.BillingUnit.String(),
-					MeasureUnit: v.PaymentType.String(),
+					MeasureUnit: v.BillingUnit.String(),
 					StartTime:   v.StartTime,
 					EndTime:     v.EndTime,
 					Currency:    v.Currency,
@@ -106,6 +109,8 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		},
 		ExternalID: internalId,
 		ELineItems: eLines,
+		//PaymentType: "",
+		//BillingType: "",
 	}
 	err := cs.orchestra.ExecOrderCreate(op)
 	if err != nil {

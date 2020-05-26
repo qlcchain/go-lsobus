@@ -270,20 +270,22 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	lineItem.Product.BuyerProductID = params.BuyerProductID
 	if lineItem.Action != ordmod.ProductActionTypeAdd {
 		lineItem.Product.ID = params.ProductID
+		lineItem.RefOrderID = params.RefOrderID
+		lineItem.RefOrderItemID = params.RefOrderItemID
 	}
 
 	if lineItem.Action != ordmod.ProductActionTypeRemove {
 		//Product Specification
 		lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 		// Price
 		s.BuildItemPrice(lineItem, params.BillingParams)
 
 		// Term
-		lineItem.PricingTerm = sonata.NewInt32(36)
+		//lineItem.PricingTerm = sonata.NewInt32(36)
 	}
 
 	return lineItem
@@ -339,4 +341,6 @@ func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreat
 }
 
 func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
+	order.PaymentType = params.PaymentType
+	order.BillingType = params.BillingType
 }

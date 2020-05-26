@@ -99,7 +99,7 @@ func (s *sonataBaseImpl) BuildUNIProductSpec(params *UNIItemParams) *cmnmod.UNIS
 
 func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.ELineSpec {
 	lineSpec := &cmnmod.ELineSpec{}
-	lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
+	//lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineSpec.SetAtType("ELineSpec")
 
 	lineSpec.ClassOfServiceName = params.CosName
@@ -111,6 +111,21 @@ func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.
 	}
 	lineSpec.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
 	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+
+	return lineSpec
+}
+
+func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *ELineItemParams) *cmnmod.PCCWConnSpec {
+	lineSpec := &cmnmod.PCCWConnSpec{}
+	//lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
+	lineSpec.SetAtType("PCCWConnSpec")
+
+	lineSpec.ClassOfService = params.CosName
+	lineSpec.Bandwidth = int32(params.Bandwidth)
+	durVal := int32(params.DurationAmount)
+	lineSpec.Duration = &cmnmod.Duration{Unit: &params.DurationUnit, Value: &durVal}
+	lineSpec.SrcLocationID = params.SrcLocationID
+	lineSpec.DestLocationID = params.DstLocationID
 
 	return lineSpec
 }

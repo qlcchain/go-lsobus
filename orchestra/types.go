@@ -20,6 +20,7 @@ type Partner struct {
 }
 
 type BillingParams struct {
+	PaymentType string
 	BillingType string
 	BillingUnit string // used for PAYG, etc day/month/year
 	MeasureUnit string // used for USAGE, etc minute/hour/Mbps/MByte
@@ -37,6 +38,8 @@ type BaseItemParams struct {
 	ProdOfferID string
 	ProdQuoteID string
 
+	RefOrderID     string
+	RefOrderItemID string
 	ProductID      string
 	BuyerProductID string
 	Description    string
@@ -63,6 +66,9 @@ type ELineItemParams struct {
 	BwUnit    string
 	SVlanID   uint
 	CosName   string
+
+	SrcLocationID string
+	DstLocationID string
 }
 
 type OrderParams struct {
@@ -78,6 +84,9 @@ type OrderParams struct {
 
 	UNIItems   []*UNIItemParams
 	ELineItems []*ELineItemParams
+
+	BillingType string
+	PaymentType string
 
 	RspPoq   *poqmod.ProductOfferingQualification
 	RspQuote *quomod.Quote
