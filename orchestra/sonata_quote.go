@@ -43,10 +43,11 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.Quote))
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
-	if err != nil {
-		//		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -77,13 +78,16 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
-		//rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuoteList = rspParams.GetPayload()
+
 	return nil
 }
 
@@ -94,11 +98,13 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
-	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteGetResponse(reqParams)
+	} else if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuote = rspParams.GetPayload()
 
@@ -217,10 +223,12 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 	}
 
 	// Term
-	uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-	uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-	uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
-	uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+	if params.DurationUnit != "" && params.DurationAmount > 0 {
+		uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+		uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+		uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+		uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+	}
 
 	return uniItem
 }
@@ -263,10 +271,12 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	}
 
 	// Term
-	lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-	lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-	lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
-	lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+	if params.DurationUnit != "" && params.DurationAmount > 0 {
+		lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+		lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+		lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+		lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+	}
 
 	return lineItem
 }

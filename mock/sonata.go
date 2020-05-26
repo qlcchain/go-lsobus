@@ -57,6 +57,13 @@ func SonataGenerateSiteFindResponse(reqParams *sitapi.GeographicSiteFindParams) 
 	return rspParams
 }
 
+func SonataGenerateSiteGetResponse(reqParams *sitapi.GeographicSiteGetParams) *sitapi.GeographicSiteGetOK {
+	rspParams := sitapi.NewGeographicSiteGetOK()
+	rspParams.Payload = &sitmod.GeographicSite{}
+	rspParams.Payload.ID = reqParams.SiteID
+	return rspParams
+}
+
 func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.ProductFindOK {
 	rspParams := invapi.NewProductFindOK()
 
@@ -177,6 +184,31 @@ func SonataGeneratePoqCreateResponse(reqParams *poqapi.ProductOfferingQualificat
 	return rspParams
 }
 
+func SonataGeneratePoqFindResponse(reqParams *poqapi.ProductOfferingQualificationFindParams) *poqapi.ProductOfferingQualificationFindOK {
+	rspParams := poqapi.NewProductOfferingQualificationFindOK()
+
+	poq1 := &poqmod.ProductOfferingQualificationFind{}
+	poq1.ID = uuid.New().String()
+	poq1.State = poqmod.ProductOfferingQualificationStateTypeDone
+	rspParams.Payload = append(rspParams.Payload, poq1)
+
+	poq2 := &poqmod.ProductOfferingQualificationFind{}
+	poq2.ID = uuid.New().String()
+	poq2.State = poqmod.ProductOfferingQualificationStateTypeDone
+	rspParams.Payload = append(rspParams.Payload, poq2)
+
+	return rspParams
+}
+
+func SonataGeneratePoqGetResponse(reqParams *poqapi.ProductOfferingQualificationGetParams) *poqapi.ProductOfferingQualificationGetOK {
+	rspParams := poqapi.NewProductOfferingQualificationGetOK()
+	rspParams.Payload = &poqmod.ProductOfferingQualification{}
+	rspParams.Payload.ID = &reqParams.ProductOfferingQualificationID
+	rspParams.Payload.State = poqmod.ProductOfferingQualificationStateTypeDone
+
+	return rspParams
+}
+
 func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quoapi.QuoteCreateCreated {
 	rspQuote := &quomod.Quote{}
 
@@ -254,6 +286,22 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 	return rspParams
 }
 
+func SonataGenerateQuoteFindResponse(reqParams *quoapi.QuoteFindParams) *quoapi.QuoteFindOK {
+	rspParams := quoapi.NewQuoteFindOK()
+
+	quote1 := &quomod.QuoteFind{}
+	quote1.ID = uuid.New().String()
+	quote1.State = quomod.QuoteStateTypeREADY
+	rspParams.Payload = append(rspParams.Payload, quote1)
+
+	quote2 := &quomod.QuoteFind{}
+	quote2.ID = uuid.New().String()
+	quote2.State = quomod.QuoteStateTypeREADY
+	rspParams.Payload = append(rspParams.Payload, quote2)
+
+	return rspParams
+}
+
 func SonataGenerateQuoteGetResponse(reqParams *quoapi.QuoteGetParams) *quoapi.QuoteGetOK {
 	rspParams := quoapi.NewQuoteGetOK()
 
@@ -303,6 +351,24 @@ func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParam
 
 	rspParams := ordapi.NewProductOrderCreateCreated()
 	rspParams.Payload = rspOrder
+
+	return rspParams
+}
+
+func SonataGenerateOrderFindResponse(reqParams *ordapi.ProductOrderFindParams) *ordapi.ProductOrderFindOK {
+	rspParams := ordapi.NewProductOrderFindOK()
+
+	order1 := &ordmod.ProductOrderSummary{}
+	id1 := uuid.New().String()
+	order1.ID = &id1
+	order1.State = ordmod.ProductOrderStateTypeCompleted
+	rspParams.Payload = append(rspParams.Payload, order1)
+
+	order2 := &ordmod.ProductOrderSummary{}
+	id2 := uuid.New().String()
+	order2.ID = &id2
+	order2.State = ordmod.ProductOrderStateTypeCompleted
+	rspParams.Payload = append(rspParams.Payload, order2)
 
 	return rspParams
 }

@@ -43,10 +43,11 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
-	if err != nil {
-		//		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	orderParams.RspOrder = rspParams.GetPayload()
@@ -76,9 +77,10 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 	}
 
 	httpCli := s.NewHTTPClient()
-
 	rspParams, err := httpCli.ProductOrder.ProductOrderFind(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGenerateOrderFindResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
@@ -96,10 +98,11 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
-	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
+	} else if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspOrder = rspParams.GetPayload()

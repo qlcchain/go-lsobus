@@ -6,7 +6,8 @@ import (
 )
 
 type Orchestra struct {
-	cfg *config.Config
+	cfg      *config.Config
+	fakeMode bool
 
 	sonataSiteImpl  *sonataSiteImpl
 	sonataPOQImpl   *sonataPOQImpl
@@ -26,6 +27,14 @@ func NewOrchestra(cfgFile string) *Orchestra {
 	o.sonataOrderImpl = newSonataOrderImpl(o)
 	o.sonataInvImpl = newSonataInvImpl(o)
 	return o
+}
+
+func (o *Orchestra) SetFakeMode(mode bool) {
+	o.fakeMode = mode
+}
+
+func (o *Orchestra) GetFakeMode() bool {
+	return o.fakeMode
 }
 
 func (o *Orchestra) Init() error {

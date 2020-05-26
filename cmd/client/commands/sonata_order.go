@@ -39,7 +39,7 @@ var sonataOrderCreateCmd = &cobra.Command{
 			return
 		}
 
-		o, err := getOrchestraInstance()
+		o, err := getOrchestraInstance(cmd)
 		if err != nil {
 			cmd.PrintErrln(err)
 			return
@@ -66,7 +66,7 @@ var sonataOrderFindCmd = &cobra.Command{
 			return
 		}
 
-		o, err := getOrchestraInstance()
+		o, err := getOrchestraInstance(cmd)
 		if err != nil {
 			cmd.PrintErrln(err)
 			return
@@ -93,7 +93,7 @@ var sonataOrderGetCmd = &cobra.Command{
 			return
 		}
 
-		o, err := getOrchestraInstance()
+		o, err := getOrchestraInstance(cmd)
 		if err != nil {
 			cmd.PrintErrln(err)
 			return

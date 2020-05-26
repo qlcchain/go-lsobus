@@ -28,14 +28,16 @@ var sonataCmd = &cobra.Command{
 }
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	// Common
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
 	cmd.Flags().String("itemAction", "add", "Type of product action, (e.g., add, change, remove)")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 	cmd.Flags().String("productID", "", "Product ID of existing service")
 
-	cmd.Flags().String("durationUnit", "DAY", "Duration unit, (e.g., YEAR, MONTH, DAY, HOUR)")
-	cmd.Flags().Uint("durationAmount", 1, "Duration amount")
+	cmd.Flags().String("durationUnit", "", "Duration unit, (e.g., YEAR, MONTH, DAY, HOUR)")
+	cmd.Flags().Uint("durationAmount", 0, "Duration amount")
 
 	// UNI
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
@@ -60,12 +62,16 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 }
 
 func addFlagsForFindParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 }
 
 func addFlagsForGetParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	cmd.Flags().String("id", "", "ID of site/quote/order")
 }
 
@@ -276,11 +282,18 @@ func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) er
 	return nil
 }
 
-func getOrchestraInstance() (*orchestra.Orchestra, error) {
+func getOrchestraInstance(cmd *cobra.Command) (*orchestra.Orchestra, error) {
 	o := orchestra.NewOrchestra("")
 	err := o.Init()
 	if err != nil {
 		return nil, err
+	}
+
+	if cmd != nil {
+		fakeMode, err := cmd.Flags().GetBool("fakeMode")
+		if err == nil {
+			o.SetFakeMode(fakeMode)
+		}
 	}
 
 	return o, nil
