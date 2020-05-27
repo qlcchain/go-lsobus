@@ -49,7 +49,7 @@ lint:
 
 style:
 	gofmt -w .
-	goimports -local github.com/iixlabs/virtual-lsobus -w .
+	goimports -local github.com/qlcchain/go-lsobus -w .
 
 snapshot:
 	docker run --rm --privileged \
