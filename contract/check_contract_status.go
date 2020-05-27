@@ -64,33 +64,45 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
-		bws := strings.Split(v.Bandwidth, " ")
-		if len(bws) != 2 {
-			return "", errors.New("bandwidth error")
+		eLine := &orchestra.ELineItemParams{}
+		billingParams := &orchestra.BillingParams{}
+		if len(v.Bandwidth) != 0 {
+			bws := strings.Split(v.Bandwidth, " ")
+			if len(bws) != 2 {
+				return "", errors.New("bandwidth error")
+			}
+			bw, err := strconv.Atoi(bws[0])
+			if err != nil {
+				return "", err
+			}
+			eLine.Bandwidth = uint(bw)
+			eLine.BwUnit = bws[1]
 		}
-		bw, err := strconv.Atoi(bws[0])
-		if err != nil {
-			return "", err
+
+		if v.PaymentType.String() != "null" {
+			billingParams.PaymentType = v.PaymentType.String()
 		}
-		eLine := &orchestra.ELineItemParams{
+		if v.BillingType.String() != "null" {
+			billingParams.BillingType = v.BillingType.String()
+		}
+		if v.BillingUnit.String() != "null" {
+			billingParams.BillingUnit = v.BillingUnit.String()
+		}
+		if v.BillingUnit.String() != "null" {
+			billingParams.MeasureUnit = v.BillingUnit.String()
+		}
+		billingParams.StartTime = v.StartTime
+		billingParams.EndTime = v.EndTime
+		billingParams.Currency = v.Currency
+		billingParams.Price = float32(v.Price)
+		eLine = &orchestra.ELineItemParams{
 			SrcPortID:     v.SrcPort,
 			DstPortID:     v.DstPort,
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
-			Bandwidth:     uint(bw),
-			BwUnit:        bws[1],
 			CosName:       v.ServiceClass.String(),
 			BaseItemParams: orchestra.BaseItemParams{
-				BillingParams: &orchestra.BillingParams{
-					PaymentType: v.PaymentType.String(),
-					BillingType: v.BillingType.String(),
-					BillingUnit: v.BillingUnit.String(),
-					MeasureUnit: v.BillingUnit.String(),
-					StartTime:   v.StartTime,
-					EndTime:     v.EndTime,
-					Currency:    v.Currency,
-					Price:       float32(v.Price),
-				},
+				BillingParams:  billingParams,
 				BuyerProductID: v.ItemId,
 			},
 		}

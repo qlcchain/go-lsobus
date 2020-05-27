@@ -35,9 +35,11 @@ func (cs *ContractService) processDoDContract() {
 	}
 	for _, v := range dod {
 		cs.logger.Infof("find a dod settlement need sign,request hash is %s", v.Hash.String())
-		b := cs.verifyOrderInfoFromSonata(v.Order)
-		if !b {
-			continue
+		if v.Order.OrderType == abi.DoDSettleOrderTypeCreate || v.Order.OrderType == abi.DoDSettleOrderTypeChange {
+			b := cs.verifyOrderInfoFromSonata(v.Order)
+			if !b {
+				continue
+			}
 		}
 		action, err := abi.ParseDoDSettleResponseAction("confirm")
 		if err != nil {
