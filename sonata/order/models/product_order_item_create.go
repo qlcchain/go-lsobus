@@ -66,12 +66,6 @@ type ProductOrderItemCreate struct {
 	// quote
 	Quote *QuoteRef `json:"quote,omitempty"`
 
-	// Reference order ID.
-	RefOrderID string `json:"refOrderId,omitempty"`
-
-	// Reference order item ID.
-	RefOrderItemID string `json:"refOrderItemId,omitempty"`
-
 	// related party
 	RelatedParty []*RelatedParty `json:"relatedParty"`
 }

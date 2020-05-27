@@ -273,8 +273,6 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	lineItem.Product.BuyerProductID = params.BuyerProductID
 	if lineItem.Action != ordmod.ProductActionTypeAdd {
 		lineItem.Product.ID = params.ProductID
-		lineItem.RefOrderID = params.RefOrderID
-		lineItem.RefOrderItemID = params.RefOrderItemID
 	}
 
 	if lineItem.Action != ordmod.ProductActionTypeRemove {

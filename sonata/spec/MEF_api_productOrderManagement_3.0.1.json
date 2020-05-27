@@ -1456,14 +1456,6 @@
         "product": {
           "$ref": "#/definitions/Product"
         },
-        "refOrderId": {
-          "description": "Reference order ID.",
-          "type": "string"
-        },
-        "refOrderItemId": {
-          "description": "Reference order item ID.",
-          "type": "string"
-        },
         "orderItemRelationship": {
           "type": "array",
           "items": {
@@ -1947,14 +1939,6 @@
         },
         "product": {
           "$ref": "#/definitions/Product"
-        },
-        "refOrderId": {
-          "description": "Reference order ID.",
-          "type": "string"
-        },
-        "refOrderItemId": {
-          "description": "Reference order item ID.",
-          "type": "string"
         },
         "orderItemRelationship": {
           "type": "array",

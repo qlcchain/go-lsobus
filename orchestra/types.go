@@ -38,8 +38,6 @@ type BaseItemParams struct {
 	ProdOfferID string
 	ProdQuoteID string
 
-	RefOrderID     string
-	RefOrderItemID string
 	ProductID      string
 	BuyerProductID string
 	QuoteID        string

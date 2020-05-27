@@ -230,6 +230,12 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 		uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
 	}
 
+	//Price
+	itemPrice := &quomod.QuotePrice{}
+	itemPrice.PriceType = quomod.PriceTypeRECURRING
+	itemPrice.RecurringChargePeriod = quomod.ChargePeriodDAY
+	uniItem.QuoteItemPrice = append(uniItem.QuoteItemPrice, itemPrice)
+
 	return uniItem
 }
 
