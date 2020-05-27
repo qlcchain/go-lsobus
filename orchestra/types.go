@@ -42,6 +42,8 @@ type BaseItemParams struct {
 	RefOrderItemID string
 	ProductID      string
 	BuyerProductID string
+	QuoteID        string
+	QuoteItemID    string
 	Description    string
 
 	DurationUnit   string
@@ -87,6 +89,7 @@ type OrderParams struct {
 
 	BillingType string
 	PaymentType string
+	QuoteID     string
 
 	RspPoq   *poqmod.ProductOfferingQualification
 	RspQuote *quomod.Quote

@@ -94,6 +94,8 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 				BuyerProductID: v.ItemId,
 			},
 		}
+		eLine.QuoteID = orderInfo.QuoteId
+		eLine.QuoteItemID = v.QuoteItemId
 		eLine.Action = itemAction
 		eLines = append(eLines, eLine)
 	}
@@ -109,6 +111,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		},
 		ExternalID: internalId,
 		ELineItems: eLines,
+		QuoteID:    orderInfo.QuoteId,
 		//PaymentType: "",
 		//BillingType: "",
 	}

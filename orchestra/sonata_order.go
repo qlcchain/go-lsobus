@@ -226,6 +226,9 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	}
 
 	if uniItem.Action != ordmod.ProductActionTypeRemove {
+		// Quote
+		uniItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
+
 		// UNI Product Specification
 		uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 		uniItem.Product.ProductSpecification.ID = "UNISpec"
@@ -280,6 +283,9 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
 		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+
+		// Quote
+		lineItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
 
 		// Price
 		s.BuildItemPrice(lineItem, params.BillingParams)

@@ -57,6 +57,8 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
 
 	// Price
+	cmd.Flags().String("quoteID", "", "Quote ID")
+	cmd.Flags().String("quoteItemID", "", "Quote Item ID")
 	cmd.Flags().String("currency", "USD", "Currency, (e.g., USD, HKD, CNY)")
 	cmd.Flags().Float32("price", 0, "price")
 }
@@ -92,6 +94,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
+	params.QuoteID, err = cmd.Flags().GetString("quoteID")
+	if err != nil {
+		return err
+	}
+
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
 		return err
@@ -126,6 +133,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 
+		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
 		params.UNIItems = append(params.UNIItems, uniItem)
@@ -151,6 +168,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
 		if err != nil {
 			return err
 		}
@@ -209,6 +236,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 		lineItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
+		lineItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
 		if err != nil {
 			return err
 		}
