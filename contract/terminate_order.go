@@ -9,14 +9,6 @@ import (
 )
 
 func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderParam) (string, error) {
-	/* TODO: Genearate a block to terminate an order
-		1. call dod_settlement_getTerminateOrderBlock to terminate an order,need order's id generated before
-	    2. sign orderBlock and process it to the chain
-		3. periodically check whether this order has been signed and confirmed through internal id
-		4. if order has been signed and confirmed,call orchestra interface to order at the sonata service
-		5. call orchestra interface to periodically check whether the resource of this order has been ready?
-		6. if resource is ready,call dod_settlement_getResourceReadyBlock periodically check whether the resource of this order has been ready?
-	*/
 	addr := cs.account.Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToTerminateOrderParam(param)
@@ -61,6 +53,9 @@ func (cs *ContractService) convertProtoToTerminateOrderParam(param *proto.Termin
 	op.Seller = &abi.DoDSettleUser{
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
+	}
+	if len(param.ProductId) == 0 {
+		return nil, errors.New("product can not be nil")
 	}
 	op.ProductId = param.ProductId
 	return op, nil

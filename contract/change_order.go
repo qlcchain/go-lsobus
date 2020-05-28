@@ -9,16 +9,6 @@ import (
 )
 
 func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
-	/* TODO: Generate a block to change order's service parameters
-		1. call dod_settlement_getChangeOrderBlock  to change an order,need order's id generated before it will return an internal id
-	    2. sign orderBlock and process it to the chain
-		3. periodically check whether this order has been signed and confirmed through internal id
-		4. if order has been signed and confirmed,call orchestra interface to order at the sonata service,
-	       will return an real order id
-		5. call dod_settlement_getUpdateOrderInfoBlock to update real orderId to qlc chain
-		6. call orchestra interface to periodically check whether the resource of this order has been ready?
-		7. if resource is ready,call dod_settlement_getResourceReadyBlock periodically check whether the resource of this order has been ready?
-	*/
 	addr := cs.account.Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToChangeOrderParam(param)
@@ -66,18 +56,62 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 	}
 	op.QuoteId = param.QuoteId
 	for _, v := range param.ChangeConnectionParam {
+		conn := new(abi.DoDSettleChangeConnectionParam)
+		if len(v.ProductId) == 0 {
+			return nil, errors.New("product id can not be nil")
+		}
+		conn.ProductId = v.ProductId
+		if len(v.QuoteItemId) != 0 {
+			conn.QuoteItemId = v.QuoteItemId
+		}
 
-		var conn *abi.DoDSettleChangeConnectionParam
-		conn = &abi.DoDSettleChangeConnectionParam{
-			ProductId:   v.ProductId,
-			QuoteItemId: v.QuoteItemId,
-			DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
-				ConnectionName: v.DynamicParam.ConnectionName,
-				Bandwidth:      v.DynamicParam.Bandwidth,
-				Price:          float64(v.DynamicParam.Price),
-				StartTime:      v.DynamicParam.StartTime,
-				EndTime:        v.DynamicParam.EndTime,
-			},
+		if len(v.DynamicParam.PaymentType) != 0 {
+			paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
+			if err != nil {
+				return nil, err
+			}
+			conn.PaymentType = paymentType
+		}
+		if len(v.DynamicParam.BillingType) != 0 {
+			billingType, err := abi.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
+			if err != nil {
+				return nil, err
+			}
+			conn.BillingType = billingType
+		}
+		var billingUnit abi.DoDSettleBillingUnit
+		var err error
+		if len(v.DynamicParam.BillingUnit) > 0 {
+			billingUnit, err = abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
+			if err != nil {
+				return nil, err
+			}
+			conn.BillingUnit = billingUnit
+		}
+		if len(v.DynamicParam.ServiceClass) > 0 {
+			serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
+			if err != nil {
+				return nil, err
+			}
+			conn.ServiceClass = serviceClass
+		}
+		if len(v.DynamicParam.Currency) != 0 {
+			conn.Currency = v.DynamicParam.Currency
+		}
+		if len(v.DynamicParam.Bandwidth) != 0 {
+			conn.Bandwidth = v.DynamicParam.Bandwidth
+		}
+		if len(v.DynamicParam.ConnectionName) != 0 {
+			conn.ConnectionName = v.DynamicParam.ConnectionName
+		}
+		if v.DynamicParam.StartTime != 0 {
+			conn.StartTime = v.DynamicParam.StartTime
+		}
+		if v.DynamicParam.EndTime != 0 {
+			conn.EndTime = v.DynamicParam.EndTime
+		}
+		if v.DynamicParam.Price != 0 {
+			conn.Price = float64(v.DynamicParam.Price)
 		}
 		op.Connections = append(op.Connections, conn)
 	}
