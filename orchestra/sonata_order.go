@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/sonata"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -41,10 +43,11 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	orderParams.RspOrder = rspParams.GetPayload()
@@ -56,6 +59,9 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 	reqParams := ordapi.NewProductOrderFindParams()
 	if params.ProjectID != "" {
 		reqParams.ProjectID = &params.ProjectID
+	}
+	if params.ExternalID != "" {
+		reqParams.ExternalID = &params.ExternalID
 	}
 	if params.BuyerID != "" {
 		reqParams.BuyerID = &params.BuyerID
@@ -71,9 +77,10 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 	}
 
 	httpCli := s.NewHTTPClient()
-
 	rspParams, err := httpCli.ProductOrder.ProductOrderFind(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGenerateOrderFindResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
@@ -91,10 +98,11 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
-	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
+	} else if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspOrder = rspParams.GetPayload()
@@ -192,14 +200,20 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	}
 	uniItem := &ordmod.ProductOrderItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = ordmod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
 	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
 
 	uniItem.Product = &ordmod.Product{}
+	uniItem.Product.BuyerProductID = params.BuyerProductID
 	if uniItem.Action != ordmod.ProductActionTypeAdd {
 		uniItem.Product.ID = params.ProductID
 	}
@@ -211,14 +225,22 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 		uniItem.Product.SetPlace([]ordmod.RelatedPlaceReforValue{uniPlace})
 	}
 
-	// UNI Product Specification
-	uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
-	uniItem.Product.ProductSpecification.ID = "UNISpec"
-	uniDesc := s.BuildUNIProductSpec(params)
-	uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+	if uniItem.Action != ordmod.ProductActionTypeRemove {
+		// Quote
+		uniItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
 
-	// Price
-	s.BuildItemPrice(uniItem, params.BillingParams)
+		// UNI Product Specification
+		uniItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
+		uniItem.Product.ProductSpecification.ID = "UNISpec"
+		uniDesc := s.BuildUNIProductSpec(params)
+		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
+
+		// Price
+		s.BuildItemPrice(uniItem, params.BillingParams)
+
+		// Term
+		uniItem.PricingTerm = sonata.NewInt32(36)
+	}
 
 	return uniItem
 }
@@ -237,27 +259,38 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	lineItem := &ordmod.ProductOrderItemCreate{}
 	lineItem.Action = ordmod.ProductActionType(params.Action)
 
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
 
 	lineItem.Product = &ordmod.Product{}
+	lineItem.Product.BuyerProductID = params.BuyerProductID
 	if lineItem.Action != ordmod.ProductActionTypeAdd {
 		lineItem.Product.ID = params.ProductID
 	}
 
-	//Product Specification
 	if lineItem.Action != ordmod.ProductActionTypeRemove {
+		//Product Specification
 		lineItem.Product.ProductSpecification = &ordmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
-	}
 
-	// Price
-	s.BuildItemPrice(lineItem, params.BillingParams)
+		// Quote
+		lineItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
+
+		// Price
+		s.BuildItemPrice(lineItem, params.BillingParams)
+
+		// Term
+		//lineItem.PricingTerm = sonata.NewInt32(36)
+	}
 
 	return lineItem
 }
@@ -312,4 +345,6 @@ func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreat
 }
 
 func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
+	order.PaymentType = params.PaymentType
+	order.BillingType = params.BillingType
 }

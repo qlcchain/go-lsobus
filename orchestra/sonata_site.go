@@ -35,10 +35,11 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteFind(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateSiteFindResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspSiteList = rspParams.GetPayload()
@@ -53,7 +54,9 @@ func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteGet(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGenerateSiteGetResponse(reqParams)
+	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
 		return err
 	}

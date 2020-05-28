@@ -183,6 +183,17 @@
           "$ref": "./MEF_ELineSpec_v3.json"
         }
       ]
+    },
+    "PCCWConnSpec": {
+      "description": "Description of PCCW ConnSpec for Ordering.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Describing"
+        },
+        {
+          "$ref": "./PCCW_ConnSpec_v1.json"
+        }
+      ]
     }
   }
 }

@@ -31,6 +31,9 @@ type ProductOrderCreate struct {
 	// billing account
 	BillingAccount *BillingAccountRef `json:"billingAccount,omitempty"`
 
+	// Billing type.
+	BillingType string `json:"billingType,omitempty"`
+
 	// Date when the order was submitted by the Buyer to the Seller
 	// Required: true
 	// Format: date-time
@@ -62,6 +65,9 @@ type ProductOrderCreate struct {
 	// Buyer Order Version: The version number that the Buyer uses to refer to this particular version of the order.
 	// Required: true
 	OrderVersion *string `json:"orderVersion"`
+
+	// Payment type.
+	PaymentType string `json:"paymentType,omitempty"`
 
 	// pricing method
 	PricingMethod PricingMethod `json:"pricingMethod,omitempty"`

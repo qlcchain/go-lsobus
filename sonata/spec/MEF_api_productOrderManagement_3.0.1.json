@@ -1346,6 +1346,14 @@
           },
           "minItems": 1
         },
+        "billingType": {
+          "description": "Billing type.",
+          "type": "string"
+        },
+        "paymentType": {
+          "description": "Payment type.",
+          "type": "string"
+        },
         "orderMessage": {
           "type": "array",
           "items": {
@@ -1842,6 +1850,14 @@
             "$ref": "#/definitions/ProductOrderItem_Create"
           },
           "minItems": 1
+        },
+        "billingType": {
+          "description": "Billing type.",
+          "type": "string"
+        },
+        "paymentType": {
+          "description": "Payment type.",
+          "type": "string"
         }
       }
     },

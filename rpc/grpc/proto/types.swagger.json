@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "types.proto",
-    "version": "version not set"
+    "title": "API Virtual-LSOBus",
+    "version": "1.0.0"
   },
   "schemes": [
     "http",
@@ -16,7 +16,7 @@
   ],
   "paths": {
     "/chain/version": {
-      "post": {
+      "get": {
         "operationId": "Version",
         "responses": {
           "200": {
@@ -26,18 +26,34 @@
             }
           }
         },
+        "tags": [
+          "ChainAPI"
+        ]
+      }
+    },
+    "/order/change": {
+      "post": {
+        "operationId": "ChangeOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrderId"
+            }
+          }
+        },
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoVersionRequest"
+              "$ref": "#/definitions/protoChangeOrderParam"
             }
           }
         ],
         "tags": [
-          "ChainAPI"
+          "OrderAPI"
         ]
       }
     },
@@ -48,7 +64,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoCreateOrderRsp"
+              "$ref": "#/definitions/protoOrderId"
             }
           }
         },
@@ -68,13 +84,37 @@
       }
     },
     "/order/info": {
-      "post": {
-        "operationId": "OrderInfo",
+      "get": {
+        "operationId": "GetOrderInfo",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoOrderInfoRsp"
+              "$ref": "#/definitions/protoOrderInfo"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "internalId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "OrderAPI"
+        ]
+      }
+    },
+    "/order/terminate": {
+      "post": {
+        "operationId": "TerminateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrderId"
             }
           }
         },
@@ -84,7 +124,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoGetOrderInfoByInternalId"
+              "$ref": "#/definitions/protoTerminateOrderParam"
             }
           }
         ],
@@ -95,9 +135,52 @@
     }
   },
   "definitions": {
+    "protoChangeConnectionParam": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "quoteItemId": {
+          "type": "string"
+        },
+        "dynamicParam": {
+          "$ref": "#/definitions/protoConnectionDynamicParam"
+        }
+      }
+    },
+    "protoChangeOrderParam": {
+      "type": "object",
+      "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
+        "buyer": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "seller": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "quoteId": {
+          "type": "string"
+        },
+        "changeConnectionParam": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoChangeConnectionParam"
+          }
+        }
+      }
+    },
     "protoConnectionDynamicParam": {
       "type": "object",
       "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "quoteItemId": {
+          "type": "string"
+        },
         "connectionName": {
           "type": "string"
         },
@@ -120,7 +203,8 @@
           "type": "string"
         },
         "price": {
-          "type": "string"
+          "type": "number",
+          "format": "float"
         },
         "startTime": {
           "type": "string",
@@ -146,6 +230,9 @@
     "protoConnectionStaticParam": {
       "type": "object",
       "properties": {
+        "itemId": {
+          "type": "string"
+        },
         "productId": {
           "type": "string"
         },
@@ -181,16 +268,39 @@
         }
       }
     },
+    "protoContractPrivacyParam": {
+      "type": "object",
+      "properties": {
+        "privateFrom": {
+          "type": "string"
+        },
+        "privateFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "privateGroupID": {
+          "type": "string"
+        }
+      }
+    },
     "protoCreateOrderParam": {
       "type": "object",
       "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
         "buyer": {
           "$ref": "#/definitions/protoUser"
         },
         "seller": {
           "$ref": "#/definitions/protoUser"
         },
-        "cps": {
+        "quoteId": {
+          "type": "string"
+        },
+        "connectionParam": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/protoConnectionParam"
@@ -198,15 +308,7 @@
         }
       }
     },
-    "protoCreateOrderRsp": {
-      "type": "object",
-      "properties": {
-        "orderIdOnChain": {
-          "type": "string"
-        }
-      }
-    },
-    "protoGetOrderInfoByInternalId": {
+    "protoOrderId": {
       "type": "object",
       "properties": {
         "internalId": {
@@ -214,7 +316,7 @@
         }
       }
     },
-    "protoOrderInfoRsp": {
+    "protoOrderInfo": {
       "type": "object",
       "properties": {
         "buyer": {
@@ -270,6 +372,26 @@
         }
       }
     },
+    "protoTerminateOrderParam": {
+      "type": "object",
+      "properties": {
+        "privacy": {
+          "$ref": "#/definitions/protoContractPrivacyParam"
+        },
+        "buyer": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "seller": {
+          "$ref": "#/definitions/protoUser"
+        },
+        "productId": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "protoUser": {
       "type": "object",
       "properties": {
@@ -280,9 +402,6 @@
           "type": "string"
         }
       }
-    },
-    "protoVersionRequest": {
-      "type": "object"
     },
     "protoVersionResponse": {
       "type": "object",

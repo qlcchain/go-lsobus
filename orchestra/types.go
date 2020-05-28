@@ -20,6 +20,7 @@ type Partner struct {
 }
 
 type BillingParams struct {
+	PaymentType string
 	BillingType string
 	BillingUnit string // used for PAYG, etc day/month/year
 	MeasureUnit string // used for USAGE, etc minute/hour/Mbps/MByte
@@ -30,15 +31,21 @@ type BillingParams struct {
 }
 
 type BaseItemParams struct {
+	ItemID string
 	Action string
 
 	ProdSpecID  string
 	ProdOfferID string
 	ProdQuoteID string
 
-	ProductID   string
-	ExternalID  string
-	Description string
+	ProductID      string
+	BuyerProductID string
+	QuoteID        string
+	QuoteItemID    string
+	Description    string
+
+	DurationUnit   string
+	DurationAmount uint
 
 	BillingParams *BillingParams
 }
@@ -56,8 +63,12 @@ type ELineItemParams struct {
 	SrcPortID string
 	DstPortID string
 	Bandwidth uint
+	BwUnit    string
 	SVlanID   uint
 	CosName   string
+
+	SrcLocationID string
+	DstLocationID string
 }
 
 type OrderParams struct {
@@ -74,6 +85,10 @@ type OrderParams struct {
 	UNIItems   []*UNIItemParams
 	ELineItems []*ELineItemParams
 
+	BillingType string
+	PaymentType string
+	QuoteID     string
+
 	RspPoq   *poqmod.ProductOfferingQualification
 	RspQuote *quomod.Quote
 	RspOrder *ordmod.ProductOrder
@@ -89,6 +104,8 @@ type FindParams struct {
 	State      string
 
 	ProductSpecificationID string
+	ProductOfferingID      string
+	ProductOrderID         string
 
 	RspSiteList  []*sitmod.GeographicSiteFindResp
 	RspPoqList   []*poqmod.ProductOfferingQualificationFind

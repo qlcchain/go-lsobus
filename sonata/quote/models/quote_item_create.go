@@ -45,6 +45,9 @@ type QuoteItemCreate struct {
 	// qualification
 	Qualification *ProductOfferingQualificationRef `json:"qualification,omitempty"`
 
+	// quote item price
+	QuoteItemPrice []*QuotePrice `json:"quoteItemPrice"`
+
 	// quote item relationship
 	QuoteItemRelationship []*QuoteItemRelationship `json:"quoteItemRelationship"`
 
@@ -80,6 +83,10 @@ func (m *QuoteItemCreate) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateQualification(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateQuoteItemPrice(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -196,6 +203,31 @@ func (m *QuoteItemCreate) validateQualification(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *QuoteItemCreate) validateQuoteItemPrice(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.QuoteItemPrice) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.QuoteItemPrice); i++ {
+		if swag.IsZero(m.QuoteItemPrice[i]) { // not required
+			continue
+		}
+
+		if m.QuoteItemPrice[i] != nil {
+			if err := m.QuoteItemPrice[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("quoteItemPrice" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

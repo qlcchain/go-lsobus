@@ -1359,6 +1359,12 @@
           "items": {
             "$ref": "#/definitions/RelatedParty"
           }
+        },
+        "quoteItemPrice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QuotePrice"
+          }
         }
       }
     },

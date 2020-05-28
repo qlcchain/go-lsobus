@@ -41,6 +41,12 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	if params.ProductSpecificationID != "" {
 		reqParams.ProductSpecificationID = &params.ProductSpecificationID
 	}
+	if params.ProductOfferingID != "" {
+		reqParams.ProductOfferingID = &params.ProductOfferingID
+	}
+	if params.ProductOrderID != "" {
+		reqParams.ProductOrderID = &params.ProductOrderID
+	}
 	if params.Offset != "" {
 		reqParams.Offset = &params.Offset
 	}
@@ -51,11 +57,13 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductFind(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspInvList = rspParams.GetPayload()
 
@@ -69,11 +77,13 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductGet(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateInvGetResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspInv = rspParams.GetPayload()
 

@@ -3,6 +3,8 @@ package orchestra
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/sonata"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -41,10 +43,11 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.Quote))
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -75,13 +78,16 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
-		//rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuoteList = rspParams.GetPayload()
+
 	return nil
 }
 
@@ -92,11 +98,13 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
-	if err != nil {
-		s.logger.Error("send request,", "error:", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteGetResponse(reqParams)
+	} else if err != nil {
+		s.logger.Error("send request,", "error:", err)
+		return err
 	}
+
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspQuote = rspParams.GetPayload()
 
@@ -182,8 +190,13 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 
 	uniItem := &quomod.QuoteItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = quomod.ProductActionType(params.Action)
 
 	uniOfferId := MEFProductOfferingUNI
@@ -209,6 +222,20 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 		uniItem.Product.ProductSpecification.SetDescribing(uniDesc)
 	}
 
+	// Term
+	if params.DurationUnit != "" && params.DurationAmount > 0 {
+		uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+		uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+		uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+		uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+	}
+
+	//Price
+	itemPrice := &quomod.QuotePrice{}
+	itemPrice.PriceType = quomod.PriceTypeRECURRING
+	itemPrice.RecurringChargePeriod = quomod.ChargePeriodDAY
+	uniItem.QuoteItemPrice = append(uniItem.QuoteItemPrice, itemPrice)
+
 	return uniItem
 }
 
@@ -226,8 +253,12 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	lineItem := &quomod.QuoteItemCreate{}
 	lineItem.Action = quomod.ProductActionType(params.Action)
 
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	linePoVal := MEFProductOfferingELine
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}
@@ -240,9 +271,17 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	//Product Specification
 	if lineItem.Action != quomod.ProductActionTypeDISCONNECT {
 		lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-		lineItem.Product.ProductSpecification.ID = "UNISpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineItem.Product.ProductSpecification.ID = "PCCWConnSpec"
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
+	}
+
+	// Term
+	if params.DurationUnit != "" && params.DurationAmount > 0 {
+		lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+		lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+		lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+		lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
 	}
 
 	return lineItem

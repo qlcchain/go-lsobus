@@ -21,7 +21,7 @@ func addGetOrderInfoByShell(parentCmd *ishell.Cmd) {
 	}
 	args := []util.Flag{internalId}
 	c := &ishell.Cmd{
-		Name:                "info",
+		Name:                "orderInfo",
 		Help:                "order info",
 		CompleterWithPrefix: util.OptsCompleter(args),
 		Func: func(c *ishell.Context) {
@@ -54,7 +54,7 @@ func getOrderInfo(internalId string) error {
 		InternalId: internalId,
 	}
 	c := pb.NewOrderAPIClient(cn)
-	orderInfo, err := c.OrderInfo(context.Background(), id)
+	orderInfo, err := c.GetOrderInfo(context.Background(), id)
 	if err != nil {
 		fmt.Println(err)
 	}

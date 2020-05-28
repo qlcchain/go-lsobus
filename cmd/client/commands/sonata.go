@@ -28,11 +28,16 @@ var sonataCmd = &cobra.Command{
 }
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	// Common
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
 	cmd.Flags().String("itemAction", "add", "Type of product action, (e.g., add, change, remove)")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 	cmd.Flags().String("productID", "", "Product ID of existing service")
+
+	cmd.Flags().String("durationUnit", "", "Duration unit, (e.g., YEAR, MONTH, DAY, HOUR)")
+	cmd.Flags().Uint("durationAmount", 0, "Duration amount")
 
 	// UNI
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
@@ -52,17 +57,24 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
 
 	// Price
-	cmd.Flags().String("currency", "USA", "Currency, (e.g., USA, HKD, CNY)")
+	cmd.Flags().String("quoteID", "", "Quote ID")
+	cmd.Flags().String("quoteItemID", "", "Quote Item ID")
+	cmd.Flags().String("currency", "USD", "Currency, (e.g., USD, HKD, CNY)")
 	cmd.Flags().Float32("price", 0, "price")
 }
 
 func addFlagsForFindParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
+	cmd.Flags().String("prodOrderID", "", "Production order ID")
 }
 
 func addFlagsForGetParams(cmd *cobra.Command) {
+	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+
 	cmd.Flags().String("id", "", "ID of site/quote/order")
 }
 
@@ -81,6 +93,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
+
+	params.QuoteID, err = cmd.Flags().GetString("quoteID")
+	if err != nil {
+		return err
+	}
 
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
@@ -106,6 +123,26 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+
+		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
 		params.UNIItems = append(params.UNIItems, uniItem)
@@ -125,6 +162,26 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+
+		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
 		params.UNIItems = append(params.UNIItems, uniItem)
@@ -162,6 +219,7 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		if err != nil {
 			return err
 		}
+		lineItem.BwUnit = "Mbps"
 
 		lineItem.CosName, err = cmd.Flags().GetString("cosName")
 		if err != nil {
@@ -169,6 +227,25 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		}
 
 		lineItem.SVlanID, err = cmd.Flags().GetUint("sVlanID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
+		if err != nil {
+			return err
+		}
+		lineItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
+		if err != nil {
+			return err
+		}
+
+		lineItem.QuoteID, err = cmd.Flags().GetString("quoteID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
 		if err != nil {
 			return err
 		}
@@ -230,6 +307,11 @@ func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) 
 		return err
 	}
 
+	params.ProductOrderID, err = cmd.Flags().GetString("prodOrderID")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -243,11 +325,18 @@ func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) er
 	return nil
 }
 
-func getOrchestraInstance() (*orchestra.Orchestra, error) {
+func getOrchestraInstance(cmd *cobra.Command) (*orchestra.Orchestra, error) {
 	o := orchestra.NewOrchestra("")
 	err := o.Init()
 	if err != nil {
 		return nil, err
+	}
+
+	if cmd != nil {
+		fakeMode, err := cmd.Flags().GetBool("fakeMode")
+		if err == nil {
+			o.SetFakeMode(fakeMode)
+		}
 	}
 
 	return o, nil

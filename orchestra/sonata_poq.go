@@ -39,10 +39,11 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOfferingQualification))
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
-	if err != nil {
-		s.logger.Errorf("send request, error %s", err)
-		//return err
+	if s.Orch.GetFakeMode() {
 		rspParams = mock.SonataGeneratePoqCreateResponse(reqParams)
+	} else if err != nil {
+		s.logger.Errorf("send request, error %s", err)
+		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	orderParams.RspPoq = rspParams.GetPayload()
@@ -68,7 +69,9 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGeneratePoqFindResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
@@ -84,7 +87,9 @@ func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
-	if err != nil {
+	if s.Orch.GetFakeMode() {
+		rspParams = mock.SonataGeneratePoqGetResponse(reqParams)
+	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
 		return err
 	}
@@ -164,8 +169,13 @@ func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOffer
 
 	uniItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
-	uniItemID := s.NewItemID()
-	uniItem.ID = &uniItemID
+	if params.ItemID != "" {
+		uniItem.ID = &params.ItemID
+	} else {
+		uniItemID := s.NewItemID()
+		uniItem.ID = &uniItemID
+	}
+
 	uniItem.Action = poqmod.ProductActionType(params.Action)
 
 	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
@@ -207,8 +217,12 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 	lineItem := &poqmod.ProductOfferingQualificationItemCreate{}
 
 	lineItem.Action = poqmod.ProductActionType(params.Action)
-	lineItemID := s.NewItemID()
-	lineItem.ID = &lineItemID
+	if params.ItemID != "" {
+		lineItem.ID = &params.ItemID
+	} else {
+		lineItemID := s.NewItemID()
+		lineItem.ID = &lineItemID
+	}
 
 	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
 
@@ -222,7 +236,7 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 	if params.Action != string(poqmod.ProductActionTypeRemove) {
 		lineItem.Product.ProductSpecification = &poqmod.ProductSpecificationRef{}
 		lineItem.Product.ProductSpecification.ID = "ELineSpec"
-		lineDesc := s.BuildELineProductSpec(params)
+		lineDesc := s.BuildPCCWConnProductSpec(params)
 		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 	}
 

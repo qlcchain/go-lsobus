@@ -15,8 +15,7 @@ message VersionResponse {
 service ChainAPI{
   rpc Version(VersionRequest) returns (VersionResponse){
     option (google.api.http) = {
-      post: "/chain/version"
-      body: "*"
+      get: "/chain/version"
     };
   }
 }
@@ -27,30 +26,33 @@ message User {
 }
 
 message ConnectionStaticParam {
-  string productId = 1;
-  string srcCompanyName = 2 ;
-  string srcRegion = 3;
-  string srcCity = 4;
-  string srcDataCenter = 5;
-  string srcPort = 6;
-  string dstCompanyName = 7;
-  string dstRegion = 8;
-  string dstCity = 9;
-  string dstDataCenter = 10;
-  string dstPort = 11;
+  string itemId = 1;
+  string productId = 2;
+  string srcCompanyName = 3;
+  string srcRegion = 4;
+  string srcCity = 5;
+  string srcDataCenter = 6;
+  string srcPort = 7;
+  string dstCompanyName = 8;
+  string dstRegion = 9;
+  string dstCity = 10;
+  string dstDataCenter = 11;
+  string dstPort = 12;
 }
 
 message ConnectionDynamicParam {
-  string connectionName = 1;
-  string paymentType = 2;
-  string billingType = 3;
-  string currency = 4;
-  string serviceClass = 5;
-  string bandwidth = 6;
-  string billingUnit = 7;
-  string price = 8;
-  int64 startTime = 9;
-  int64 endTime = 10;
+  string orderId = 1;
+  string quoteItemId =2;
+  string connectionName = 3;
+  string paymentType = 4;
+  string billingType = 5;
+  string currency = 6;
+  string serviceClass = 7;
+  string bandwidth = 8;
+  string billingUnit = 9;
+  float price = 10;
+  int64 startTime = 11;
+  int64 endTime = 12;
 }
 
 message ConnectionParam {
@@ -59,13 +61,15 @@ message ConnectionParam {
 }
 
 message CreateOrderParam {
-  User buyer = 1;
-  User seller = 2;
-  repeated ConnectionParam cps = 3;
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  string quoteId = 4;
+  repeated ConnectionParam connectionParam = 5;
 }
 
-message CreateOrderRsp {
-  string orderIdOnChain = 1;
+message OrderId {
+  string internalId = 1;
 }
 
 message GetOrderInfoByInternalId {
@@ -80,7 +84,7 @@ message OrderLifeTrack {
   string Hash = 5;
 }
 
-message OrderInfoRsp {
+message OrderInfo {
   User buyer = 1;
   User seller = 2;
   string orderId = 3;
@@ -91,19 +95,56 @@ message OrderInfoRsp {
   repeated OrderLifeTrack track = 8;
 }
 
+message ContractPrivacyParam {
+  string privateFrom = 1;
+  repeated string privateFor =2;
+  string privateGroupID = 3;
+}
+
+message ChangeConnectionParam {
+  string productId = 1;
+  string quoteItemId = 2;
+  ConnectionDynamicParam dynamicParam = 3;
+}
+
+message ChangeOrderParam {
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  string quoteId = 4;
+  repeated ChangeConnectionParam changeConnectionParam = 5;
+}
+
+message TerminateOrderParam {
+  ContractPrivacyParam privacy = 1;
+  User buyer = 2;
+  User seller = 3;
+  repeated string productId = 4;
+}
+
 service OrderAPI{
-  rpc CreateOrder(CreateOrderParam) returns (CreateOrderRsp){
+  rpc CreateOrder(CreateOrderParam) returns (OrderId){
     option (google.api.http) = {
       post: "/order/create"
       body: "*"
     };
   }
-  rpc OrderInfo(GetOrderInfoByInternalId) returns (OrderInfoRsp){
+  rpc GetOrderInfo(GetOrderInfoByInternalId) returns (OrderInfo){
     option (google.api.http) = {
-      post: "/order/info"
+      get: "/order/info"
+    };
+  }
+  rpc ChangeOrder(ChangeOrderParam) returns (OrderId){
+    option (google.api.http) = {
+      post: "/order/change"
+      body: "*"
+    };
+  }
+  rpc TerminateOrder(TerminateOrderParam) returns (OrderId){
+    option (google.api.http) = {
+      post: "/order/terminate"
       body: "*"
     };
   }
 }
-
 

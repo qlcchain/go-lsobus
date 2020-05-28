@@ -1,0 +1,56 @@
+{
+  "title": "ConnSpec",
+  "description": "Description of PCCW ConnSpec for Ordering",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "Conn",
+  "type": "object",
+  "properties": {
+    "bandwidth": {
+      "description": "The bandwidth for this service.",
+      "type": "integer",
+      "format": "int32"
+    },
+    "classOfService": {
+      "description": "The name of the designation given to one or more sets of performance objectives and associated parameters by the Seller (e.g., “Gold”).",
+      "type": "string"
+    },
+    "duration": {
+      "$ref": "#/definitions/Duration"
+    },
+    "srcLocationId": {
+      "description": "The source location ID for this service.",
+      "type": "string"
+    },
+    "destLocationId": {
+      "description": "The destination location ID for this service.",
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Duration": {
+      "description": "",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "",
+          "type": "integer",
+          "format": "int32"
+        },
+        "unit": {
+          "description": "",
+          "type": "string",
+          "enum": [
+            "DAY",
+            "WEEK",
+            "MONTH",
+            "YEAR"
+          ]
+        }
+      }
+    }
+  }
+}

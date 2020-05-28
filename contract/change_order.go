@@ -1,6 +1,14 @@
 package contract
 
-func (cs *ContractService) GetChangeOrderBlock() {
+import (
+	"errors"
+
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
+	"github.com/qlcchain/go-qlc/common/types"
+	"github.com/qlcchain/go-qlc/vm/contract/abi"
+)
+
+func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
 	/* TODO: Generate a block to change order's service parameters
 		1. call dod_settlement_getChangeOrderBlock  to change an order,need order's id generated before it will return an internal id
 	    2. sign orderBlock and process it to the chain
@@ -11,12 +19,67 @@ func (cs *ContractService) GetChangeOrderBlock() {
 		6. call orchestra interface to periodically check whether the resource of this order has been ready?
 		7. if resource is ready,call dod_settlement_getResourceReadyBlock periodically check whether the resource of this order has been ready?
 	*/
+	addr := cs.account.Address().String()
+	if addr == param.Buyer.Address {
+		op, err := cs.convertProtoToChangeOrderParam(param)
+		if err != nil {
+			return "", err
+		}
+		block := new(types.StateBlock)
+		err = cs.client.Call(&block, "DoDSettlement_getChangeOrderBlock", op)
+		if err != nil {
+			return "", err
+		}
+
+		var w types.Work
+		worker, _ := types.NewWorker(w, block.Root())
+		block.Work = worker.NewWork()
+
+		hash := block.GetHash()
+		block.Signature = cs.account.Sign(hash)
+		var h types.Hash
+		err = cs.client.Call(&h, "ledger_process", &block)
+		if err != nil {
+			return "", err
+		}
+		cs.logger.Infof("process hash %s success", h.String())
+		internalId := block.Previous.String()
+		cs.orderIdOnChain.Store(internalId, "")
+		return internalId, nil
+	} else {
+		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
+	}
+	return "", errors.New("buyer address not match")
 }
 
-func (cs *ContractService) CheckChangeOrderContractSignStatus(internalId string) bool {
-	return true
-}
+func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*abi.DoDSettleChangeOrderParam, error) {
+	sellerAddr, _ := types.HexToAddress(param.Seller.Address)
+	buyAddr, _ := types.HexToAddress(param.Buyer.Address)
+	op := new(abi.DoDSettleChangeOrderParam)
+	op.Buyer = &abi.DoDSettleUser{
+		Address: buyAddr,
+		Name:    param.Buyer.Name,
+	}
+	op.Seller = &abi.DoDSettleUser{
+		Address: sellerAddr,
+		Name:    param.Seller.Name,
+	}
+	op.QuoteId = param.QuoteId
+	for _, v := range param.ChangeConnectionParam {
 
-func (cs *ContractService) CheckChangeOrderResourceReady(externalId string) bool {
-	return true
+		var conn *abi.DoDSettleChangeConnectionParam
+		conn = &abi.DoDSettleChangeConnectionParam{
+			ProductId:   v.ProductId,
+			QuoteItemId: v.QuoteItemId,
+			DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
+				ConnectionName: v.DynamicParam.ConnectionName,
+				Bandwidth:      v.DynamicParam.Bandwidth,
+				Price:          float64(v.DynamicParam.Price),
+				StartTime:      v.DynamicParam.StartTime,
+				EndTime:        v.DynamicParam.EndTime,
+			},
+		}
+		op.Connections = append(op.Connections, conn)
+	}
+	return op, nil
 }

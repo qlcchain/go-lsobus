@@ -120,6 +120,12 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 			return nil, err
 		}
 		return &result, nil
+	case "PCCWConnSpec":
+		var result cmnmod.PCCWConnSpec
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
 	case "UNISpec":
 		var result cmnmod.UNISpec
 		if err := consumer.Consume(buf2, &result); err != nil {

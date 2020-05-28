@@ -2,7 +2,6 @@ package grpcServer
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/qlcchain/go-lsobus/contract"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
@@ -18,22 +17,42 @@ func NewOrderApi(cs *contract.ContractService) *OrderApi {
 	}
 }
 
-func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.CreateOrderRsp, error) {
+func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderId, error) {
 	id, err := oa.cs.GetCreateOrderBlock(param)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.CreateOrderRsp{
-		OrderIdOnChain: id,
+	return &proto.OrderId{
+		InternalId: id,
 	}, nil
 }
 
-func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfoRsp, error) {
+func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderId, error) {
+	id, err := oa.cs.GetChangeOrderBlock(param)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.OrderId{
+		InternalId: id,
+	}, nil
+}
+
+func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderId, error) {
+	id, err := oa.cs.GetTerminateOrderBlock(param)
+	if err != nil {
+		return nil, err
+	}
+	return &proto.OrderId{
+		InternalId: id,
+	}, nil
+}
+
+func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfo, error) {
 	orderInfo, err := oa.cs.GetOrderInfoByInternalId(id.InternalId)
 	if err != nil {
 		return nil, err
 	}
-	info := new(proto.OrderInfoRsp)
+	info := new(proto.OrderInfo)
 	info.Buyer = &proto.User{
 		Address: orderInfo.Buyer.Address.String(),
 		Name:    orderInfo.Buyer.Name,
@@ -49,6 +68,7 @@ func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInter
 	for _, v := range orderInfo.Connections {
 		conn := &proto.ConnectionParam{
 			StaticParam: &proto.ConnectionStaticParam{
+				ProductId:      v.ProductId,
 				SrcCompanyName: v.SrcCompanyName,
 				SrcRegion:      v.SrcRegion,
 				SrcCity:        v.SrcCity,
@@ -63,15 +83,27 @@ func (oa *OrderApi) OrderInfo(ctx context.Context, id *proto.GetOrderInfoByInter
 			DynamicParam: &proto.ConnectionDynamicParam{
 				ConnectionName: v.ConnectionName,
 				Bandwidth:      v.Bandwidth,
-				BillingUnit:    v.BillingUnit.String(),
-				Price:          strconv.FormatFloat(v.Price, 'E', -1, 64),
-				ServiceClass:   v.ServiceClass.String(),
-				PaymentType:    v.PaymentType.String(),
-				BillingType:    v.BillingType.String(),
-				Currency:       v.Currency,
-				StartTime:      v.StartTime,
-				EndTime:        v.EndTime,
+				//BillingUnit:    v.BillingUnit.String(),
+				Price: float32(v.Price),
+				//ServiceClass:   v.ServiceClass.String(),
+				//PaymentType:    v.PaymentType.String(),
+				//BillingType:    v.BillingType.String(),
+				Currency:  v.Currency,
+				StartTime: v.StartTime,
+				EndTime:   v.EndTime,
 			},
+		}
+		if v.BillingUnit.String() != "null" {
+			conn.DynamicParam.BillingUnit = v.BillingUnit.String()
+		}
+		if v.ServiceClass.String() != "null" {
+			conn.DynamicParam.ServiceClass = v.ServiceClass.String()
+		}
+		if v.PaymentType.String() != "null" {
+			conn.DynamicParam.PaymentType = v.PaymentType.String()
+		}
+		if v.BillingType.String() != "null" {
+			conn.DynamicParam.BillingType = v.BillingType.String()
 		}
 		info.Connections = append(info.Connections, conn)
 	}
