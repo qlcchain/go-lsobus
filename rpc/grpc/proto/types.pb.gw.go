@@ -32,14 +32,6 @@ func request_ChainAPI_Version_0(ctx context.Context, marshaler runtime.Marshaler
 	var protoReq VersionRequest
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
 	msg, err := client.Version(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -62,15 +54,15 @@ func request_OrderAPI_CreateOrder_0(ctx context.Context, marshaler runtime.Marsh
 
 }
 
+var (
+	filter_OrderAPI_GetOrderInfo_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
 func request_OrderAPI_GetOrderInfo_0(ctx context.Context, marshaler runtime.Marshaler, client OrderAPIClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetOrderInfoByInternalId
 	var metadata runtime.ServerMetadata
 
-	newReader, berr := utilities.IOReaderFactory(req.Body)
-	if berr != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
-	}
-	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrderAPI_GetOrderInfo_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -151,7 +143,7 @@ func RegisterChainAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *g
 // "ChainAPIClient" to call the correct interceptors.
 func RegisterChainAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ChainAPIClient) error {
 
-	mux.Handle("POST", pattern_ChainAPI_Version_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ChainAPI_Version_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -240,7 +232,7 @@ func RegisterOrderAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
-	mux.Handle("POST", pattern_OrderAPI_GetOrderInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_OrderAPI_GetOrderInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -308,9 +300,9 @@ var (
 
 	pattern_OrderAPI_GetOrderInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"order", "info"}, ""))
 
-	pattern_OrderAPI_ChangeOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"order", "info"}, ""))
+	pattern_OrderAPI_ChangeOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"order", "change"}, ""))
 
-	pattern_OrderAPI_TerminateOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"order", "info"}, ""))
+	pattern_OrderAPI_TerminateOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"order", "terminate"}, ""))
 )
 
 var (

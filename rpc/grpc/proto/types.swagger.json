@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "types.proto",
-    "version": "version not set"
+    "title": "API Virtual-LSOBus",
+    "version": "1.0.0"
   },
   "schemes": [
     "http",
@@ -16,7 +16,7 @@
   ],
   "paths": {
     "/chain/version": {
-      "post": {
+      "get": {
         "operationId": "Version",
         "responses": {
           "200": {
@@ -26,16 +26,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/protoVersionRequest"
-            }
-          }
-        ],
         "tags": [
           "ChainAPI"
         ]
@@ -94,7 +84,7 @@
       }
     },
     "/order/info": {
-      "post": {
+      "get": {
         "operationId": "GetOrderInfo",
         "responses": {
           "200": {
@@ -106,12 +96,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/protoGetOrderInfoByInternalId"
-            }
+            "name": "internalId",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -320,14 +308,6 @@
         }
       }
     },
-    "protoGetOrderInfoByInternalId": {
-      "type": "object",
-      "properties": {
-        "internalId": {
-          "type": "string"
-        }
-      }
-    },
     "protoOrderId": {
       "type": "object",
       "properties": {
@@ -422,9 +402,6 @@
           "type": "string"
         }
       }
-    },
-    "protoVersionRequest": {
-      "type": "object"
     },
     "protoVersionResponse": {
       "type": "object",

@@ -15,8 +15,7 @@ message VersionResponse {
 service ChainAPI{
   rpc Version(VersionRequest) returns (VersionResponse){
     option (google.api.http) = {
-      post: "/chain/version"
-      body: "*"
+      get: "/chain/version"
     };
   }
 }
@@ -132,8 +131,7 @@ service OrderAPI{
   }
   rpc GetOrderInfo(GetOrderInfoByInternalId) returns (OrderInfo){
     option (google.api.http) = {
-      post: "/order/info"
-      body: "*"
+      get: "/order/info"
     };
   }
   rpc ChangeOrder(ChangeOrderParam) returns (OrderId){
