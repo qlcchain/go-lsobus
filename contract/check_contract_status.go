@@ -126,7 +126,6 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		},
 		ExternalID: internalId,
 		ELineItems: eLines,
-		QuoteID:    orderInfo.QuoteId,
 		//PaymentType: "",
 		//BillingType: "",
 	}

@@ -97,11 +97,6 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
-	params.QuoteID, err = cmd.Flags().GetString("quoteID")
-	if err != nil {
-		return err
-	}
-
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
 		return err
