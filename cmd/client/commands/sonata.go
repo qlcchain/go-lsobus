@@ -19,6 +19,7 @@ func addSonataCmd(root *cobra.Command) {
 	addSonataQuoteCmd(sonataCmd)
 	addSonataOrderCmd(sonataCmd)
 	addSonataInvCmd(sonataCmd)
+	addSonataOfferCmd(sonataCmd)
 }
 
 var sonataCmd = &cobra.Command{

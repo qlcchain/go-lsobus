@@ -21,6 +21,7 @@ const (
 	MEFAPIVersionQuote = "2"
 	MEFAPIVersionOrder = "3"
 	MEFAPIVersionInv   = "3"
+	MEFAPIVersionOffer = "1"
 
 	MEFSchemaLocationRoot      = "https://github.com/MEF-GIT/MEF-LSO-Sonata-SDK/blob/working-draft"
 	MEFSchemaLocationSpecRoot  = MEFSchemaLocationRoot + "/payload_descriptions/ProductSpecDescription"

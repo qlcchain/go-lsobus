@@ -3,9 +3,10 @@ package contract
 import (
 	"errors"
 
-	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 	"github.com/qlcchain/go-qlc/common/types"
 	"github.com/qlcchain/go-qlc/vm/contract/abi"
+
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderParam) (string, error) {

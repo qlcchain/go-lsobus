@@ -11,8 +11,8 @@ import (
 const (
 	VirtualLSOBus = "vb.json"
 	configVersion = 1
-	cfgDir        = "virtualLSOBus"
-	nixCfgDir     = ".virtualLSOBus"
+	cfgDir        = "glsobus"
+	nixCfgDir     = ".glsobus"
 )
 
 func DefaultConfig(dir string) (*Config, error) {

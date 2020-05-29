@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 	"google.golang.org/grpc"
+
+	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
 	"github.com/qlcchain/go-qlc/cmd/util"

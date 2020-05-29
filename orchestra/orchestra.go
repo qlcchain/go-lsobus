@@ -14,6 +14,7 @@ type Orchestra struct {
 	sonataQuoteImpl *sonataQuoteImpl
 	sonataOrderImpl *sonataOrderImpl
 	sonataInvImpl   *sonataInvImpl
+	sonataOfferImpl *sonataOfferImpl
 }
 
 func NewOrchestra(cfgFile string) *Orchestra {
@@ -26,6 +27,8 @@ func NewOrchestra(cfgFile string) *Orchestra {
 	o.sonataQuoteImpl = newSonataQuoteImpl(o)
 	o.sonataOrderImpl = newSonataOrderImpl(o)
 	o.sonataInvImpl = newSonataInvImpl(o)
+	o.sonataOfferImpl = newSonataOfferImpl(o)
+
 	return o
 }
 
@@ -59,6 +62,11 @@ func (o *Orchestra) Init() error {
 	}
 
 	err = o.sonataInvImpl.Init()
+	if err != nil {
+		return err
+	}
+
+	err = o.sonataOfferImpl.Init()
 	if err != nil {
 		return err
 	}
@@ -130,4 +138,12 @@ func (o *Orchestra) ExecSiteFind(params *FindParams) error {
 
 func (o *Orchestra) ExecSiteGet(params *GetParams) error {
 	return o.sonataSiteImpl.SendGetRequest(params)
+}
+
+func (o *Orchestra) ExecOfferFind(params *FindParams) error {
+	return o.sonataOfferImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecOfferGet(params *GetParams) error {
+	return o.sonataOfferImpl.SendGetRequest(params)
 }

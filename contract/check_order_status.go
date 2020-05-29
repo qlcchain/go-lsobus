@@ -3,11 +3,12 @@ package contract
 import (
 	"time"
 
-	"github.com/qlcchain/go-lsobus/orchestra"
-	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 	"github.com/qlcchain/go-qlc/common/types"
 	qlcchain "github.com/qlcchain/go-qlc/rpc/api"
 	"github.com/qlcchain/go-qlc/vm/contract/abi"
+
+	"github.com/qlcchain/go-lsobus/orchestra"
+	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 )
 
 func (cs *ContractService) checkOrderStatus() {
