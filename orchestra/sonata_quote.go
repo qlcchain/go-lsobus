@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	"github.com/qlcchain/go-lsobus/sonata"
-
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -30,8 +28,8 @@ func (s *sonataQuoteImpl) Init() error {
 }
 
 func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
-	tranCfg := quocli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
-	httpCli := quocli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpTran := s.NewHttpTransport(quocli.DefaultBasePath)
+	httpCli := quocli.New(httpTran, nil)
 	return httpCli
 }
 
@@ -199,8 +197,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 
 	uniItem.Action = quomod.ProductActionType(params.Action)
 
-	uniOfferId := MEFProductOfferingUNI
-	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &uniOfferId}
+	uniItem.ProductOffering = &quomod.ProductOfferingRef{ID: &params.ProdOfferID}
 
 	uniItem.Product = &quomod.Product{}
 	if uniItem.Action != quomod.ProductActionTypeINSTALL {
@@ -223,18 +220,22 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 	}
 
 	// Term
-	if params.DurationUnit != "" && params.DurationAmount > 0 {
-		uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-		uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-		uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
-		uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
-	}
+	/*
+		if params.DurationUnit != "" && params.DurationAmount > 0 {
+			uniItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+			uniItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+			uniItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+			uniItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+		}
+	*/
 
 	//Price
-	itemPrice := &quomod.QuotePrice{}
-	itemPrice.PriceType = quomod.PriceTypeRECURRING
-	itemPrice.RecurringChargePeriod = quomod.ChargePeriodDAY
-	uniItem.QuoteItemPrice = append(uniItem.QuoteItemPrice, itemPrice)
+	/*
+		itemPrice := &quomod.QuotePrice{}
+		itemPrice.PriceType = quomod.PriceTypeRECURRING
+		itemPrice.RecurringChargePeriod = quomod.ChargePeriodDAY
+		uniItem.QuoteItemPrice = append(uniItem.QuoteItemPrice, itemPrice)
+	*/
 
 	return uniItem
 }
@@ -260,8 +261,7 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 		lineItem.ID = &lineItemID
 	}
 
-	linePoVal := MEFProductOfferingELine
-	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &linePoVal}
+	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &params.ProdOfferID}
 
 	lineItem.Product = new(quomod.Product)
 	if lineItem.Action != quomod.ProductActionTypeINSTALL {
@@ -277,12 +277,14 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	}
 
 	// Term
-	if params.DurationUnit != "" && params.DurationAmount > 0 {
-		lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
-		lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
-		lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
-		lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
-	}
+	/*
+		if params.DurationUnit != "" && params.DurationAmount > 0 {
+			lineItem.RequestedQuoteItemTerm = &quomod.ItemTerm{}
+			lineItem.RequestedQuoteItemTerm.Duration = &quomod.Duration{}
+			lineItem.RequestedQuoteItemTerm.Duration.Value = sonata.NewInt32(int32(params.DurationAmount))
+			lineItem.RequestedQuoteItemTerm.Duration.Unit = quomod.DurationUnit(params.DurationUnit)
+		}
+	*/
 
 	return lineItem
 }

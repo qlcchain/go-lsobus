@@ -22,8 +22,8 @@ func (s *sonataSiteImpl) Init() error {
 }
 
 func (s *sonataSiteImpl) NewHTTPClient() *sitcli.APIGeographicSiteManagement {
-	tranCfg := sitcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
-	httpCli := sitcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpTran := s.NewHttpTransport(sitcli.DefaultBasePath)
+	httpCli := sitcli.New(httpTran, nil)
 	return httpCli
 }
 

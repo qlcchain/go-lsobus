@@ -1,13 +1,19 @@
 package orchestra
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/qlcchain/go-lsobus/config"
 	chainctx "github.com/qlcchain/go-lsobus/services/context"
+
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 type Orchestra struct {
+	logger   *zap.SugaredLogger
 	cfg      *config.Config
 	fakeMode bool
+	apiToken string
 
 	sonataSiteImpl  *sonataSiteImpl
 	sonataPOQImpl   *sonataPOQImpl
@@ -22,6 +28,7 @@ func NewOrchestra(cfgFile string) *Orchestra {
 	cfg, _ := cc.Config()
 
 	o := &Orchestra{cfg: cfg}
+	o.logger = log.NewLogger("sonataImpl")
 	o.sonataSiteImpl = newSonataSiteImpl(o)
 	o.sonataPOQImpl = newSonataPOQImpl(o)
 	o.sonataQuoteImpl = newSonataQuoteImpl(o)

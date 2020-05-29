@@ -99,6 +99,8 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		eLine = &orchestra.ELineItemParams{
 			SrcPortID:     v.SrcPort,
 			DstPortID:     v.DstPort,
+			DstCompanyID:  v.DstCompanyName,
+			DstMetroID:    v.DstCity,
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
 			CosName:       v.ServiceClass.String(),

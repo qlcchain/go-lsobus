@@ -30,8 +30,8 @@ func (s *sonataOrderImpl) Init() error {
 }
 
 func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
-	tranCfg := ordcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
-	httpCli := ordcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpTran := s.NewHttpTransport(ordcli.DefaultBasePath)
+	httpCli := ordcli.New(httpTran, nil)
 	return httpCli
 }
 
@@ -209,8 +209,7 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 
 	uniItem.Action = ordmod.ProductActionType(params.Action)
 
-	uniOfferId := MEFProductOfferingUNI
-	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &uniOfferId}
+	uniItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &params.ProdOfferID}
 
 	uniItem.Product = &ordmod.Product{}
 	uniItem.Product.BuyerProductID = params.BuyerProductID
@@ -266,8 +265,7 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 		lineItem.ID = &lineItemID
 	}
 
-	linePoVal := MEFProductOfferingELine
-	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &linePoVal}
+	lineItem.ProductOffering = &ordmod.ProductOfferingRef{ID: &params.ProdOfferID}
 
 	lineItem.Product = &ordmod.Product{}
 	lineItem.Product.BuyerProductID = params.BuyerProductID

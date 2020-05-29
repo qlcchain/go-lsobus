@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PCCWConnSpecV1 ConnSpec
@@ -21,24 +22,48 @@ type PCCWConnSpecV1 struct {
 	// The bandwidth for this service.
 	Bandwidth int32 `json:"bandwidth,omitempty"`
 
-	// The name of the designation given to one or more sets of performance objectives and associated parameters by the Seller (e.g., “Gold”).
+	// class of service
 	ClassOfService string `json:"classOfService,omitempty"`
+
+	// dest company Id
+	DestCompanyID string `json:"destCompanyId,omitempty"`
 
 	// The destination location ID for this service.
 	DestLocationID string `json:"destLocationId,omitempty"`
 
-	// duration
-	Duration *Duration `json:"duration,omitempty"`
+	// dest metro Id
+	DestMetroID string `json:"destMetroId,omitempty"`
+
+	// dest port Id
+	DestPortID string `json:"destPortId,omitempty"`
+
+	// name
+	Name string `json:"name,omitempty"`
 
 	// The source location ID for this service.
 	SrcLocationID string `json:"srcLocationId,omitempty"`
+
+	// src port Id
+	SrcPortID string `json:"srcPortId,omitempty"`
+
+	// started at
+	// Format: date-time
+	StartedAt strfmt.DateTime `json:"startedAt,omitempty"`
+
+	// terminated at
+	// Format: date-time
+	TerminatedAt strfmt.DateTime `json:"terminatedAt,omitempty"`
 }
 
 // Validate validates this p c c w conn spec v1
 func (m *PCCWConnSpecV1) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateDuration(formats); err != nil {
+	if err := m.validateStartedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTerminatedAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -48,19 +73,27 @@ func (m *PCCWConnSpecV1) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *PCCWConnSpecV1) validateDuration(formats strfmt.Registry) error {
+func (m *PCCWConnSpecV1) validateStartedAt(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Duration) { // not required
+	if swag.IsZero(m.StartedAt) { // not required
 		return nil
 	}
 
-	if m.Duration != nil {
-		if err := m.Duration.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("duration")
-			}
-			return err
-		}
+	if err := validate.FormatOf("startedAt", "body", "date-time", m.StartedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *PCCWConnSpecV1) validateTerminatedAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TerminatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("terminatedAt", "body", "date-time", m.TerminatedAt.String(), formats); err != nil {
+		return err
 	}
 
 	return nil

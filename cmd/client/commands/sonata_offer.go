@@ -41,7 +41,7 @@ var sonataOfferFindCmd = &cobra.Command{
 			return
 		}
 
-		err = o.ExecOfferFind(nil)
+		err = o.ExecOfferFind(params)
 		if err != nil {
 			cmd.PrintErrln(err)
 		}

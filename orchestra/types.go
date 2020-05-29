@@ -37,16 +37,12 @@ type BaseItemParams struct {
 
 	ProdSpecID  string
 	ProdOfferID string
-	ProdQuoteID string
 
 	ProductID      string
 	BuyerProductID string
 	QuoteID        string
 	QuoteItemID    string
 	Description    string
-
-	DurationUnit   string
-	DurationAmount uint
 
 	BillingParams *BillingParams
 }
@@ -61,12 +57,14 @@ type UNIItemParams struct {
 type ELineItemParams struct {
 	BaseItemParams
 
-	SrcPortID string
-	DstPortID string
-	Bandwidth uint
-	BwUnit    string
-	SVlanID   uint
-	CosName   string
+	SrcPortID    string
+	DstPortID    string
+	DstCompanyID string
+	DstMetroID   string
+	Bandwidth    uint
+	BwUnit       string
+	SVlanID      uint
+	CosName      string
 
 	SrcLocationID string
 	DstLocationID string
