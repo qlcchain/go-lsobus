@@ -26,8 +26,8 @@ func (s *sonataPOQImpl) Init() error {
 }
 
 func (s *sonataPOQImpl) NewHTTPClient() *poqcli.APIProductOfferingQualificationManagement {
-	tranCfg := poqcli.DefaultTransportConfig().WithHost(s.GetHost()).WithSchemes([]string{s.GetScheme()})
-	httpCli := poqcli.NewHTTPClientWithConfig(nil, tranCfg)
+	httpTran := s.NewHttpTransport(poqcli.DefaultBasePath)
+	httpCli := poqcli.New(httpTran, nil)
 	return httpCli
 }
 
@@ -178,7 +178,7 @@ func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOffer
 
 	uniItem.Action = poqmod.ProductActionType(params.Action)
 
-	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingUNI}
+	uniItem.ProductOffering = &poqmod.ProductOfferingRef{ID: params.ProdOfferID}
 
 	uniItem.Product = &poqmod.Product{}
 	if uniItem.Action != poqmod.ProductActionTypeAdd {
@@ -224,7 +224,7 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 		lineItem.ID = &lineItemID
 	}
 
-	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: MEFProductOfferingELine}
+	lineItem.ProductOffering = &poqmod.ProductOfferingRef{ID: params.ProdOfferID}
 
 	// Product
 	lineItem.Product = &poqmod.Product{}

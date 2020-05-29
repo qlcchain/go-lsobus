@@ -1,19 +1,26 @@
 package orchestra
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/qlcchain/go-lsobus/config"
 	chainctx "github.com/qlcchain/go-lsobus/services/context"
+
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 type Orchestra struct {
+	logger   *zap.SugaredLogger
 	cfg      *config.Config
 	fakeMode bool
+	apiToken string
 
 	sonataSiteImpl  *sonataSiteImpl
 	sonataPOQImpl   *sonataPOQImpl
 	sonataQuoteImpl *sonataQuoteImpl
 	sonataOrderImpl *sonataOrderImpl
 	sonataInvImpl   *sonataInvImpl
+	sonataOfferImpl *sonataOfferImpl
 }
 
 func NewOrchestra(cfgFile string) *Orchestra {
@@ -21,11 +28,14 @@ func NewOrchestra(cfgFile string) *Orchestra {
 	cfg, _ := cc.Config()
 
 	o := &Orchestra{cfg: cfg}
+	o.logger = log.NewLogger("sonataImpl")
 	o.sonataSiteImpl = newSonataSiteImpl(o)
 	o.sonataPOQImpl = newSonataPOQImpl(o)
 	o.sonataQuoteImpl = newSonataQuoteImpl(o)
 	o.sonataOrderImpl = newSonataOrderImpl(o)
 	o.sonataInvImpl = newSonataInvImpl(o)
+	o.sonataOfferImpl = newSonataOfferImpl(o)
+
 	return o
 }
 
@@ -59,6 +69,11 @@ func (o *Orchestra) Init() error {
 	}
 
 	err = o.sonataInvImpl.Init()
+	if err != nil {
+		return err
+	}
+
+	err = o.sonataOfferImpl.Init()
 	if err != nil {
 		return err
 	}
@@ -130,4 +145,12 @@ func (o *Orchestra) ExecSiteFind(params *FindParams) error {
 
 func (o *Orchestra) ExecSiteGet(params *GetParams) error {
 	return o.sonataSiteImpl.SendGetRequest(params)
+}
+
+func (o *Orchestra) ExecOfferFind(params *FindParams) error {
+	return o.sonataOfferImpl.SendFindRequest(params)
+}
+
+func (o *Orchestra) ExecOfferGet(params *GetParams) error {
+	return o.sonataOfferImpl.SendGetRequest(params)
 }

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -19,6 +20,7 @@ func addSonataCmd(root *cobra.Command) {
 	addSonataQuoteCmd(sonataCmd)
 	addSonataOrderCmd(sonataCmd)
 	addSonataInvCmd(sonataCmd)
+	addSonataOfferCmd(sonataCmd)
 }
 
 var sonataCmd = &cobra.Command{
@@ -34,10 +36,11 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
 	cmd.Flags().String("itemAction", "add", "Type of product action, (e.g., add, change, remove)")
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
+	cmd.Flags().String("prodOfferID", "", "Production offering ID")
 	cmd.Flags().String("productID", "", "Product ID of existing service")
 
-	cmd.Flags().String("durationUnit", "", "Duration unit, (e.g., YEAR, MONTH, DAY, HOUR)")
-	cmd.Flags().Uint("durationAmount", 0, "Duration amount")
+	cmd.Flags().Int64("startTime", 0, "Start time, (unix seconds)")
+	cmd.Flags().Int64("endTime", 0, "End time, (unix seconds)")
 
 	// UNI
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
@@ -94,11 +97,6 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
 	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
 
-	params.QuoteID, err = cmd.Flags().GetString("quoteID")
-	if err != nil {
-		return err
-	}
-
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
 		return err
@@ -124,21 +122,17 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 
-		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
-		if err != nil {
-			return err
-		}
-		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
-		if err != nil {
-			return err
-		}
-
 		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
 		if err != nil {
 			return err
 		}
 
 		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.ProdOfferID, err = cmd.Flags().GetString("prodOfferID")
 		if err != nil {
 			return err
 		}
@@ -163,21 +157,17 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 
-		uniItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
-		if err != nil {
-			return err
-		}
-		uniItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
-		if err != nil {
-			return err
-		}
-
 		uniItem.QuoteID, err = cmd.Flags().GetString("quoteID")
 		if err != nil {
 			return err
 		}
 
 		uniItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
+		uniItem.ProdOfferID, err = cmd.Flags().GetString("prodOfferID")
 		if err != nil {
 			return err
 		}
@@ -231,21 +221,17 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 			return err
 		}
 
-		lineItem.DurationUnit, err = cmd.Flags().GetString("durationUnit")
-		if err != nil {
-			return err
-		}
-		lineItem.DurationAmount, err = cmd.Flags().GetUint("durationAmount")
-		if err != nil {
-			return err
-		}
-
 		lineItem.QuoteID, err = cmd.Flags().GetString("quoteID")
 		if err != nil {
 			return err
 		}
 
 		lineItem.QuoteItemID, err = cmd.Flags().GetString("quoteItemID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.ProdOfferID, err = cmd.Flags().GetString("prodOfferID")
 		if err != nil {
 			return err
 		}
@@ -267,26 +253,38 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 }
 
 func fillBillingParamsByCmdFlags(cmd *cobra.Command) *orchestra.BillingParams {
-	currency, err := cmd.Flags().GetString("currency")
+	var err error
+
+	params := &orchestra.BillingParams{}
+	params.BillingType = "DOD"
+
+	params.Currency, err = cmd.Flags().GetString("currency")
 	if err != nil {
 		return nil
 	}
 
-	price, err := cmd.Flags().GetFloat32("price")
+	params.Price, err = cmd.Flags().GetFloat32("price")
 	if err != nil {
 		return nil
 	}
 
-	if currency != "" && price > 0 {
-		params := &orchestra.BillingParams{}
-		params.BillingType = "DOD"
-		params.Price = price
-		params.Currency = currency
-
-		return params
+	params.StartTime, err = cmd.Flags().GetInt64("startTime")
+	if err != nil {
+		return nil
+	}
+	if params.StartTime <= 0 {
+		params.StartTime = time.Now().Unix()
 	}
 
-	return nil
+	params.EndTime, err = cmd.Flags().GetInt64("endTime")
+	if err != nil {
+		return nil
+	}
+	if params.EndTime <= params.StartTime {
+		params.EndTime = params.StartTime + 24*3600
+	}
+
+	return params
 }
 
 func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {

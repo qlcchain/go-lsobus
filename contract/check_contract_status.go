@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qlcchain/go-lsobus/orchestra"
 	"github.com/qlcchain/go-qlc/vm/contract/abi"
+
+	"github.com/qlcchain/go-lsobus/orchestra"
 )
 
 func (cs *ContractService) checkContractStatus() {
@@ -98,6 +99,8 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		eLine = &orchestra.ELineItemParams{
 			SrcPortID:     v.SrcPort,
 			DstPortID:     v.DstPort,
+			DstCompanyID:  v.DstCompanyName,
+			DstMetroID:    v.DstCity,
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
 			CosName:       v.ServiceClass.String(),
@@ -123,7 +126,6 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		},
 		ExternalID: internalId,
 		ELineItems: eLines,
-		QuoteID:    orderInfo.QuoteId,
 		//PaymentType: "",
 		//BillingType: "",
 	}

@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"time"
+
+	httptransport "github.com/go-openapi/runtime/client"
 
 	"github.com/qlcchain/go-lsobus/common/util"
 
@@ -21,6 +24,7 @@ const (
 	MEFAPIVersionQuote = "2"
 	MEFAPIVersionOrder = "3"
 	MEFAPIVersionInv   = "3"
+	MEFAPIVersionOffer = "1"
 
 	MEFSchemaLocationRoot      = "https://github.com/MEF-GIT/MEF-LSO-Sonata-SDK/blob/working-draft"
 	MEFSchemaLocationSpecRoot  = MEFSchemaLocationRoot + "/payload_descriptions/ProductSpecDescription"
@@ -75,6 +79,16 @@ func (s *sonataBaseImpl) GetScheme() string {
 	return s.Scheme
 }
 
+func (s *sonataBaseImpl) GetApiToken() string {
+	return s.Orch.GetApiToken()
+}
+
+func (s *sonataBaseImpl) NewHttpTransport(basePath string) *httptransport.Runtime {
+	httpTran := httptransport.New(s.GetHost(), basePath, []string{s.GetScheme()})
+	httpTran.DefaultAuthentication = httptransport.BearerToken(s.GetApiToken())
+	return httpTran
+}
+
 func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
 }
@@ -122,10 +136,17 @@ func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *ELineItemParams) *cmnm
 
 	lineSpec.ClassOfService = params.CosName
 	lineSpec.Bandwidth = int32(params.Bandwidth)
-	durVal := int32(params.DurationAmount)
-	lineSpec.Duration = &cmnmod.Duration{Unit: &params.DurationUnit, Value: &durVal}
+	lineSpec.SrcPortID = params.SrcPortID
+	lineSpec.DestPortID = params.DstPortID
+	lineSpec.DestCompanyID = params.DstCompanyID
+	lineSpec.DestMetroID = params.DstMetroID
 	lineSpec.SrcLocationID = params.SrcLocationID
 	lineSpec.DestLocationID = params.DstLocationID
+
+	if params.BillingParams != nil {
+		lineSpec.StartedAt.Scan(time.Unix(params.BillingParams.StartTime, 0))
+		lineSpec.TerminatedAt.Scan(time.Unix(params.BillingParams.EndTime, 0))
+	}
 
 	return lineSpec
 }

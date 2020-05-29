@@ -11,11 +11,8 @@
       "format": "int32"
     },
     "classOfService": {
-      "description": "The name of the designation given to one or more sets of performance objectives and associated parameters by the Seller (e.g., “Gold”).",
+      "description": "",
       "type": "string"
-    },
-    "duration": {
-      "$ref": "#/definitions/Duration"
     },
     "srcLocationId": {
       "description": "The source location ID for this service.",
@@ -23,6 +20,36 @@
     },
     "destLocationId": {
       "description": "The destination location ID for this service.",
+      "type": "string"
+    },
+    "startedAt": {
+      "description": "",
+      "type": "string",
+      "format": "date-time"
+    },
+    "terminatedAt": {
+      "description": "",
+      "type": "string",
+      "format": "date-time"
+    },
+    "srcPortId": {
+      "description": "",
+      "type": "string"
+    },
+    "destPortId": {
+      "description": "",
+      "type": "string"
+    },
+    "destCompanyId": {
+      "description": "",
+      "type": "string"
+    },
+    "destMetroId": {
+      "description": "",
+      "type": "string"
+    },
+    "name": {
+      "description": "",
       "type": "string"
     }
   },

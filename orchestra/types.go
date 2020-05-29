@@ -2,6 +2,7 @@ package orchestra
 
 import (
 	invmod "github.com/qlcchain/go-lsobus/sonata/inventory/models"
+	"github.com/qlcchain/go-lsobus/sonata/offer"
 	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
 	poqmod "github.com/qlcchain/go-lsobus/sonata/poq/models"
 	quomod "github.com/qlcchain/go-lsobus/sonata/quote/models"
@@ -36,16 +37,12 @@ type BaseItemParams struct {
 
 	ProdSpecID  string
 	ProdOfferID string
-	ProdQuoteID string
 
 	ProductID      string
 	BuyerProductID string
 	QuoteID        string
 	QuoteItemID    string
 	Description    string
-
-	DurationUnit   string
-	DurationAmount uint
 
 	BillingParams *BillingParams
 }
@@ -60,12 +57,14 @@ type UNIItemParams struct {
 type ELineItemParams struct {
 	BaseItemParams
 
-	SrcPortID string
-	DstPortID string
-	Bandwidth uint
-	BwUnit    string
-	SVlanID   uint
-	CosName   string
+	SrcPortID    string
+	DstPortID    string
+	DstCompanyID string
+	DstMetroID   string
+	Bandwidth    uint
+	BwUnit       string
+	SVlanID      uint
+	CosName      string
 
 	SrcLocationID string
 	DstLocationID string
@@ -112,6 +111,7 @@ type FindParams struct {
 	RspQuoteList []*quomod.QuoteFind
 	RspOrderList []*ordmod.ProductOrderSummary
 	RspInvList   []*invmod.ProductSummary
+	RspOfferList []*offer.ProductOffering
 }
 
 type GetParams struct {
@@ -122,4 +122,5 @@ type GetParams struct {
 	RspQuote *quomod.Quote
 	RspOrder *ordmod.ProductOrder
 	RspInv   *invmod.Product
+	RspOffer *offer.ProductOffering
 }
