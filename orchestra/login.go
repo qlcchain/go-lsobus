@@ -21,7 +21,7 @@ type LoginResponse struct {
 	Data string `json:"data"`
 }
 
-func (o *Orchestra) updateApiToken() {
+func (o *Orchestra) TryUpdateApiToken() {
 	reqParams := &LoginParams{Username: "yuangui.wen@qlink.mobi", Password: "Wyg12345"}
 	err := o.ExecAuthLogin(reqParams)
 	if err == nil {
@@ -34,10 +34,20 @@ func (o *Orchestra) updateApiToken() {
 
 func (o *Orchestra) GetApiToken() string {
 	if o.apiToken == "" {
-		o.updateApiToken()
+		o.TryUpdateApiToken()
 	}
 
 	return o.apiToken
+}
+
+func (o *Orchestra) RenewApiToken() string {
+	o.apiToken = ""
+	o.TryUpdateApiToken()
+	return o.apiToken
+}
+
+func (o *Orchestra) ClearApiToken() {
+	o.apiToken = ""
 }
 
 func (o *Orchestra) ExecAuthLogin(params *LoginParams) error {

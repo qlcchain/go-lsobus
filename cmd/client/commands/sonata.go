@@ -54,6 +54,9 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("dstUniID", "", "Destination UNI ID of connection")
 	cmd.Flags().UintSlice("dstVlanID", nil, "Destination CE VLAN IDs of UNI")
 
+	cmd.Flags().String("srcLocationID", "", "Source location ID of connection")
+	cmd.Flags().String("dstLocationID", "", "Destination location ID of connection")
+
 	// ELine
 	cmd.Flags().Uint("bandwidth", 0, "Bandwidth of connection, Unit is Mbps")
 	cmd.Flags().String("cosName", "", "class of service name")
@@ -194,6 +197,16 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		lineItem := &orchestra.ELineItemParams{}
 		lineItem.Action = itemAction
 		lineItem.ProductID = productID
+
+		lineItem.SrcLocationID, err = cmd.Flags().GetString("srcLocationID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.DstLocationID, err = cmd.Flags().GetString("dstLocationID")
+		if err != nil {
+			return err
+		}
 
 		lineItem.SrcPortID, err = cmd.Flags().GetString("srcUniID")
 		if err != nil {

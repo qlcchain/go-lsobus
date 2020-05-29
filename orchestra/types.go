@@ -86,7 +86,6 @@ type OrderParams struct {
 
 	BillingType string
 	PaymentType string
-	QuoteID     string
 
 	RspPoq   *poqmod.ProductOfferingQualification
 	RspQuote *quomod.Quote

@@ -61,6 +61,9 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
+		if _, ok := err.(*invapi.ProductFindUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 
@@ -81,6 +84,9 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateInvGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
+		if _, ok := err.(*invapi.ProductGetUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 

@@ -45,6 +45,9 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
+		if _, ok := err.(*quoapi.QuoteCreateUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 
@@ -80,6 +83,9 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
+		if _, ok := err.(*quoapi.QuoteFindUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 
@@ -100,6 +106,9 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateQuoteGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
+		if _, ok := err.(*quoapi.QuoteGetUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 

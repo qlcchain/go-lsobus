@@ -83,6 +83,14 @@ func (s *sonataBaseImpl) GetApiToken() string {
 	return s.Orch.GetApiToken()
 }
 
+func (s *sonataBaseImpl) RenewApiToken() string {
+	return s.Orch.RenewApiToken()
+}
+
+func (s *sonataBaseImpl) ClearApiToken() {
+	s.Orch.ClearApiToken()
+}
+
 func (s *sonataBaseImpl) NewHttpTransport(basePath string) *httptransport.Runtime {
 	httpTran := httptransport.New(s.GetHost(), basePath, []string{s.GetScheme()})
 	httpTran.DefaultAuthentication = httptransport.BearerToken(s.GetApiToken())
