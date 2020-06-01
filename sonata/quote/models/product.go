@@ -28,12 +28,12 @@ type Product struct {
 
 	// Unique identifier of the product
 	// Required: true
-	ID *string `json:"id"`
+	ID *string `json:"id,omitempty"`
 
 	placeField []RelatedPlaceRefOrValue
 
 	// product relationship
-	ProductRelationship []*ProductRelationship `json:"productRelationship"`
+	ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 	// product specification
 	ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
@@ -54,11 +54,11 @@ func (m *Product) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		Href string `json:"href,omitempty"`
 
-		ID *string `json:"id"`
+		ID *string `json:"id,omitempty"`
 
-		Place json.RawMessage `json:"place"`
+		Place json.RawMessage `json:"place,omitempty"`
 
-		ProductRelationship []*ProductRelationship `json:"productRelationship"`
+		ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}
@@ -108,9 +108,9 @@ func (m Product) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		Href string `json:"href,omitempty"`
 
-		ID *string `json:"id"`
+		ID *string `json:"id,omitempty"`
 
-		ProductRelationship []*ProductRelationship `json:"productRelationship"`
+		ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}{
@@ -127,7 +127,7 @@ func (m Product) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		Place []RelatedPlaceRefOrValue `json:"place"`
+		Place []RelatedPlaceRefOrValue `json:"place,omitempty"`
 	}{
 
 		Place: m.placeField,

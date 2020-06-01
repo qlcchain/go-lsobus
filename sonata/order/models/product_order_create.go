@@ -37,21 +37,21 @@ type ProductOrderCreate struct {
 	// Date when the order was submitted by the Buyer to the Seller
 	// Required: true
 	// Format: date-time
-	BuyerRequestDate *strfmt.DateTime `json:"buyerRequestDate"`
+	BuyerRequestDate *strfmt.DateTime `json:"buyerRequestDate,omitempty"`
 
 	// desired response
 	// Required: true
-	DesiredResponse DesiredOrderResponses `json:"desiredResponse"`
+	DesiredResponse DesiredOrderResponses `json:"desiredResponse,omitempty"`
 
 	// Indicates that expedited treatment is requested and any charges generated in provisioning this request (e.g., additional engineering charges or labor charges if applicable) will be accepted by the buyer.
 	ExpeditePriority bool `json:"expeditePriority,omitempty"`
 
 	// Buyer Purchase Order Number: A number that uniquely identifies an order within the Buyer's enterprise
 	// Required: true
-	ExternalID *string `json:"externalId"`
+	ExternalID *string `json:"externalId,omitempty"`
 
 	// note
-	Note []*Note `json:"note"`
+	Note []*Note `json:"note,omitempty"`
 
 	// order activity
 	// Required: true
@@ -64,7 +64,7 @@ type ProductOrderCreate struct {
 
 	// Buyer Order Version: The version number that the Buyer uses to refer to this particular version of the order.
 	// Required: true
-	OrderVersion *string `json:"orderVersion"`
+	OrderVersion *string `json:"orderVersion,omitempty"`
 
 	// Payment type.
 	PaymentType string `json:"paymentType,omitempty"`
@@ -89,12 +89,12 @@ type ProductOrderCreate struct {
 
 	// related party
 	// Required: true
-	RelatedParty []*RelatedParty `json:"relatedParty"`
+	RelatedParty []*RelatedParty `json:"relatedParty,omitempty"`
 
 	// Identifies the Buyer's desired due date (requested delivery date)
 	// Required: true
 	// Format: date-time
-	RequestedCompletionDate *strfmt.DateTime `json:"requestedCompletionDate"`
+	RequestedCompletionDate *strfmt.DateTime `json:"requestedCompletionDate,omitempty"`
 
 	// If specified, identifies the Buyer's desired date for order processing to start
 	// Format: date-time

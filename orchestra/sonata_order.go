@@ -47,6 +47,9 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
+		if _, ok := err.(*ordapi.ProductOrderCreateUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -82,6 +85,9 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateOrderFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
+		if _, ok := err.(*ordapi.ProductOrderFindUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 
@@ -102,6 +108,9 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
+		if _, ok := err.(*ordapi.ProductOrderGetUnauthorized); ok {
+			s.ClearApiToken()
+		}
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))

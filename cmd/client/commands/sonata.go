@@ -31,6 +31,7 @@ var sonataCmd = &cobra.Command{
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	// Common
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
@@ -43,8 +44,10 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Int64("endTime", 0, "End time, (unix seconds)")
 
 	// UNI
+	cmd.Flags().String("srcUniName", "", "Name of source port")
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
 	cmd.Flags().Uint("srcPortSpeed", 1000, "Source Port speed, Unit is Mbps")
+	cmd.Flags().String("dstUniName", "", "Name of source port")
 	cmd.Flags().String("dstSiteID", "", "Destination Port geographic site ID")
 	cmd.Flags().Uint("dstPortSpeed", 1000, "Destination Port speed, Unit is Mbps")
 
@@ -54,7 +57,11 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("dstUniID", "", "Destination UNI ID of connection")
 	cmd.Flags().UintSlice("dstVlanID", nil, "Destination CE VLAN IDs of UNI")
 
+	cmd.Flags().String("srcLocationID", "", "Source location ID of connection")
+	cmd.Flags().String("dstLocationID", "", "Destination location ID of connection")
+
 	// ELine
+	cmd.Flags().String("name", "", "Name of service")
 	cmd.Flags().Uint("bandwidth", 0, "Bandwidth of connection, Unit is Mbps")
 	cmd.Flags().String("cosName", "", "class of service name")
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
@@ -68,6 +75,7 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 
 func addFlagsForFindParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
@@ -77,6 +85,7 @@ func addFlagsForFindParams(cmd *cobra.Command) {
 
 func addFlagsForGetParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	cmd.Flags().String("id", "", "ID of site/quote/order")
 }
@@ -117,6 +126,12 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		uniItem.Action = itemAction
 		uniItem.ProductID = productID
 		uniItem.SiteID = srcSiteID
+
+		uniItem.Name, err = cmd.Flags().GetString("srcUniName")
+		if err != nil {
+			return err
+		}
+
 		uniItem.PortSpeed, err = cmd.Flags().GetUint("srcPortSpeed")
 		if err != nil {
 			return err
@@ -152,6 +167,12 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		uniItem.Action = itemAction
 		uniItem.ProductID = productID
 		uniItem.SiteID = dstSiteID
+
+		uniItem.Name, err = cmd.Flags().GetString("dstUniName")
+		if err != nil {
+			return err
+		}
+
 		uniItem.PortSpeed, err = cmd.Flags().GetUint("dstPortSpeed")
 		if err != nil {
 			return err
@@ -194,6 +215,21 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		lineItem := &orchestra.ELineItemParams{}
 		lineItem.Action = itemAction
 		lineItem.ProductID = productID
+
+		lineItem.Name, err = cmd.Flags().GetString("name")
+		if err != nil {
+			return err
+		}
+
+		lineItem.SrcLocationID, err = cmd.Flags().GetString("srcLocationID")
+		if err != nil {
+			return err
+		}
+
+		lineItem.DstLocationID, err = cmd.Flags().GetString("dstLocationID")
+		if err != nil {
+			return err
+		}
 
 		lineItem.SrcPortID, err = cmd.Flags().GetString("srcUniID")
 		if err != nil {
@@ -334,6 +370,11 @@ func getOrchestraInstance(cmd *cobra.Command) (*orchestra.Orchestra, error) {
 		fakeMode, err := cmd.Flags().GetBool("fakeMode")
 		if err == nil {
 			o.SetFakeMode(fakeMode)
+		}
+
+		apiToken, err := cmd.Flags().GetString("apiToken")
+		if err == nil {
+			o.SetApiToken(apiToken)
 		}
 	}
 

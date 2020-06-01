@@ -34,7 +34,7 @@ type QuoteItemCreate struct {
 	ID *string `json:"id"`
 
 	// note
-	Note []*Note `json:"note"`
+	Note []*Note `json:"note,omitempty"`
 
 	// product
 	Product *Product `json:"product,omitempty"`
@@ -46,13 +46,13 @@ type QuoteItemCreate struct {
 	Qualification *ProductOfferingQualificationRef `json:"qualification,omitempty"`
 
 	// quote item price
-	QuoteItemPrice []*QuotePrice `json:"quoteItemPrice"`
+	QuoteItemPrice []*QuotePrice `json:"quoteItemPrice,omitempty"`
 
 	// quote item relationship
-	QuoteItemRelationship []*QuoteItemRelationship `json:"quoteItemRelationship"`
+	QuoteItemRelationship []*QuoteItemRelationship `json:"quoteItemRelationship,omitempty"`
 
 	// related party
-	RelatedParty []*RelatedParty `json:"relatedParty"`
+	RelatedParty []*RelatedParty `json:"relatedParty,omitempty"`
 
 	// requested quote item term
 	RequestedQuoteItemTerm *ItemTerm `json:"requestedQuoteItemTerm,omitempty"`

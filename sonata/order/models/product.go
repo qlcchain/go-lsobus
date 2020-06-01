@@ -34,7 +34,7 @@ type Product struct {
 	placeField []RelatedPlaceReforValue
 
 	// product relationship
-	ProductRelationship []*ProductRelationship `json:"productRelationship"`
+	ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 	// product specification
 	ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
@@ -59,9 +59,9 @@ func (m *Product) UnmarshalJSON(raw []byte) error {
 
 		ID string `json:"id,omitempty"`
 
-		Place json.RawMessage `json:"place"`
+		Place json.RawMessage `json:"place,omitempty"`
 
-		ProductRelationship []*ProductRelationship `json:"productRelationship"`
+		ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}
@@ -118,7 +118,7 @@ func (m Product) MarshalJSON() ([]byte, error) {
 
 		ID string `json:"id,omitempty"`
 
-		ProductRelationship []*ProductRelationship `json:"productRelationship"`
+		ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 		ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 	}{
@@ -137,7 +137,7 @@ func (m Product) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		Place []RelatedPlaceReforValue `json:"place"`
+		Place []RelatedPlaceReforValue `json:"place,omitempty"`
 	}{
 
 		Place: m.placeField,

@@ -83,6 +83,14 @@ func (s *sonataBaseImpl) GetApiToken() string {
 	return s.Orch.GetApiToken()
 }
 
+func (s *sonataBaseImpl) RenewApiToken() string {
+	return s.Orch.RenewApiToken()
+}
+
+func (s *sonataBaseImpl) ClearApiToken() {
+	s.Orch.ClearApiToken()
+}
+
 func (s *sonataBaseImpl) NewHttpTransport(basePath string) *httptransport.Runtime {
 	httpTran := httptransport.New(s.GetHost(), basePath, []string{s.GetScheme()})
 	httpTran.DefaultAuthentication = httptransport.BearerToken(s.GetApiToken())
@@ -134,6 +142,8 @@ func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *ELineItemParams) *cmnm
 	//lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineSpec.SetAtType("PCCWConnSpec")
 
+	//lineSpec.Type = "ELINE"
+	lineSpec.Name = params.Name
 	lineSpec.ClassOfService = params.CosName
 	lineSpec.Bandwidth = int32(params.Bandwidth)
 	lineSpec.SrcPortID = params.SrcPortID

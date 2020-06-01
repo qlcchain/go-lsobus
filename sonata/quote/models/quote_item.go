@@ -45,6 +45,9 @@ type QuoteItem struct {
 	// qualification
 	Qualification []*ProductOfferingQualificationRef `json:"qualification"`
 
+	// pre-calculated price
+	PreCalculatedPrice *QuotePrice `json:"preCalculatedPrice,omitempty"`
+
 	// quote item price
 	QuoteItemPrice []*QuotePrice `json:"quoteItemPrice"`
 
