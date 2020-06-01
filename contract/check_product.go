@@ -55,17 +55,17 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 		for _, v := range products {
 			cs.logger.Infof("productId is %s,item id is %s", v.productID, v.buyerProductID)
 			pi := &abi.DoDSettleProductItem{
-				ProductId: v.productID,
-				ItemId:    v.buyerProductID,
+				ProductId:      v.productID,
+				BuyerProductId: v.buyerProductID,
 			}
 			ProductIds = append(ProductIds, pi)
 		}
 	} else {
 		for _, v := range orderInfo.Connections {
-			cs.logger.Infof("productId is %s,item id is %s", v.ProductId, v.ItemId)
+			cs.logger.Infof("productId is %s,buyerProductId id is %s", v.ProductId, v.BuyerProductId)
 			pi := &abi.DoDSettleProductItem{
-				ProductId: v.ProductId,
-				ItemId:    v.ItemId,
+				ProductId:      v.ProductId,
+				BuyerProductId: v.BuyerProductId,
 			}
 			ProductIds = append(ProductIds, pi)
 		}

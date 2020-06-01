@@ -35,12 +35,12 @@ func (cs *ContractService) processDoDContract() {
 	}
 	for _, v := range dod {
 		cs.logger.Infof("find a dod settlement need sign,request hash is %s", v.Hash.String())
-		if v.Order.OrderType == abi.DoDSettleOrderTypeCreate || v.Order.OrderType == abi.DoDSettleOrderTypeChange {
-			b := cs.verifyOrderInfoFromSonata(v.Order)
-			if !b {
-				continue
-			}
+		//		if v.Order.OrderType == abi.DoDSettleOrderTypeCreate || v.Order.OrderType == abi.DoDSettleOrderTypeChange {
+		b := cs.verifyOrderInfoFromSonata(v.Order)
+		if !b {
+			continue
 		}
+		//		}
 		action, err := abi.ParseDoDSettleResponseAction("confirm")
 		if err != nil {
 			cs.logger.Error(err)
@@ -89,45 +89,37 @@ func (cs *ContractService) processDoDContract() {
 
 // use quoteId call sonata api to verify order info
 func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderInfo) bool {
-	op := &orchestra.GetParams{
-		ID: order.QuoteId,
-	}
-
-	err := cs.orchestra.ExecQuoteGet(op)
-	if err != nil {
-		cs.logger.Error(err)
-		return false
-	}
-	if op.RspQuote == nil {
-		cs.logger.Errorf("order information verify fail, empty quote response")
-		return false
-	}
-
-	if len(op.RspQuote.QuoteItem) != len(order.Connections) {
-		cs.logger.Errorf("order information verify fail, item count not equal")
-		return false
-	}
-
 	for idx := 0; idx < len(order.Connections); idx++ {
 		var quote *qm.QuoteItem
 		conn := order.Connections[idx]
+		op := &orchestra.GetParams{
+			ID: conn.QuoteId,
+		}
+
+		err := cs.orchestra.ExecQuoteGet(op)
+		if err != nil {
+			cs.logger.Error(err)
+			return false
+		}
+		if op.RspQuote == nil {
+			cs.logger.Errorf("order information verify fail, empty quote response")
+			return false
+		}
+
+		if len(op.RspQuote.QuoteItem) != len(order.Connections) {
+			cs.logger.Errorf("order information verify fail, item count not equal")
+			return false
+		}
+
 		for _, v := range op.RspQuote.QuoteItem {
 			if *v.ID == conn.QuoteItemId {
 				quote = v
 			}
 		}
 		if quote != nil {
-			//if len(quote.QuoteItemPrice) == 0 {
-			//	cs.logger.Errorf("order information verify fail, empty price")
-			//	return false
-			//}
-			//quotePrice := quote.QuoteItemPrice[0]
-			//if quotePrice.Price == nil || quotePrice.Price.PreTaxAmount == nil {
-			//	cs.logger.Errorf("order information verify fail, invalid price")
-			//	return false
-			//}
 			if quote.State != qm.QuoteItemStateTypeREADY {
 				cs.logger.Error("order information verify fail")
+				return false
 			}
 		} else {
 			cs.logger.Errorf("order information verify fail,can not find quote item id %s", conn.QuoteItemId)
