@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -46,8 +47,14 @@ func addDSTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 		Usage: "productId (separate by comma)",
 		Value: "",
 	}
+	price := util.Flag{
+		Name:  "price",
+		Must:  true,
+		Usage: "price",
+		Value: "",
+	}
 
-	args := []util.Flag{buyerAddress, buyerName, sellerAddress, sellerName, productId}
+	args := []util.Flag{buyerAddress, buyerName, sellerAddress, sellerName, productId, price}
 	cmd := &ishell.Cmd{
 		Name:                "terminateOrder",
 		Help:                "create a terminate order request",
@@ -67,8 +74,9 @@ func addDSTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 			sellerAddressP := util.StringVar(c.Args, sellerAddress)
 			sellerNameP := util.StringVar(c.Args, sellerName)
 			productIdP := util.StringVar(c.Args, productId)
+			priceP := util.StringVar(c.Args, price)
 
-			if err := DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP); err != nil {
+			if err := DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP, priceP); err != nil {
 				util.Warn(err)
 				return
 			}
@@ -77,7 +85,7 @@ func addDSTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
 	parentCmd.AddCmd(cmd)
 }
 
-func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP string) error {
+func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, productIdP string, priceP string) error {
 	cn, err := grpc.Dial(endpointP, grpc.WithInsecure())
 	if err != nil {
 		fmt.Println(err)
@@ -99,7 +107,10 @@ func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, pr
 	if err != nil {
 		return err
 	}
-
+	price, err := strconv.ParseFloat(priceP, 64)
+	if err != nil {
+		return err
+	}
 	param := &pb.TerminateOrderParam{
 		Buyer: &pb.User{
 			Address: acc.Address().String(),
@@ -109,9 +120,23 @@ func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, pr
 			Address: sellerAddress.String(),
 			Name:    sellerNameP,
 		},
-		ProductId: strings.Split(productIdP, ","),
+		TerminateConnectionParam: make([]*pb.TerminateConnectionParam, 0),
 	}
+	pids := strings.Split(productIdP, ",")
+	for _, productId := range pids {
+		var conn *pb.TerminateConnectionParam
 
+		conn = &pb.TerminateConnectionParam{
+			DynamicParam: &pb.ConnectionDynamicParam{
+				Price:       float32(price),
+				Currency:    "USD",
+				QuoteId:     "1",
+				QuoteItemId: "1",
+			},
+		}
+		conn.ProductId = productId
+		param.TerminateConnectionParam = append(param.TerminateConnectionParam, conn)
+	}
 	c := pb.NewOrderAPIClient(cn)
 	internalId, err := c.TerminateOrder(context.Background(), param)
 	if err != nil {

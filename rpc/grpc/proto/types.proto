@@ -27,32 +27,37 @@ message User {
 
 message ConnectionStaticParam {
   string itemId = 1;
-  string productId = 2;
-  string srcCompanyName = 3;
-  string srcRegion = 4;
-  string srcCity = 5;
-  string srcDataCenter = 6;
-  string srcPort = 7;
-  string dstCompanyName = 8;
-  string dstRegion = 9;
-  string dstCity = 10;
-  string dstDataCenter = 11;
-  string dstPort = 12;
+  string buyerProductId = 2;
+  string productId = 3;
+  string srcCompanyName = 4;
+  string srcRegion = 5;
+  string srcCity = 6;
+  string srcDataCenter = 7;
+  string srcPort = 8;
+  string dstCompanyName = 9;
+  string dstRegion = 10;
+  string dstCity = 11;
+  string dstDataCenter = 12;
+  string dstPort = 13;
 }
 
 message ConnectionDynamicParam {
   string orderId = 1;
-  string quoteItemId =2;
-  string connectionName = 3;
-  string paymentType = 4;
-  string billingType = 5;
-  string currency = 6;
-  string serviceClass = 7;
-  string bandwidth = 8;
-  string billingUnit = 9;
-  float price = 10;
-  int64 startTime = 11;
-  int64 endTime = 12;
+  string quoteId = 2;
+  string quoteItemId =3;
+  string connectionName = 4;
+  string paymentType = 5;
+  string billingType = 6;
+  string currency = 7;
+  string serviceClass = 8;
+  string bandwidth = 9;
+  string billingUnit = 10;
+  float price = 11;
+  float Addition = 12;
+  int64 startTime = 13;
+  string startTimeStr = 14;
+  int64 endTime = 15;
+  string endTimeStrTimeStr = 16;
 }
 
 message ConnectionParam {
@@ -64,8 +69,7 @@ message CreateOrderParam {
   ContractPrivacyParam privacy = 1;
   User buyer = 2;
   User seller = 3;
-  string quoteId = 4;
-  repeated ConnectionParam connectionParam = 5;
+  repeated ConnectionParam connectionParam = 4;
 }
 
 message OrderId {
@@ -103,23 +107,26 @@ message ContractPrivacyParam {
 
 message ChangeConnectionParam {
   string productId = 1;
-  string quoteItemId = 2;
-  ConnectionDynamicParam dynamicParam = 3;
+  ConnectionDynamicParam dynamicParam = 2;
 }
 
 message ChangeOrderParam {
   ContractPrivacyParam privacy = 1;
   User buyer = 2;
   User seller = 3;
-  string quoteId = 4;
-  repeated ChangeConnectionParam changeConnectionParam = 5;
+  repeated ChangeConnectionParam changeConnectionParam = 4;
+}
+
+message TerminateConnectionParam {
+  string productId = 1;
+  ConnectionDynamicParam dynamicParam = 2;
 }
 
 message TerminateOrderParam {
   ContractPrivacyParam privacy = 1;
   User buyer = 2;
   User seller = 3;
-  repeated string productId = 4;
+  repeated TerminateConnectionParam terminateConnectionParam = 4;
 }
 
 service OrderAPI{

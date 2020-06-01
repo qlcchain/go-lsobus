@@ -106,11 +106,11 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			CosName:       v.ServiceClass.String(),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams:  billingParams,
-				BuyerProductID: v.ItemId,
+				BuyerProductID: v.BuyerProductId,
 			},
 		}
 		eLine.Name = v.ConnectionName
-		eLine.QuoteID = orderInfo.QuoteId
+		eLine.QuoteID = v.QuoteId
 		eLine.QuoteItemID = v.QuoteItemId
 		eLine.Action = itemAction
 		eLines = append(eLines, eLine)

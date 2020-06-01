@@ -68,6 +68,8 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByIn
 	for _, v := range orderInfo.Connections {
 		conn := &proto.ConnectionParam{
 			StaticParam: &proto.ConnectionStaticParam{
+				ItemId:         v.ItemId,
+				BuyerProductId: v.BuyerProductId,
 				ProductId:      v.ProductId,
 				SrcCompanyName: v.SrcCompanyName,
 				SrcRegion:      v.SrcRegion,
@@ -81,16 +83,22 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByIn
 				DstPort:        v.DstPort,
 			},
 			DynamicParam: &proto.ConnectionDynamicParam{
+				OrderId:        v.OrderId,
+				QuoteId:        v.QuoteId,
+				QuoteItemId:    v.QuoteItemId,
 				ConnectionName: v.ConnectionName,
 				Bandwidth:      v.Bandwidth,
 				//BillingUnit:    v.BillingUnit.String(),
-				Price: float32(v.Price),
+				Price:    float32(v.Price),
+				Addition: float32(v.Addition),
 				//ServiceClass:   v.ServiceClass.String(),
 				//PaymentType:    v.PaymentType.String(),
 				//BillingType:    v.BillingType.String(),
-				Currency:  v.Currency,
-				StartTime: v.StartTime,
-				EndTime:   v.EndTime,
+				Currency:          v.Currency,
+				StartTime:         v.StartTime,
+				StartTimeStr:      v.StartTimeStr,
+				EndTime:           v.EndTime,
+				EndTimeStrTimeStr: v.EndTimeStr,
 			},
 		}
 		if v.BillingUnit.String() != "null" {
