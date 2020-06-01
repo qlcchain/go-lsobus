@@ -10,37 +10,41 @@ import (
 )
 
 func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
-	addr := cs.account.Address().String()
-	if addr == param.Buyer.Address {
-		op, err := cs.convertProtoToChangeOrderParam(param)
-		if err != nil {
-			return "", err
-		}
-		block := new(types.StateBlock)
-		err = cs.client.Call(&block, "DoDSettlement_getChangeOrderBlock", op)
-		if err != nil {
-			return "", err
-		}
+	if cs.chainReady {
+		addr := cs.account.Address().String()
+		if addr == param.Buyer.Address {
+			op, err := cs.convertProtoToChangeOrderParam(param)
+			if err != nil {
+				return "", err
+			}
+			block := new(types.StateBlock)
+			err = cs.client.Call(&block, "DoDSettlement_getChangeOrderBlock", op)
+			if err != nil {
+				return "", err
+			}
 
-		var w types.Work
-		worker, _ := types.NewWorker(w, block.Root())
-		block.Work = worker.NewWork()
+			var w types.Work
+			worker, _ := types.NewWorker(w, block.Root())
+			block.Work = worker.NewWork()
 
-		hash := block.GetHash()
-		block.Signature = cs.account.Sign(hash)
-		var h types.Hash
-		err = cs.client.Call(&h, "ledger_process", &block)
-		if err != nil {
-			return "", err
+			hash := block.GetHash()
+			block.Signature = cs.account.Sign(hash)
+			var h types.Hash
+			err = cs.client.Call(&h, "ledger_process", &block)
+			if err != nil {
+				return "", err
+			}
+			cs.logger.Infof("process hash %s success", h.String())
+			internalId := block.Previous.String()
+			cs.orderIdOnChain.Store(internalId, "")
+			return internalId, nil
+		} else {
+			cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
 		}
-		cs.logger.Infof("process hash %s success", h.String())
-		internalId := block.Previous.String()
-		cs.orderIdOnChain.Store(internalId, "")
-		return internalId, nil
+		return "", errors.New("buyer address not match")
 	} else {
-		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
+		return "", errors.New("chain is not ready")
 	}
-	return "", errors.New("buyer address not match")
 }
 
 func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*abi.DoDSettleChangeOrderParam, error) {
@@ -55,15 +59,18 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
-	op.QuoteId = param.QuoteId
 	for _, v := range param.ChangeConnectionParam {
 		conn := new(abi.DoDSettleChangeConnectionParam)
+		if len(v.DynamicParam.QuoteId) == 0 {
+			return nil, errors.New("quote id can not be nil")
+		}
+		conn.QuoteId = v.DynamicParam.QuoteId
 		if len(v.ProductId) == 0 {
 			return nil, errors.New("product id can not be nil")
 		}
 		conn.ProductId = v.ProductId
-		if len(v.QuoteItemId) != 0 {
-			conn.QuoteItemId = v.QuoteItemId
+		if len(v.DynamicParam.QuoteItemId) != 0 {
+			conn.QuoteItemId = v.DynamicParam.QuoteItemId
 		}
 
 		if len(v.DynamicParam.PaymentType) != 0 {
@@ -108,11 +115,20 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		if v.DynamicParam.StartTime != 0 {
 			conn.StartTime = v.DynamicParam.StartTime
 		}
+		if len(v.DynamicParam.StartTimeStr) != 0 {
+			conn.StartTimeStr = v.DynamicParam.StartTimeStr
+		}
 		if v.DynamicParam.EndTime != 0 {
 			conn.EndTime = v.DynamicParam.EndTime
 		}
+		if len(v.DynamicParam.EndTimeStrTimeStr) != 0 {
+			conn.EndTimeStr = v.DynamicParam.EndTimeStrTimeStr
+		}
 		if v.DynamicParam.Price != 0 {
 			conn.Price = float64(v.DynamicParam.Price)
+		}
+		if v.DynamicParam.Addition != 0 {
+			conn.Addition = float64(v.DynamicParam.Addition)
 		}
 		op.Connections = append(op.Connections, conn)
 	}

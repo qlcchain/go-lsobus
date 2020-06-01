@@ -194,7 +194,6 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 			Address: sellerAddress.String(),
 			Name:    sellerNameP,
 		},
-		QuoteId:               quoteIdP,
 		ChangeConnectionParam: make([]*pb.ChangeConnectionParam, 0),
 	}
 
@@ -214,16 +213,17 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 		} else {
 			conn = &pb.ChangeConnectionParam{
 				DynamicParam: &pb.ConnectionDynamicParam{
-					Bandwidth: bandwidthP,
-					StartTime: startTime,
-					EndTime:   endTime,
-					Price:     float32(price),
+					QuoteId:     quoteIdP,
+					QuoteItemId: "1",
+					Bandwidth:   bandwidthP,
+					StartTime:   startTime,
+					EndTime:     endTime,
+					Price:       float32(price),
 				},
 			}
 		}
 
 		conn.ProductId = productId
-		conn.QuoteItemId = "1"
 		param.ChangeConnectionParam = append(param.ChangeConnectionParam, conn)
 	}
 	c := pb.NewOrderAPIClient(cn)

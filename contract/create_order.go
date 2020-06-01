@@ -10,37 +10,41 @@ import (
 )
 
 func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (string, error) {
-	addr := cs.account.Address().String()
-	if addr == param.Buyer.Address {
-		op, err := cs.convertProtoToCreateOrderParam(param)
-		if err != nil {
-			return "", err
-		}
-		block := new(types.StateBlock)
-		err = cs.client.Call(&block, "DoDSettlement_getCreateOrderBlock", op)
-		if err != nil {
-			return "", err
-		}
+	if cs.chainReady {
+		addr := cs.account.Address().String()
+		if addr == param.Buyer.Address {
+			op, err := cs.convertProtoToCreateOrderParam(param)
+			if err != nil {
+				return "", err
+			}
+			block := new(types.StateBlock)
+			err = cs.client.Call(&block, "DoDSettlement_getCreateOrderBlock", op)
+			if err != nil {
+				return "", err
+			}
 
-		var w types.Work
-		worker, _ := types.NewWorker(w, block.Root())
-		block.Work = worker.NewWork()
+			var w types.Work
+			worker, _ := types.NewWorker(w, block.Root())
+			block.Work = worker.NewWork()
 
-		hash := block.GetHash()
-		block.Signature = cs.account.Sign(hash)
-		var h types.Hash
-		err = cs.client.Call(&h, "ledger_process", &block)
-		if err != nil {
-			return "", err
+			hash := block.GetHash()
+			block.Signature = cs.account.Sign(hash)
+			var h types.Hash
+			err = cs.client.Call(&h, "ledger_process", &block)
+			if err != nil {
+				return "", err
+			}
+			cs.logger.Infof("process hash %s success", h.String())
+			internalId := block.Previous.String()
+			cs.orderIdOnChain.Store(internalId, "")
+			return internalId, nil
+		} else {
+			cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
 		}
-		cs.logger.Infof("process hash %s success", h.String())
-		internalId := block.Previous.String()
-		cs.orderIdOnChain.Store(internalId, "")
-		return internalId, nil
+		return "", errors.New("buyer address not match")
 	} else {
-		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
+		return "", errors.New("chain is not ready")
 	}
-	return "", errors.New("buyer address not match")
 }
 
 func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*abi.DoDSettleCreateOrderParam, error) {
@@ -55,7 +59,6 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
-	op.QuoteId = param.QuoteId
 	for _, v := range param.ConnectionParam {
 		paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
 		if err != nil {
@@ -84,6 +87,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 			conn = &abi.DoDSettleConnectionParam{
 				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
 					ItemId:         v.StaticParam.ItemId,
+					BuyerProductId: v.StaticParam.BuyerProductId,
 					ProductId:      v.StaticParam.ProductId,
 					SrcCompanyName: v.StaticParam.SrcCompanyName,
 					SrcRegion:      v.StaticParam.SrcRegion,
@@ -98,6 +102,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				},
 				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
+					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,
 					ConnectionName: v.DynamicParam.ConnectionName,
 					Bandwidth:      v.DynamicParam.Bandwidth,
@@ -113,6 +118,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 			conn = &abi.DoDSettleConnectionParam{
 				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
 					ItemId:         v.StaticParam.ItemId,
+					BuyerProductId: v.StaticParam.BuyerProductId,
 					ProductId:      v.StaticParam.ProductId,
 					SrcCompanyName: v.StaticParam.SrcCompanyName,
 					SrcRegion:      v.StaticParam.SrcRegion,
@@ -127,16 +133,20 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				},
 				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
+					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,
 					ConnectionName: v.DynamicParam.ConnectionName,
 					Bandwidth:      v.DynamicParam.Bandwidth,
 					Price:          float64(v.DynamicParam.Price),
+					Addition:       float64(v.DynamicParam.Addition),
 					ServiceClass:   serviceClass,
 					PaymentType:    paymentType,
 					BillingType:    billingType,
 					Currency:       v.DynamicParam.Currency,
 					StartTime:      v.DynamicParam.StartTime,
+					StartTimeStr:   v.DynamicParam.StartTimeStr,
 					EndTime:        v.DynamicParam.EndTime,
+					EndTimeStr:     v.DynamicParam.EndTimeStrTimeStr,
 				},
 			}
 		}

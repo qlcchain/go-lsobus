@@ -212,7 +212,6 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			Address: sellerAddress.String(),
 			Name:    sellerNameP,
 		},
-		QuoteId:         quoteIdP,
 		ConnectionParam: make([]*pb.ConnectionParam, 0),
 	}
 
@@ -223,6 +222,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			conn = &pb.ConnectionParam{
 				StaticParam: &pb.ConnectionStaticParam{
 					ItemId:         quoteItemId,
+					BuyerProductId: quoteItemId,
 					SrcCompanyName: "CBC",
 					SrcRegion:      "CHN",
 					SrcCity:        "HK",
@@ -236,6 +236,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 				},
 				DynamicParam: &pb.ConnectionDynamicParam{
 					ConnectionName: fmt.Sprintf("connection%d", rand.Int()),
+					QuoteId:        quoteIdP,
 					QuoteItemId:    quoteItemId,
 					Bandwidth:      bandwidthP,
 					BillingUnit:    billingUnit.String(),
@@ -260,6 +261,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 			conn = &pb.ConnectionParam{
 				StaticParam: &pb.ConnectionStaticParam{
 					ItemId:         quoteItemId,
+					BuyerProductId: quoteItemId,
 					SrcCompanyName: "CBC",
 					SrcRegion:      "CHN",
 					SrcCity:        "HK",
@@ -273,6 +275,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 				},
 				DynamicParam: &pb.ConnectionDynamicParam{
 					ConnectionName: fmt.Sprintf("connection%d", rand.Int()),
+					QuoteId:        quoteItemId,
 					QuoteItemId:    quoteItemId,
 					Bandwidth:      bandwidthP,
 					Price:          float32(price),

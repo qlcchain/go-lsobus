@@ -1,10 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "API Virtual-LSOBus",
-    "version": "1.0.0"
+    "title": "types.proto",
+    "version": "version not set"
   },
-  "host": "127.0.0.1:9998",
   "schemes": [
     "http",
     "https"
@@ -142,9 +141,6 @@
         "productId": {
           "type": "string"
         },
-        "quoteItemId": {
-          "type": "string"
-        },
         "dynamicParam": {
           "$ref": "#/definitions/protoConnectionDynamicParam"
         }
@@ -162,9 +158,6 @@
         "seller": {
           "$ref": "#/definitions/protoUser"
         },
-        "quoteId": {
-          "type": "string"
-        },
         "changeConnectionParam": {
           "type": "array",
           "items": {
@@ -177,6 +170,9 @@
       "type": "object",
       "properties": {
         "orderId": {
+          "type": "string"
+        },
+        "quoteId": {
           "type": "string"
         },
         "quoteItemId": {
@@ -207,13 +203,23 @@
           "type": "number",
           "format": "float"
         },
+        "Addition": {
+          "type": "number",
+          "format": "float"
+        },
         "startTime": {
           "type": "string",
           "format": "int64"
         },
+        "startTimeStr": {
+          "type": "string"
+        },
         "endTime": {
           "type": "string",
           "format": "int64"
+        },
+        "endTimeStrTimeStr": {
+          "type": "string"
         }
       }
     },
@@ -232,6 +238,9 @@
       "type": "object",
       "properties": {
         "itemId": {
+          "type": "string"
+        },
+        "buyerProductId": {
           "type": "string"
         },
         "productId": {
@@ -297,9 +306,6 @@
         },
         "seller": {
           "$ref": "#/definitions/protoUser"
-        },
-        "quoteId": {
-          "type": "string"
         },
         "connectionParam": {
           "type": "array",
@@ -373,6 +379,17 @@
         }
       }
     },
+    "protoTerminateConnectionParam": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "dynamicParam": {
+          "$ref": "#/definitions/protoConnectionDynamicParam"
+        }
+      }
+    },
     "protoTerminateOrderParam": {
       "type": "object",
       "properties": {
@@ -385,10 +402,10 @@
         "seller": {
           "$ref": "#/definitions/protoUser"
         },
-        "productId": {
+        "terminateConnectionParam": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/protoTerminateConnectionParam"
           }
         }
       }
