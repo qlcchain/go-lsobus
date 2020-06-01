@@ -44,8 +44,10 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Int64("endTime", 0, "End time, (unix seconds)")
 
 	// UNI
+	cmd.Flags().String("srcUniName", "", "Name of source port")
 	cmd.Flags().String("srcSiteID", "", "Source Port geographic site ID")
 	cmd.Flags().Uint("srcPortSpeed", 1000, "Source Port speed, Unit is Mbps")
+	cmd.Flags().String("dstUniName", "", "Name of source port")
 	cmd.Flags().String("dstSiteID", "", "Destination Port geographic site ID")
 	cmd.Flags().Uint("dstPortSpeed", 1000, "Destination Port speed, Unit is Mbps")
 
@@ -59,6 +61,7 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().String("dstLocationID", "", "Destination location ID of connection")
 
 	// ELine
+	cmd.Flags().String("name", "", "Name of service")
 	cmd.Flags().Uint("bandwidth", 0, "Bandwidth of connection, Unit is Mbps")
 	cmd.Flags().String("cosName", "", "class of service name")
 	cmd.Flags().Uint("sVlanID", 0, "Service VLAN ID of connection")
@@ -123,6 +126,12 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		uniItem.Action = itemAction
 		uniItem.ProductID = productID
 		uniItem.SiteID = srcSiteID
+
+		uniItem.Name, err = cmd.Flags().GetString("srcUniName")
+		if err != nil {
+			return err
+		}
+
 		uniItem.PortSpeed, err = cmd.Flags().GetUint("srcPortSpeed")
 		if err != nil {
 			return err
@@ -158,6 +167,12 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		uniItem.Action = itemAction
 		uniItem.ProductID = productID
 		uniItem.SiteID = dstSiteID
+
+		uniItem.Name, err = cmd.Flags().GetString("dstUniName")
+		if err != nil {
+			return err
+		}
+
 		uniItem.PortSpeed, err = cmd.Flags().GetUint("dstPortSpeed")
 		if err != nil {
 			return err
@@ -200,6 +215,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		lineItem := &orchestra.ELineItemParams{}
 		lineItem.Action = itemAction
 		lineItem.ProductID = productID
+
+		lineItem.Name, err = cmd.Flags().GetString("name")
+		if err != nil {
+			return err
+		}
 
 		lineItem.SrcLocationID, err = cmd.Flags().GetString("srcLocationID")
 		if err != nil {

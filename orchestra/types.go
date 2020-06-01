@@ -32,6 +32,9 @@ type BillingParams struct {
 }
 
 type BaseItemParams struct {
+	Name        string
+	Description string
+
 	ItemID string
 	Action string
 
@@ -42,7 +45,6 @@ type BaseItemParams struct {
 	BuyerProductID string
 	QuoteID        string
 	QuoteItemID    string
-	Description    string
 
 	BillingParams *BillingParams
 }

@@ -23,7 +23,7 @@ type ProductOrderCreateReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *ProductOrderCreateReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 201:
+	case 200, 201:
 		result := NewProductOrderCreateCreated()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err

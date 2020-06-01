@@ -109,6 +109,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 				BuyerProductID: v.ItemId,
 			},
 		}
+		eLine.Name = v.ConnectionName
 		eLine.QuoteID = orderInfo.QuoteId
 		eLine.QuoteItemID = v.QuoteItemId
 		eLine.Action = itemAction

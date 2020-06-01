@@ -143,6 +143,7 @@ func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *ELineItemParams) *cmnm
 	lineSpec.SetAtType("PCCWConnSpec")
 
 	//lineSpec.Type = "ELINE"
+	lineSpec.Name = params.Name
 	lineSpec.ClassOfService = params.CosName
 	lineSpec.Bandwidth = int32(params.Bandwidth)
 	lineSpec.SrcPortID = params.SrcPortID
