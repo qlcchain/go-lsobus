@@ -31,6 +31,7 @@ var sonataCmd = &cobra.Command{
 
 func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	// Common
 	cmd.Flags().String("orderActivity", "install", "Type of order, (e.g., install, change, disconnect)")
@@ -71,6 +72,7 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 
 func addFlagsForFindParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
@@ -80,6 +82,7 @@ func addFlagsForFindParams(cmd *cobra.Command) {
 
 func addFlagsForGetParams(cmd *cobra.Command) {
 	cmd.Flags().Bool("fakeMode", false, "Fake mode")
+	cmd.Flags().String("apiToken", "", "API token")
 
 	cmd.Flags().String("id", "", "ID of site/quote/order")
 }
@@ -347,6 +350,11 @@ func getOrchestraInstance(cmd *cobra.Command) (*orchestra.Orchestra, error) {
 		fakeMode, err := cmd.Flags().GetBool("fakeMode")
 		if err == nil {
 			o.SetFakeMode(fakeMode)
+		}
+
+		apiToken, err := cmd.Flags().GetString("apiToken")
+		if err == nil {
+			o.SetApiToken(apiToken)
 		}
 	}
 

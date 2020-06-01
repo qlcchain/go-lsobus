@@ -38,10 +38,10 @@ type ProductOrderItemCreate struct {
 
 	// order item price
 	// Min Items: 1
-	OrderItemPrice []*OrderItemPrice `json:"orderItemPrice"`
+	OrderItemPrice []*OrderItemPrice `json:"orderItemPrice,omitempty"`
 
 	// order item relationship
-	OrderItemRelationship []*OrderItemRelationShip `json:"orderItemRelationship"`
+	OrderItemRelationship []*OrderItemRelationShip `json:"orderItemRelationship,omitempty"`
 
 	// pricing method
 	PricingMethod PricingMethod `json:"pricingMethod,omitempty"`
@@ -58,7 +58,7 @@ type ProductOrderItemCreate struct {
 
 	// product offering
 	// Required: true
-	ProductOffering *ProductOfferingRef `json:"productOffering"`
+	ProductOffering *ProductOfferingRef `json:"productOffering,omitempty"`
 
 	// qualification
 	Qualification *QualificationRef `json:"qualification,omitempty"`
@@ -66,8 +66,14 @@ type ProductOrderItemCreate struct {
 	// quote
 	Quote *QuoteRef `json:"quote,omitempty"`
 
+	// Identifier of then reference order
+	RefOrderId *QuoteRef `json:"refOrderId,omitempty"`
+
+	// Identifier of then reference order item
+	RefOrderItemId *QuoteRef `json:"refOrderItemId,omitempty"`
+
 	// related party
-	RelatedParty []*RelatedParty `json:"relatedParty"`
+	RelatedParty []*RelatedParty `json:"relatedParty,omitempty"`
 }
 
 // Validate validates this product order item create

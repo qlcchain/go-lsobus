@@ -22,7 +22,9 @@ type LoginResponse struct {
 }
 
 func (o *Orchestra) TryUpdateApiToken() {
-	reqParams := &LoginParams{Username: "yuangui.wen@qlink.mobi", Password: "Wyg12345"}
+	//reqParams := &LoginParams{Username: "yuangui.wen@qlink.mobi", Password: "Wyg12345"}
+	//reqParams := &LoginParams{Username: "wenyuangui@yeah.net", Password: "Qlc123456"}
+	reqParams := &LoginParams{Username: "quickwen@126.com", Password: "Qlc123456"}
 	err := o.ExecAuthLogin(reqParams)
 	if err == nil {
 		o.logger.Infof("update api token, got new token %s", reqParams.RspLogin.Data)
@@ -30,6 +32,10 @@ func (o *Orchestra) TryUpdateApiToken() {
 	} else {
 		o.logger.Errorf("ExecAuthLogin err %s", err)
 	}
+}
+
+func (o *Orchestra) SetApiToken(token string) {
+	o.apiToken = token
 }
 
 func (o *Orchestra) GetApiToken() string {
