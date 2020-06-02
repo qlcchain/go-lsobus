@@ -26,11 +26,11 @@ func setupTestCase(t *testing.T) func(t *testing.T) {
 func setupOrchestraConfig(o *Orchestra) {
 	o.cfg.Partners = nil
 	p1 := &config.PartnerCfg{
-		Name: "PCCW",
-		ID: "PCCW",
+		Name:      "PCCW",
+		ID:        "PCCW",
 		SonataUrl: "http://127.0.0.1:7777",
-		Username: "test",
-		Password: "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	o.cfg.Partners = append(o.cfg.Partners, p1)
 }
@@ -42,7 +42,7 @@ func setupOrderParams() *OrderParams {
 	}
 
 	uniItem := &UNIItemParams{
-		SiteID: "site111",
+		SiteID:    "site111",
 		PortSpeed: 1000,
 	}
 	uniItem.ProdOfferID = "offer111"

@@ -21,8 +21,8 @@ import (
 
 	invapi "github.com/qlcchain/go-lsobus/sonata/inventory/client/product"
 	invmod "github.com/qlcchain/go-lsobus/sonata/inventory/models"
-	ordapi "github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
 	offapi "github.com/qlcchain/go-lsobus/sonata/offer"
+	ordapi "github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
 	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
 	poqapi "github.com/qlcchain/go-lsobus/sonata/poq/client/product_offering_qualification"
 	poqmod "github.com/qlcchain/go-lsobus/sonata/poq/models"
