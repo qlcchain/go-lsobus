@@ -75,7 +75,11 @@ func (p *PartnerImpl) ExecAuthLogin(params *LoginParams) error {
 	p.logger.Debugf("send login, url %s, username %s", req.BaseURL, params.Username)
 
 	rsp, err := rest.Send(req)
-	if err != nil {
+	if p.GetFakeMode() {
+		rsp = &rest.Response{}
+		rsp.StatusCode = 200
+		rsp.Body = "{\"data\": \"12345678\"}"
+	} else if err != nil {
 		return err
 	}
 	if rsp.StatusCode != 200 {
