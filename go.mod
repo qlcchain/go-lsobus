@@ -10,6 +10,7 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cornelk/hashmap v1.0.1
 	github.com/fatih/color v1.9.0
+	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/gammazero/workerpool v0.0.0-20200108033143-79b2336fad7a
 	github.com/go-openapi/errors v0.19.4
 	github.com/go-openapi/runtime v0.19.15
@@ -19,8 +20,7 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0
-	github.com/qlcchain/go-qlc v1.3.3-0.20200530051651-cea6987fd2f5
-	github.com/qlcchain/jsonrpc2 v0.0.7
+	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200602063352-10054d398ff6
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.0.0
 	go.uber.org/atomic v1.6.0

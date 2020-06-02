@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qlcchain/go-qlc/common/types"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/common"
 	"github.com/qlcchain/go-lsobus/config"
@@ -277,8 +277,8 @@ func TestSerivceContext_ConfigManager(t *testing.T) {
 
 }
 
-func account() *types.Account {
-	seed, _ := types.NewSeed()
-	_, priv, _ := types.KeypairFromSeed(seed.String(), 0)
-	return types.NewAccount(priv)
+func account() *pkg.Account {
+	seed, _ := pkg.NewSeed()
+	_, priv, _ := pkg.KeypairFromSeed(seed.String(), 0)
+	return pkg.NewAccount(priv)
 }

@@ -7,15 +7,14 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"google.golang.org/grpc"
 
 	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
-	"github.com/qlcchain/go-qlc/common/types"
-
 	"github.com/qlcchain/go-lsobus/cmd/util"
 )
 
@@ -160,29 +159,29 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 		return err
 	}
 
-	acc := types.NewAccount(accBytes)
+	acc := pkg.NewAccount(accBytes)
 	if acc == nil {
 		return fmt.Errorf("account format err")
 	}
 
-	sellerAddress, err := types.HexToAddress(sellerAddressP)
+	sellerAddress, err := pkg.HexToAddress(sellerAddressP)
 	if err != nil {
 		return err
 	}
 
-	paymentType, err := abi.ParseDoDSettlePaymentType("invoice")
+	paymentType, err := qlcSdk.ParseDoDSettlePaymentType("invoice")
 	if err != nil {
 		return err
 	}
 
-	billingType, err := abi.ParseDoDSettleBillingType(billingTypeP)
+	billingType, err := qlcSdk.ParseDoDSettleBillingType(billingTypeP)
 	if err != nil {
 		return err
 	}
 
-	var billingUnit abi.DoDSettleBillingUnit
+	var billingUnit qlcSdk.DoDSettleBillingUnit
 	if len(billingUnitP) > 0 {
-		billingUnit, err = abi.ParseDoDSettleBillingUnit(billingUnitP)
+		billingUnit, err = qlcSdk.ParseDoDSettleBillingUnit(billingUnitP)
 		if err != nil {
 			return err
 		}
@@ -193,7 +192,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 		return err
 	}
 
-	serviceClass, err := abi.ParseDoDSettleServiceClass("gold")
+	serviceClass, err := qlcSdk.ParseDoDSettleServiceClass("gold")
 	if err != nil {
 		return err
 	}
@@ -218,7 +217,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 	var conn *pb.ConnectionParam
 	for i := 0; i < num; i++ {
 		quoteItemId := strconv.Itoa(1 + i)
-		if billingType == abi.DoDSettleBillingTypePAYG {
+		if billingType == qlcSdk.DoDSettleBillingTypePAYG {
 			conn = &pb.ConnectionParam{
 				StaticParam: &pb.ConnectionStaticParam{
 					ItemId:         quoteItemId,

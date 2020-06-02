@@ -9,14 +9,14 @@ import (
 	"syscall"
 	"time"
 
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"github.com/qlcchain/go-lsobus/common/util"
 
 	"github.com/qlcchain/go-lsobus/services"
 	ct "github.com/qlcchain/go-lsobus/services/context"
 
 	"github.com/spf13/cobra"
-
-	qlctypes "github.com/qlcchain/go-qlc/common/types"
 
 	"github.com/qlcchain/go-lsobus/log"
 )
@@ -52,7 +52,7 @@ func Execute() {
 }
 
 func start() error {
-	var account *qlctypes.Account
+	var account *pkg.Account
 	serviceContext := ct.NewServiceContext(cfgPathP)
 	cm, err := serviceContext.ConfigManager()
 	if err != nil {
@@ -74,7 +74,7 @@ func start() error {
 		if err != nil {
 			return err
 		}
-		account = qlctypes.NewAccount(bytes)
+		account = pkg.NewAccount(bytes)
 	} else {
 		return errors.New("must run with qlc account")
 	}

@@ -3,8 +3,9 @@ package contract
 import (
 	"errors"
 
-	"github.com/qlcchain/go-qlc/common/types"
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
@@ -17,27 +18,25 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 			if err != nil {
 				return "", err
 			}
-			block := new(types.StateBlock)
-			err = cs.client.Call(&block, "DoDSettlement_getChangeOrderBlock", op)
-			if err != nil {
+			if blk, err := cs.client.DoDSettlement.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+				return cs.account.Sign(hash), nil
+			}); err != nil {
 				return "", err
-			}
+			} else {
+				var w pkg.Work
+				worker, _ := pkg.NewWorker(w, blk.Root())
+				blk.Work = worker.NewWork()
 
-			var w types.Work
-			worker, _ := types.NewWorker(w, block.Root())
-			block.Work = worker.NewWork()
-
-			hash := block.GetHash()
-			block.Signature = cs.account.Sign(hash)
-			var h types.Hash
-			err = cs.client.Call(&h, "ledger_process", &block)
-			if err != nil {
-				return "", err
+				hash, err := cs.client.Ledger.Process(blk)
+				if err != nil {
+					cs.logger.Errorf("process block error: %s", err)
+					return "", err
+				}
+				cs.logger.Infof("process hash %s success", hash.String())
+				internalId := blk.Previous.String()
+				cs.orderIdOnChain.Store(internalId, "")
+				return internalId, nil
 			}
-			cs.logger.Infof("process hash %s success", h.String())
-			internalId := block.Previous.String()
-			cs.orderIdOnChain.Store(internalId, "")
-			return internalId, nil
 		} else {
 			cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
 		}
@@ -47,20 +46,20 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 	}
 }
 
-func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*abi.DoDSettleChangeOrderParam, error) {
-	sellerAddr, _ := types.HexToAddress(param.Seller.Address)
-	buyAddr, _ := types.HexToAddress(param.Buyer.Address)
-	op := new(abi.DoDSettleChangeOrderParam)
-	op.Buyer = &abi.DoDSettleUser{
+func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*qlcSdk.DoDSettleChangeOrderParam, error) {
+	sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
+	buyAddr, _ := pkg.HexToAddress(param.Buyer.Address)
+	op := new(qlcSdk.DoDSettleChangeOrderParam)
+	op.Buyer = &qlcSdk.DoDSettleUser{
 		Address: buyAddr,
 		Name:    param.Buyer.Name,
 	}
-	op.Seller = &abi.DoDSettleUser{
+	op.Seller = &qlcSdk.DoDSettleUser{
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
 	for _, v := range param.ChangeConnectionParam {
-		conn := new(abi.DoDSettleChangeConnectionParam)
+		conn := new(qlcSdk.DoDSettleChangeConnectionParam)
 		if len(v.DynamicParam.QuoteId) == 0 {
 			return nil, errors.New("quote id can not be nil")
 		}
@@ -74,30 +73,30 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		}
 
 		if len(v.DynamicParam.PaymentType) != 0 {
-			paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
+			paymentType, err := qlcSdk.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
 			if err != nil {
 				return nil, err
 			}
 			conn.PaymentType = paymentType
 		}
 		if len(v.DynamicParam.BillingType) != 0 {
-			billingType, err := abi.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
+			billingType, err := qlcSdk.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
 			if err != nil {
 				return nil, err
 			}
 			conn.BillingType = billingType
 		}
-		var billingUnit abi.DoDSettleBillingUnit
+		var billingUnit qlcSdk.DoDSettleBillingUnit
 		var err error
 		if len(v.DynamicParam.BillingUnit) > 0 {
-			billingUnit, err = abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
+			billingUnit, err = qlcSdk.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
 			if err != nil {
 				return nil, err
 			}
 			conn.BillingUnit = billingUnit
 		}
 		if len(v.DynamicParam.ServiceClass) > 0 {
-			serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
+			serviceClass, err := qlcSdk.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
 			if err != nil {
 				return nil, err
 			}

@@ -7,15 +7,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/qlcchain/go-lsobus/cmd/util"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"google.golang.org/grpc"
 
 	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
-
-	"github.com/qlcchain/go-qlc/cmd/util"
-	"github.com/qlcchain/go-qlc/common/types"
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
 )
 
 func addDSChangeOrderCmdByShell(parentCmd *ishell.Cmd) {
@@ -145,17 +145,17 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 		return err
 	}
 
-	acc := types.NewAccount(accBytes)
+	acc := pkg.NewAccount(accBytes)
 	if acc == nil {
 		return fmt.Errorf("account format err")
 	}
 
-	sellerAddress, err := types.HexToAddress(sellerAddressP)
+	sellerAddress, err := pkg.HexToAddress(sellerAddressP)
 	if err != nil {
 		return err
 	}
 
-	billingType, err := abi.ParseDoDSettleBillingType(billingTypeP)
+	billingType, err := qlcSdk.ParseDoDSettleBillingType(billingTypeP)
 	if err != nil {
 		return err
 	}
@@ -166,9 +166,9 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 	}
 
 	var startTime, endTime int64
-	var billingUnit abi.DoDSettleBillingUnit
+	var billingUnit qlcSdk.DoDSettleBillingUnit
 
-	if billingType == abi.DoDSettleBillingTypeDOD {
+	if billingType == qlcSdk.DoDSettleBillingTypeDOD {
 		startTime, err = strconv.ParseInt(startTimeP, 10, 64)
 		if err != nil {
 			return err
@@ -179,7 +179,7 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 			return err
 		}
 	} else {
-		billingUnit, err = abi.ParseDoDSettleBillingUnit(billingUnitP)
+		billingUnit, err = qlcSdk.ParseDoDSettleBillingUnit(billingUnitP)
 		if err != nil {
 			return err
 		}
@@ -202,7 +202,7 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 	for _, productId := range pids {
 		var conn *pb.ChangeConnectionParam
 
-		if billingType == abi.DoDSettleBillingTypePAYG {
+		if billingType == qlcSdk.DoDSettleBillingTypePAYG {
 			conn = &pb.ChangeConnectionParam{
 				DynamicParam: &pb.ConnectionDynamicParam{
 					Bandwidth:   bandwidthP,

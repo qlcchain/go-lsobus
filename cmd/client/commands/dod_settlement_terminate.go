@@ -7,13 +7,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/qlcchain/go-lsobus/cmd/util"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"google.golang.org/grpc"
 
 	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
-	"github.com/qlcchain/go-qlc/cmd/util"
-	"github.com/qlcchain/go-qlc/common/types"
 )
 
 func addDSTerminateOrderCmdByShell(parentCmd *ishell.Cmd) {
@@ -98,12 +99,12 @@ func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, pr
 		return err
 	}
 
-	acc := types.NewAccount(accBytes)
+	acc := pkg.NewAccount(accBytes)
 	if acc == nil {
 		return fmt.Errorf("account format err")
 	}
 
-	sellerAddress, err := types.HexToAddress(sellerAddressP)
+	sellerAddress, err := pkg.HexToAddress(sellerAddressP)
 	if err != nil {
 		return err
 	}

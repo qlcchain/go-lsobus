@@ -7,9 +7,8 @@ import (
 
 	"github.com/qlcchain/go-lsobus/orchestra"
 
-	"github.com/qlcchain/go-qlc/common/types"
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
-	rpc "github.com/qlcchain/jsonrpc2"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	"github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/zap"
 
 	"github.com/qlcchain/go-lsobus/common"
@@ -20,18 +19,18 @@ import (
 )
 
 const (
-	checkNeedSignContractInterval = 30 * time.Second
-	checkContractStatusInterval   = 5 * time.Second
-	checkOrderStatusInterval      = 5 * time.Second
-	checkProductInterval          = 5 * time.Second
-	connectRpcServerInterval      = 5 * time.Second
+	checkNeedSignContractInterval = 15 * time.Second
+	checkContractStatusInterval   = 10 * time.Second
+	checkOrderStatusInterval      = 10 * time.Second
+	checkProductInterval          = 10 * time.Second
+	connectRpcServerInterval      = 10 * time.Second
 )
 
 type ContractService struct {
 	cfg               *config.Config
 	account           *types.Account
 	logger            *zap.SugaredLogger
-	client            *rpc.Client
+	client            *qlcSdk.QLCClient
 	ctx               context.Context
 	cancel            context.CancelFunc
 	handlerIds        map[common.TopicType]string
@@ -90,9 +89,8 @@ func (cs *ContractService) Start() error {
 	return nil
 }
 
-func (cs *ContractService) GetOrderInfoByInternalId(id string) (*abi.DoDSettleOrderInfo, error) {
-	orderInfo := new(abi.DoDSettleOrderInfo)
-	err := cs.client.Call(&orderInfo, "DoDSettlement_getOrderInfoByInternalId", &id)
+func (cs *ContractService) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderInfo, error) {
+	orderInfo, err := cs.client.DoDSettlement.GetOrderInfoByInternalId(id)
 	if err != nil {
 		cs.logger.Error(err)
 		return nil, err
