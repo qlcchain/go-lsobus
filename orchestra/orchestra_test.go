@@ -1,6 +1,7 @@
 package orchestra
 
 import (
+	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,14 +10,26 @@ import (
 	"github.com/qlcchain/go-lsobus/config"
 )
 
-var configDir = filepath.Join(config.TestDataDir(), "config")
+type mockOrchestraData struct {
+	cm *config.CfgManager
+}
 
-func setupTestCase(t *testing.T) func(t *testing.T) {
+func setupTestCase(t *testing.T) (*mockOrchestraData, func(t *testing.T)) {
 	t.Log("setup test case")
 
-	return func(t *testing.T) {
+	dir := filepath.Join(config.TestDataDir(), uuid.New().String())
+	cm := config.NewCfgManager(dir)
+	_, err := cm.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	md := &mockOrchestraData{}
+	md.cm = cm
+
+	return md, func(t *testing.T) {
 		t.Log("teardown test case")
-		err := os.RemoveAll(configDir)
+		err := os.RemoveAll(dir)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -79,10 +92,10 @@ func setupOrderParams() *OrderParams {
 }
 
 func TestOrchestra_Site(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -114,10 +127,10 @@ func TestOrchestra_Site(t *testing.T) {
 }
 
 func TestOrchestra_Offer(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -149,10 +162,10 @@ func TestOrchestra_Offer(t *testing.T) {
 }
 
 func TestOrchestra_POQ(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -191,10 +204,10 @@ func TestOrchestra_POQ(t *testing.T) {
 }
 
 func TestOrchestra_Quote(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -233,10 +246,10 @@ func TestOrchestra_Quote(t *testing.T) {
 }
 
 func TestOrchestra_Order(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -275,10 +288,10 @@ func TestOrchestra_Order(t *testing.T) {
 }
 
 func TestOrchestra_Inventory(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 
@@ -310,10 +323,10 @@ func TestOrchestra_Inventory(t *testing.T) {
 }
 
 func TestOrchestra_Login(t *testing.T) {
-	tearDown := setupTestCase(t)
+	md, tearDown := setupTestCase(t)
 	defer tearDown(t)
 
-	o := NewOrchestra(configDir)
+	o := NewOrchestra(md.cm.ConfigFile)
 
 	setupOrchestraConfig(o)
 

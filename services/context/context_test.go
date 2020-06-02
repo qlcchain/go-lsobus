@@ -140,7 +140,7 @@ func TestNewServiceContextWithDefaultConfig(t *testing.T) {
 	defer func() {
 		_ = os.Remove(config.DefaultDataDir())
 	}()
-	if ctx.cfgFile != path.Join(config.DefaultDataDir(), config.VirtualLSOBus) {
+	if ctx.cfgFile != path.Join(config.DefaultDataDir(), config.CfgFileName) {
 		t.Fatal("use default config error")
 	}
 	ac := account()
