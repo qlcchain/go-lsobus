@@ -13,7 +13,7 @@ import (
 
 	"github.com/cornelk/hashmap"
 
-	qlctypes "github.com/qlcchain/go-qlc/common/types"
+	"github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/config"
 )
@@ -35,7 +35,7 @@ type ServiceContext struct {
 	cfgFile  string
 	chainId  string
 	locker   sync.RWMutex
-	account  *qlctypes.Account
+	account  *types.Account
 }
 
 func NewServiceContext(cfgFile string) *ServiceContext {
@@ -47,7 +47,7 @@ func NewServiceContext(cfgFile string) *ServiceContext {
 		cm := config.NewCfgManagerWithFile(cfgFile)
 		dataDir, _ = cm.ParseDataDir()
 	}
-	id := qlctypes.HashData([]byte(dataDir)).String()
+	id := types.HashData([]byte(dataDir)).String()
 	if v, ok := cache.GetStringKey(id); ok {
 		return v.(*ServiceContext)
 	} else {
@@ -65,13 +65,13 @@ func (sc *ServiceContext) EventBus() event.EventBus {
 	return event.GetEventBus(sc.Id())
 }
 
-func (sc *ServiceContext) SetAccount(account *qlctypes.Account) {
+func (sc *ServiceContext) SetAccount(account *types.Account) {
 	sc.locker.Lock()
 	defer sc.locker.Unlock()
 	sc.account = account
 }
 
-func (sc *ServiceContext) Account() *qlctypes.Account {
+func (sc *ServiceContext) Account() *types.Account {
 	sc.locker.RLock()
 	defer sc.locker.RUnlock()
 	return sc.account

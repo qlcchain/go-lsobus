@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	"github.com/qlcchain/go-lsobus/orchestra"
 )
@@ -28,13 +28,12 @@ func (cs *ContractService) checkContractStatus() {
 func (cs *ContractService) getContractStatus() {
 	cs.orderIdOnChain.Range(func(key, value interface{}) bool {
 		internalId := key.(string)
-		orderInfo := new(abi.DoDSettleOrderInfo)
-		err := cs.client.Call(&orderInfo, "DoDSettlement_getOrderInfoByInternalId", &internalId)
+		orderInfo, err := cs.GetOrderInfoByInternalId(internalId)
 		if err != nil {
 			cs.logger.Error(err)
 			return true
 		}
-		if orderInfo.ContractState == abi.DoDSettleContractStateConfirmed {
+		if orderInfo.ContractState == qlcSdk.DoDSettleContractStateConfirmed {
 			cs.logger.Infof(" contract %s confirmed", internalId)
 			cs.logger.Info(" call sonata API to place order")
 			orderId, err := cs.createOrderToSonataServer(internalId, orderInfo)
@@ -49,16 +48,16 @@ func (cs *ContractService) getContractStatus() {
 	})
 }
 
-func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *abi.DoDSettleOrderInfo) (string, error) {
+func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *qlcSdk.DoDSettleOrderInfo) (string, error) {
 	orderActivity := ""
 	itemAction := ""
-	if orderInfo.OrderType == abi.DoDSettleOrderTypeCreate {
+	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 		orderActivity = "install"
 		itemAction = "add"
-	} else if orderInfo.OrderType == abi.DoDSettleOrderTypeChange {
+	} else if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeChange {
 		orderActivity = "change"
 		itemAction = "change"
-	} else if orderInfo.OrderType == abi.DoDSettleOrderTypeTerminate {
+	} else if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
 		orderActivity = "disconnect"
 		itemAction = "remove"
 	}

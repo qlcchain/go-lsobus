@@ -3,10 +3,10 @@ package contract
 import (
 	"errors"
 
-	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
-	"github.com/qlcchain/go-qlc/common/types"
-	abi "github.com/qlcchain/go-qlc/vm/contract/abi"
+	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (string, error) {
@@ -17,27 +17,25 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 			if err != nil {
 				return "", err
 			}
-			block := new(types.StateBlock)
-			err = cs.client.Call(&block, "DoDSettlement_getCreateOrderBlock", op)
-			if err != nil {
+			if blk, err := cs.client.DoDSettlement.GetCreateOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+				return cs.account.Sign(hash), nil
+			}); err != nil {
 				return "", err
-			}
+			} else {
+				var w pkg.Work
+				worker, _ := pkg.NewWorker(w, blk.Root())
+				blk.Work = worker.NewWork()
 
-			var w types.Work
-			worker, _ := types.NewWorker(w, block.Root())
-			block.Work = worker.NewWork()
-
-			hash := block.GetHash()
-			block.Signature = cs.account.Sign(hash)
-			var h types.Hash
-			err = cs.client.Call(&h, "ledger_process", &block)
-			if err != nil {
-				return "", err
+				hash, err := cs.client.Ledger.Process(blk)
+				if err != nil {
+					cs.logger.Errorf("process block error: %s", err)
+					return "", err
+				}
+				cs.logger.Infof("process hash %s success", hash.String())
+				internalId := blk.Previous.String()
+				cs.orderIdOnChain.Store(internalId, "")
+				return internalId, nil
 			}
-			cs.logger.Infof("process hash %s success", h.String())
-			internalId := block.Previous.String()
-			cs.orderIdOnChain.Store(internalId, "")
-			return internalId, nil
 		} else {
 			cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
 		}
@@ -47,45 +45,45 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 	}
 }
 
-func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*abi.DoDSettleCreateOrderParam, error) {
-	sellerAddr, _ := types.HexToAddress(param.Seller.Address)
-	buyAddr, _ := types.HexToAddress(param.Buyer.Address)
-	op := new(abi.DoDSettleCreateOrderParam)
-	op.Buyer = &abi.DoDSettleUser{
+func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*qlcSdk.DoDSettleCreateOrderParam, error) {
+	sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
+	buyAddr, _ := pkg.HexToAddress(param.Buyer.Address)
+	op := new(qlcSdk.DoDSettleCreateOrderParam)
+	op.Buyer = &qlcSdk.DoDSettleUser{
 		Address: buyAddr,
 		Name:    param.Buyer.Name,
 	}
-	op.Seller = &abi.DoDSettleUser{
+	op.Seller = &qlcSdk.DoDSettleUser{
 		Address: sellerAddr,
 		Name:    param.Seller.Name,
 	}
 	for _, v := range param.ConnectionParam {
-		paymentType, err := abi.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
+		paymentType, err := qlcSdk.ParseDoDSettlePaymentType(v.DynamicParam.PaymentType)
 		if err != nil {
 			return nil, err
 		}
 
-		billingType, err := abi.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
+		billingType, err := qlcSdk.ParseDoDSettleBillingType(v.DynamicParam.BillingType)
 		if err != nil {
 			return nil, err
 		}
 
-		var billingUnit abi.DoDSettleBillingUnit
+		var billingUnit qlcSdk.DoDSettleBillingUnit
 		if len(v.DynamicParam.BillingUnit) > 0 {
-			billingUnit, err = abi.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
+			billingUnit, err = qlcSdk.ParseDoDSettleBillingUnit(v.DynamicParam.BillingUnit)
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		serviceClass, err := abi.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
+		serviceClass, err := qlcSdk.ParseDoDSettleServiceClass(v.DynamicParam.ServiceClass)
 		if err != nil {
 			return nil, err
 		}
-		var conn *abi.DoDSettleConnectionParam
-		if billingType == abi.DoDSettleBillingTypePAYG {
-			conn = &abi.DoDSettleConnectionParam{
-				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
+		var conn *qlcSdk.DoDSettleConnectionParam
+		if billingType == qlcSdk.DoDSettleBillingTypePAYG {
+			conn = &qlcSdk.DoDSettleConnectionParam{
+				DoDSettleConnectionStaticParam: qlcSdk.DoDSettleConnectionStaticParam{
 					ItemId:         v.StaticParam.ItemId,
 					BuyerProductId: v.StaticParam.BuyerProductId,
 					ProductId:      v.StaticParam.ProductId,
@@ -100,7 +98,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 					DstDataCenter:  v.StaticParam.DstDataCenter,
 					DstPort:        v.StaticParam.DstPort,
 				},
-				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
+				DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
 					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,
@@ -115,8 +113,8 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				},
 			}
 		} else {
-			conn = &abi.DoDSettleConnectionParam{
-				DoDSettleConnectionStaticParam: abi.DoDSettleConnectionStaticParam{
+			conn = &qlcSdk.DoDSettleConnectionParam{
+				DoDSettleConnectionStaticParam: qlcSdk.DoDSettleConnectionStaticParam{
 					ItemId:         v.StaticParam.ItemId,
 					BuyerProductId: v.StaticParam.BuyerProductId,
 					ProductId:      v.StaticParam.ProductId,
@@ -131,7 +129,7 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 					DstDataCenter:  v.StaticParam.DstDataCenter,
 					DstPort:        v.StaticParam.DstPort,
 				},
-				DoDSettleConnectionDynamicParam: abi.DoDSettleConnectionDynamicParam{
+				DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
 					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,

@@ -3,9 +3,8 @@ package contract
 import (
 	"time"
 
-	"github.com/qlcchain/go-qlc/common/types"
-	qlcchain "github.com/qlcchain/go-qlc/rpc/api"
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/orchestra"
 	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
@@ -26,9 +25,8 @@ func (cs *ContractService) checkOrderStatus() {
 }
 
 func (cs *ContractService) getOrderStatus() {
-	var id []*qlcchain.DoDPendingResourceCheckInfo
 	addr := cs.account.Address()
-	err := cs.client.Call(&id, "DoDSettlement_getPendingResourceCheck", &addr)
+	id, err := cs.client.DoDSettlement.GetPendingResourceCheck(addr)
 	if err != nil {
 		cs.logger.Error(err)
 		return
@@ -75,56 +73,51 @@ func (cs *ContractService) getOrderStatus() {
 	}
 }
 
-func (cs *ContractService) updateProductStatusToChain(addr types.Address, InternalId types.Hash, products []string) error {
-	param := &abi.DoDSettleResourceReadyParam{
+func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, InternalId pkg.Hash, products []string) error {
+	param := &qlcSdk.DoDSettleResourceReadyParam{
 		Address:    addr,
 		InternalId: InternalId,
 		ProductId:  products,
 	}
 
-	block := new(types.StateBlock)
-	err := cs.client.Call(&block, "DoDSettlement_getResourceReadyBlock", param)
-	if err != nil {
+	if blk, err := cs.client.DoDSettlement.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		return cs.account.Sign(hash), nil
+	}); err != nil {
 		return err
-	}
+	} else {
+		var w pkg.Work
+		worker, _ := pkg.NewWorker(w, blk.Root())
+		blk.Work = worker.NewWork()
 
-	var w types.Work
-	worker, _ := types.NewWorker(w, block.Root())
-	block.Work = worker.NewWork()
-
-	hash := block.GetHash()
-	block.Signature = cs.account.Sign(hash)
-
-	var h types.Hash
-	err = cs.client.Call(&h, "ledger_process", &block)
-	if err != nil {
-		return err
+		_, err := cs.client.Ledger.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return err
+		}
+		//		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }
 
-func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash types.Hash) error {
-	param := &abi.DoDSettleResponseParam{
+func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash pkg.Hash) error {
+	param := &qlcSdk.DoDSettleResponseParam{
 		RequestHash: requestHash,
 	}
-
-	block := new(types.StateBlock)
-	err := cs.client.Call(&block, "DoDSettlement_getUpdateOrderInfoRewardBlock", param)
-	if err != nil {
+	if blk, err := cs.client.DoDSettlement.GetUpdateOrderInfoRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		return cs.account.Sign(hash), nil
+	}); err != nil {
 		return err
-	}
+	} else {
+		var w pkg.Work
+		worker, _ := pkg.NewWorker(w, blk.Root())
+		blk.Work = worker.NewWork()
 
-	var w types.Work
-	worker, _ := types.NewWorker(w, block.Root())
-	block.Work = worker.NewWork()
-
-	hash := block.GetHash()
-	block.Signature = cs.account.Sign(hash)
-
-	h := block.GetHash()
-	err = cs.client.Call(&h, "ledger_process", &block)
-	if err != nil {
-		return err
+		_, err := cs.client.Ledger.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return err
+		}
+		//	cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }

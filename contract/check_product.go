@@ -4,10 +4,11 @@ import (
 	"errors"
 	"time"
 
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"github.com/qlcchain/go-lsobus/orchestra"
 
-	"github.com/qlcchain/go-qlc/common/types"
-	"github.com/qlcchain/go-qlc/vm/contract/abi"
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 )
 
 func (cs *ContractService) checkProduct() {
@@ -27,7 +28,7 @@ func (cs *ContractService) checkProduct() {
 func (cs *ContractService) getProductId() {
 	cs.orderIdFromSonata.Range(func(key, value interface{}) bool {
 		idOnChain := key.(string)
-		orderInfo := value.(*abi.DoDSettleOrderInfo)
+		orderInfo := value.(*qlcSdk.DoDSettleOrderInfo)
 		productIds, err := cs.inventoryFind(orderInfo.OrderId)
 		if err != nil {
 			cs.logger.Error(err)
@@ -47,14 +48,14 @@ func (cs *ContractService) getProductId() {
 	})
 }
 
-func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*Product, orderInfo *abi.DoDSettleOrderInfo) error {
-	var id types.Hash
+func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
+	var id pkg.Hash
 	_ = id.Of(idOnChain)
-	ProductIds := make([]*abi.DoDSettleProductItem, 0)
-	if orderInfo.OrderType == abi.DoDSettleOrderTypeCreate {
+	ProductIds := make([]*qlcSdk.DoDSettleProductItem, 0)
+	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 		for _, v := range products {
-			cs.logger.Infof("productId is %s,item id is %s", v.productID, v.buyerProductID)
-			pi := &abi.DoDSettleProductItem{
+			cs.logger.Infof("productId is %s,buyProductID id is %s", v.productID, v.buyerProductID)
+			pi := &qlcSdk.DoDSettleProductItem{
 				ProductId:      v.productID,
 				BuyerProductId: v.buyerProductID,
 			}
@@ -63,7 +64,7 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 	} else {
 		for _, v := range orderInfo.Connections {
 			cs.logger.Infof("productId is %s,buyerProductId id is %s", v.ProductId, v.BuyerProductId)
-			pi := &abi.DoDSettleProductItem{
+			pi := &qlcSdk.DoDSettleProductItem{
 				ProductId:      v.ProductId,
 				BuyerProductId: v.BuyerProductId,
 			}
@@ -71,32 +72,30 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 		}
 	}
 
-	param := &abi.DoDSettleUpdateOrderInfoParam{
+	param := &qlcSdk.DoDSettleUpdateOrderInfoParam{
 		Buyer:      cs.account.Address(),
 		InternalId: id,
 		OrderId:    orderInfo.OrderId,
 		ProductIds: ProductIds,
-		Status:     abi.DoDSettleOrderStateSuccess,
+		Status:     qlcSdk.DoDSettleOrderStateSuccess,
 		FailReason: "",
 	}
 
-	block := new(types.StateBlock)
-	err := cs.client.Call(&block, "DoDSettlement_getUpdateOrderInfoBlock", param)
-	if err != nil {
+	if blk, err := cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		return cs.account.Sign(hash), nil
+	}); err != nil {
 		return err
-	}
+	} else {
+		var w pkg.Work
+		worker, _ := pkg.NewWorker(w, blk.Root())
+		blk.Work = worker.NewWork()
 
-	var w types.Work
-	worker, _ := types.NewWorker(w, block.Root())
-	block.Work = worker.NewWork()
-
-	hash := block.GetHash()
-	block.Signature = cs.account.Sign(hash)
-
-	var h types.Hash
-	err = cs.client.Call(&h, "ledger_process", &block)
-	if err != nil {
-		return err
+		hash, err := cs.client.Ledger.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return err
+		}
+		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }
