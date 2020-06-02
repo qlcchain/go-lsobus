@@ -116,11 +116,11 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 	}
 	op := &orchestra.OrderParams{
 		OrderActivity: orderActivity,
-		Buyer: &orchestra.Partner{
+		Buyer: &orchestra.PartnerParams{
 			ID:   orderInfo.Buyer.Address.String(),
 			Name: orderInfo.Buyer.Name,
 		},
-		Seller: &orchestra.Partner{
+		Seller: &orchestra.PartnerParams{
 			ID:   orderInfo.Seller.Address.String(),
 			Name: orderInfo.Seller.Name,
 		},

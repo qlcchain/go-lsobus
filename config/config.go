@@ -24,4 +24,6 @@ type PartnerCfg struct {
 	Name      string `json:"name"`
 	ID        string `json:"id"`
 	SonataUrl string `json:"sonataUrl"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
 }

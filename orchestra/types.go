@@ -15,7 +15,7 @@ const (
 	BillingTypeUsage = "USAGE"
 )
 
-type Partner struct {
+type PartnerParams struct {
 	ID   string
 	Name string
 }
@@ -73,11 +73,10 @@ type ELineItemParams struct {
 }
 
 type OrderParams struct {
-	OrderActivity string
+	Buyer  *PartnerParams
+	Seller *PartnerParams
 
-	ContractID string
-	Buyer      *Partner
-	Seller     *Partner
+	OrderActivity string
 
 	Description string
 	ProjectID   string
@@ -95,6 +94,9 @@ type OrderParams struct {
 }
 
 type FindParams struct {
+	Buyer  *PartnerParams
+	Seller *PartnerParams
+
 	Offset     string
 	Limit      string
 	ProjectID  string
@@ -116,6 +118,9 @@ type FindParams struct {
 }
 
 type GetParams struct {
+	Buyer  *PartnerParams
+	Seller *PartnerParams
+
 	ID string
 
 	RspSite  *sitmod.GeographicSite

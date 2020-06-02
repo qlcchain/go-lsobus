@@ -18,7 +18,7 @@ type CfgManager struct {
 }
 
 func NewCfgManager(path string) *CfgManager {
-	file := filepath.Join(path, VirtualLSOBus)
+	file := filepath.Join(path, CfgFileName)
 	cm := &CfgManager{
 		ConfigFile: file,
 		cfgPath:    path,

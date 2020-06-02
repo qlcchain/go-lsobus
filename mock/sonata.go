@@ -21,6 +21,7 @@ import (
 
 	invapi "github.com/qlcchain/go-lsobus/sonata/inventory/client/product"
 	invmod "github.com/qlcchain/go-lsobus/sonata/inventory/models"
+	offapi "github.com/qlcchain/go-lsobus/sonata/offer"
 	ordapi "github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
 	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
 	poqapi "github.com/qlcchain/go-lsobus/sonata/poq/client/product_offering_qualification"
@@ -428,5 +429,30 @@ func SonataGenerateOrderGetResponse(reqParams *ordapi.ProductOrderGetParams) *or
 
 	rspParams.Payload = order
 
+	return rspParams
+}
+
+func SonataGenerateOfferFindResponse(reqParams *offapi.ProductOfferingFindParams) *offapi.FindResponse {
+	rspParams := &offapi.FindResponse{}
+
+	offer1 := &offapi.ProductOffering{}
+	offer1.Name = "offer"
+	offer1.ID = uuid.New().String()
+	offer1.Product = &offapi.Product{}
+	rspParams.Data = append(rspParams.Data, offer1)
+
+	offer2 := &offapi.ProductOffering{}
+	offer2.Name = "offer"
+	offer2.ID = uuid.New().String()
+	offer2.Product = &offapi.Product{}
+	rspParams.Data = append(rspParams.Data, offer2)
+
+	return rspParams
+}
+
+func SonataGenerateOfferGetResponse(reqParams *offapi.ProductOfferingGetParams) *offapi.GetResponse {
+	rspParams := &offapi.GetResponse{}
+	rspParams.Data = &offapi.ProductOffering{}
+	rspParams.Data.ID = reqParams.ProductOfferingID
 	return rspParams
 }

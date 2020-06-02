@@ -18,9 +18,9 @@ type sonataOrderImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOrderImpl(o *Orchestra) *sonataOrderImpl {
+func newSonataOrderImpl(p *PartnerImpl) *sonataOrderImpl {
 	s := &sonataOrderImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionOrder
 	return s
 }
@@ -43,7 +43,7 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOrder))
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderCreate(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
@@ -81,7 +81,7 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 
 	httpCli := s.NewHTTPClient()
 	rspParams, err := httpCli.ProductOrder.ProductOrderFind(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
@@ -104,7 +104,7 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOrder.ProductOrderGet(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)

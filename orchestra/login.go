@@ -21,55 +21,65 @@ type LoginResponse struct {
 	Data string `json:"data"`
 }
 
-func (o *Orchestra) TryUpdateApiToken() {
-	//reqParams := &LoginParams{Username: "yuangui.wen@qlink.mobi", Password: "Wyg12345"}
-	//reqParams := &LoginParams{Username: "wenyuangui@yeah.net", Password: "Qlc123456"}
-	reqParams := &LoginParams{Username: "quickwen@126.com", Password: "Qlc123456"}
-	err := o.ExecAuthLogin(reqParams)
+func (p *PartnerImpl) TryUpdateApiToken() {
+	if p.cfg.Username == "" || p.cfg.Password == "" {
+		p.logger.Infof("partner %s username is empty", p.cfg.Name)
+		return
+	}
+
+	reqParams := &LoginParams{}
+	reqParams.Username = p.cfg.Username
+	reqParams.Password = p.cfg.Password
+
+	err := p.ExecAuthLogin(reqParams)
 	if err == nil {
-		o.logger.Infof("update api token, got new token %s", reqParams.RspLogin.Data)
-		o.apiToken = reqParams.RspLogin.Data
+		p.logger.Infof("partner %s update api token, got new token %s", p.cfg.Name, reqParams.RspLogin.Data)
+		p.apiToken = reqParams.RspLogin.Data
 	} else {
-		o.logger.Errorf("ExecAuthLogin err %s", err)
+		p.logger.Errorf("partner %s ExecAuthLogin err %s", p.cfg.Name, err)
 	}
 }
 
-func (o *Orchestra) SetApiToken(token string) {
-	o.apiToken = token
+func (p *PartnerImpl) SetApiToken(token string) {
+	p.apiToken = token
 }
 
-func (o *Orchestra) GetApiToken() string {
-	if o.apiToken == "" {
-		o.TryUpdateApiToken()
+func (p *PartnerImpl) GetApiToken() string {
+	if p.apiToken == "" {
+		p.TryUpdateApiToken()
 	}
 
-	return o.apiToken
+	return p.apiToken
 }
 
-func (o *Orchestra) RenewApiToken() string {
-	o.apiToken = ""
-	o.TryUpdateApiToken()
-	return o.apiToken
+func (p *PartnerImpl) RenewApiToken() string {
+	p.apiToken = ""
+	p.TryUpdateApiToken()
+	return p.apiToken
 }
 
-func (o *Orchestra) ClearApiToken() {
-	o.apiToken = ""
+func (p *PartnerImpl) ClearApiToken() {
+	p.apiToken = ""
 }
 
-func (o *Orchestra) ExecAuthLogin(params *LoginParams) error {
+func (p *PartnerImpl) ExecAuthLogin(params *LoginParams) error {
 	var err error
 
 	req := rest.Request{Method: rest.Post}
-	req.BaseURL = o.GetSonataUrl("") + "/api/login"
+	req.BaseURL = p.GetSonataUrl() + "/api/login"
 	req.Body, err = json.Marshal(params)
 	if err != nil {
 		return err
 	}
 
-	o.logger.Debugf("send login, url %s, username %s", req.BaseURL, params.Username)
+	p.logger.Debugf("send login, url %s, username %s", req.BaseURL, params.Username)
 
 	rsp, err := rest.Send(req)
-	if err != nil {
+	if p.GetFakeMode() {
+		rsp = &rest.Response{}
+		rsp.StatusCode = 200
+		rsp.Body = "{\"data\": \"12345678\"}"
+	} else if err != nil {
 		return err
 	}
 	if rsp.StatusCode != 200 {
