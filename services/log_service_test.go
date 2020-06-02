@@ -9,7 +9,7 @@ import (
 )
 
 func TestLogService(t *testing.T) {
-	cfgFile2 := filepath.Join(config.TestDataDir(), "log", config.VirtualLSOBus)
+	cfgFile2 := filepath.Join(config.TestDataDir(), "log", config.CfgFileName)
 	cm := config.NewCfgManagerWithName(filepath.Dir(cfgFile2), filepath.Base(cfgFile2))
 	_, err := cm.Load()
 	if err != nil {

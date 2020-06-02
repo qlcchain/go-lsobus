@@ -42,7 +42,7 @@ func NewServiceContext(cfgFile string) *ServiceContext {
 	var dataDir string
 	if len(cfgFile) == 0 {
 		dataDir = config.DefaultDataDir()
-		cfgFile = path.Join(dataDir, config.VirtualLSOBus)
+		cfgFile = path.Join(dataDir, config.CfgFileName)
 	} else {
 		cm := config.NewCfgManagerWithFile(cfgFile)
 		dataDir, _ = cm.ParseDataDir()

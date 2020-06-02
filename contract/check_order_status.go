@@ -38,7 +38,8 @@ func (cs *ContractService) getOrderStatus() {
 		for _, value := range v.Products {
 			if !value.Active {
 				gp := &orchestra.GetParams{
-					ID: value.ProductId,
+					Seller: &orchestra.PartnerParams{},
+					ID:     value.ProductId,
 				}
 				err := cs.orchestra.ExecInventoryGet(gp)
 				if err != nil {

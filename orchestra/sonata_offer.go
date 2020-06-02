@@ -1,6 +1,7 @@
 package orchestra
 
 import (
+	"github.com/qlcchain/go-lsobus/mock"
 	"github.com/qlcchain/go-lsobus/sonata/offer"
 )
 
@@ -8,9 +9,9 @@ type sonataOfferImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOfferImpl(o *Orchestra) *sonataOfferImpl {
+func newSonataOfferImpl(p *PartnerImpl) *sonataOfferImpl {
 	s := &sonataOfferImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionOffer
 	return s
 }
@@ -22,8 +23,12 @@ func (s *sonataOfferImpl) Init() error {
 func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 	offUrl := s.URL + "/api/mef/productOfferingManagement/v1/productOffering"
 	offapi := offer.NewAPIProductOfferingManagement(offUrl)
-	rspParams, err := offapi.ProductOfferingFind(nil)
-	if err != nil {
+
+	reqParams := &offer.ProductOfferingFindParams{}
+	rspParams, err := offapi.ProductOfferingFind(reqParams)
+	if s.GetFakeMode() {
+		rspParams = mock.SonataGenerateOfferFindResponse(reqParams)
+	} else if err != nil {
 		return err
 	}
 
@@ -39,7 +44,9 @@ func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
 
 	reqParams := &offer.ProductOfferingGetParams{ProductOfferingID: params.ID}
 	rspParams, err := offapi.ProductOfferingGet(reqParams)
-	if err != nil {
+	if s.GetFakeMode() {
+		rspParams = mock.SonataGenerateOfferGetResponse(reqParams)
+	} else if err != nil {
 		return nil
 	}
 

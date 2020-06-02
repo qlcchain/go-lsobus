@@ -16,9 +16,9 @@ type sonataQuoteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataQuoteImpl(o *Orchestra) *sonataQuoteImpl {
+func newSonataQuoteImpl(p *PartnerImpl) *sonataQuoteImpl {
 	s := &sonataQuoteImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionQuote
 	return s
 }
@@ -41,7 +41,7 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.Quote))
 
 	rspParams, err := httpCli.Quote.QuoteCreate(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
@@ -79,7 +79,7 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteFind(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
@@ -102,7 +102,7 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Quote.QuoteGet(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateQuoteGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)

@@ -28,7 +28,7 @@ func (cs *ContractService) getProductId() {
 	cs.orderIdFromSonata.Range(func(key, value interface{}) bool {
 		idOnChain := key.(string)
 		orderInfo := value.(*abi.DoDSettleOrderInfo)
-		productIds, err := cs.inventoryFind(orderInfo.OrderId)
+		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo.OrderId)
 		if err != nil {
 			cs.logger.Error(err)
 			return true
@@ -101,8 +101,9 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 	return nil
 }
 
-func (cs *ContractService) inventoryFind(orderId string) ([]*Product, error) {
+func (cs *ContractService) inventoryFind(sellName, orderId string) ([]*Product, error) {
 	fp := &orchestra.FindParams{
+		Seller:         &orchestra.PartnerParams{Name: sellName},
 		ProductOrderID: orderId,
 	}
 	err := cs.orchestra.ExecInventoryFind(fp)

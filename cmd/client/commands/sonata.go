@@ -103,8 +103,8 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		return err
 	}
 
-	params.Buyer = &orchestra.Partner{ID: "C1B2C3", Name: "CBC"}
-	params.Seller = &orchestra.Partner{ID: "P1C2C3W4", Name: "PCCW"}
+	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
 
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
@@ -326,6 +326,9 @@ func fillBillingParamsByCmdFlags(cmd *cobra.Command) *orchestra.BillingParams {
 func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {
 	var err error
 
+	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
+
 	params.ProjectID, err = cmd.Flags().GetString("projectID")
 	if err != nil {
 		return err
@@ -351,6 +354,10 @@ func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) 
 
 func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) error {
 	var err error
+
+	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
+
 	params.ID, err = cmd.Flags().GetString("id")
 	if err != nil {
 		return err
@@ -374,7 +381,7 @@ func getOrchestraInstance(cmd *cobra.Command) (*orchestra.Orchestra, error) {
 
 		apiToken, err := cmd.Flags().GetString("apiToken")
 		if err == nil {
-			o.SetApiToken(apiToken)
+			o.SetApiToken("PCCW", apiToken)
 		}
 	}
 

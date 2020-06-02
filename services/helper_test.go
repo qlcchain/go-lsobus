@@ -9,7 +9,7 @@ import (
 )
 
 func TestRegisterServices(t *testing.T) {
-	cfgFile2 := filepath.Join(config.TestDataDir(), "config1", config.VirtualLSOBus)
+	cfgFile2 := filepath.Join(config.TestDataDir(), "config1", config.CfgFileName)
 	cm := config.NewCfgManagerWithName(filepath.Dir(cfgFile2), filepath.Base(cfgFile2))
 	cc := context.NewServiceContext(cm.ConfigFile)
 	if err := RegisterServices(cc); err != nil {

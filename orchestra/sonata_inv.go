@@ -10,9 +10,9 @@ type sonataInvImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataInvImpl(o *Orchestra) *sonataInvImpl {
+func newSonataInvImpl(p *PartnerImpl) *sonataInvImpl {
 	s := &sonataInvImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionInv
 	return s
 }
@@ -57,7 +57,7 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductFind(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
@@ -80,7 +80,7 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.Product.ProductGet(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateInvGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
