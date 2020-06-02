@@ -93,6 +93,10 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *abi.DoDSettleOrderIn
 		var quote *qm.QuoteItem
 		conn := order.Connections[idx]
 		op := &orchestra.GetParams{
+			Seller: &orchestra.PartnerParams{
+				ID:   order.Seller.Address.String(),
+				Name: order.Seller.Name,
+			},
 			ID: conn.QuoteId,
 		}
 

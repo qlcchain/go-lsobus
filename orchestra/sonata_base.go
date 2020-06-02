@@ -36,7 +36,7 @@ const (
 )
 
 type sonataBaseImpl struct {
-	Orch *Orchestra
+	Partner *PartnerImpl
 
 	URL     string
 	Scheme  string
@@ -48,7 +48,7 @@ type sonataBaseImpl struct {
 }
 
 func (s *sonataBaseImpl) Init() error {
-	s.URL = s.Orch.GetSonataUrl("")
+	s.URL = s.Partner.GetSonataUrl()
 	if s.URL != "" {
 		retUrl, err := url.Parse(s.URL)
 		if err != nil {
@@ -71,6 +71,10 @@ func (s *sonataBaseImpl) Init() error {
 	return nil
 }
 
+func (s *sonataBaseImpl) GetFakeMode() bool {
+	return s.Partner.GetFakeMode()
+}
+
 func (s *sonataBaseImpl) GetHost() string {
 	return s.Host
 }
@@ -80,15 +84,15 @@ func (s *sonataBaseImpl) GetScheme() string {
 }
 
 func (s *sonataBaseImpl) GetApiToken() string {
-	return s.Orch.GetApiToken()
+	return s.Partner.GetApiToken()
 }
 
 func (s *sonataBaseImpl) RenewApiToken() string {
-	return s.Orch.RenewApiToken()
+	return s.Partner.RenewApiToken()
 }
 
 func (s *sonataBaseImpl) ClearApiToken() {
-	s.Orch.ClearApiToken()
+	s.Partner.ClearApiToken()
 }
 
 func (s *sonataBaseImpl) NewHttpTransport(basePath string) *httptransport.Runtime {

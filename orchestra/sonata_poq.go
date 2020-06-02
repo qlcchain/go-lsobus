@@ -14,9 +14,9 @@ type sonataPOQImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataPOQImpl(o *Orchestra) *sonataPOQImpl {
+func newSonataPOQImpl(p *PartnerImpl) *sonataPOQImpl {
 	s := &sonataPOQImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionPOQ
 	return s
 }
@@ -39,7 +39,7 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	s.logger.Debugf("send request, payload %s", s.DumpValue(reqParams.ProductOfferingQualification))
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationCreate(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGeneratePoqCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
@@ -72,7 +72,7 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationFind(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGeneratePoqFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
@@ -93,7 +93,7 @@ func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.ProductOfferingQualification.ProductOfferingQualificationGet(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGeneratePoqGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)

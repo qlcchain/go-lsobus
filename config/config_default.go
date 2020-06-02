@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	VirtualLSOBus = "vb.json"
+	CfgFileName   = "lsobus.json"
 	configVersion = 1
 	cfgDir        = "glsobus"
 	nixCfgDir     = ".glsobus"
@@ -33,6 +33,8 @@ func DefaultConfig(dir string) (*Config, error) {
 				Name:      "PCCW",
 				ID:        "PCCW",
 				SonataUrl: "http://127.0.0.1:7777",
+				Username:  "",
+				Password:  "",
 			},
 		},
 	}

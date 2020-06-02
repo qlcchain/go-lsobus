@@ -8,9 +8,9 @@ type sonataOfferImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOfferImpl(o *Orchestra) *sonataOfferImpl {
+func newSonataOfferImpl(p *PartnerImpl) *sonataOfferImpl {
 	s := &sonataOfferImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionOffer
 	return s
 }

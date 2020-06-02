@@ -10,9 +10,9 @@ type sonataSiteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataSiteImpl(o *Orchestra) *sonataSiteImpl {
+func newSonataSiteImpl(p *PartnerImpl) *sonataSiteImpl {
 	s := &sonataSiteImpl{}
-	s.Orch = o
+	s.Partner = p
 	s.Version = MEFAPIVersionSite
 	return s
 }
@@ -35,7 +35,7 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteFind(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateSiteFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
@@ -57,7 +57,7 @@ func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
 	httpCli := s.NewHTTPClient()
 
 	rspParams, err := httpCli.GeographicSite.GeographicSiteGet(reqParams)
-	if s.Orch.GetFakeMode() {
+	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateSiteGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
