@@ -102,7 +102,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			DstMetroID:    v.DstCity,
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
-			CosName:       v.ServiceClass.String(),
+			CosName:       strings.ToUpper(v.ServiceClass.String()),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams:  billingParams,
 				BuyerProductID: v.BuyerProductId,
