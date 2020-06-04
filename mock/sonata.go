@@ -439,20 +439,20 @@ func SonataGenerateOfferFindResponse(reqParams *offapi.ProductOfferingFindParams
 	offer1.Name = "offer"
 	offer1.ID = uuid.New().String()
 	offer1.Product = &offapi.Product{}
-	rspParams.Data = append(rspParams.Data, offer1)
+	rspParams.Payload = append(rspParams.Payload, offer1)
 
 	offer2 := &offapi.ProductOffering{}
 	offer2.Name = "offer"
 	offer2.ID = uuid.New().String()
 	offer2.Product = &offapi.Product{}
-	rspParams.Data = append(rspParams.Data, offer2)
+	rspParams.Payload = append(rspParams.Payload, offer2)
 
 	return rspParams
 }
 
 func SonataGenerateOfferGetResponse(reqParams *offapi.ProductOfferingGetParams) *offapi.GetResponse {
 	rspParams := &offapi.GetResponse{}
-	rspParams.Data = &offapi.ProductOffering{}
-	rspParams.Data.ID = reqParams.ProductOfferingID
+	rspParams.Payload = &offapi.ProductOffering{}
+	rspParams.Payload.ID = reqParams.ProductOfferingID
 	return rspParams
 }
