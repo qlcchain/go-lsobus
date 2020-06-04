@@ -3,6 +3,8 @@ package contract
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/mock"
+
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
@@ -27,7 +29,13 @@ func (cs *ContractService) checkDoDContract() {
 
 func (cs *ContractService) processDoDContract() {
 	addr := cs.account.Address()
-	dod, err := cs.client.DoDSettlement.GetPendingRequest(addr)
+	var err error
+	var dod []*qlcSdk.DoDPendingRequestRsp
+	if cs.GetFakeMode() {
+		dod = mock.GetPendingRequest(addr)
+	} else {
+		dod, err = cs.client.DoDSettlement.GetPendingRequest(addr)
+	}
 	if err != nil || len(dod) == 0 {
 		return
 	}
@@ -52,27 +60,54 @@ func (cs *ContractService) processDoDContract() {
 		blk := new(pkg.StateBlock)
 		if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 			cs.logger.Info(" order type is create")
-			if blk, err = cs.client.DoDSettlement.GetCreateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				cs.logger.Error(err)
-				continue
+			if cs.GetFakeMode() {
+				if blk, err = mock.GetCreateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
+			} else {
+				if blk, err = cs.client.DoDSettlement.GetCreateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
 			}
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeChange {
 			cs.logger.Info(" order type is change")
-			if blk, err = cs.client.DoDSettlement.GetChangeOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				cs.logger.Error(err)
-				continue
+			if cs.GetFakeMode() {
+				if blk, err = mock.GetChangeOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
+			} else {
+				if blk, err = cs.client.DoDSettlement.GetChangeOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
 			}
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
 			cs.logger.Info(" order type is terminate")
-			if blk, err = cs.client.DoDSettlement.GetTerminateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				cs.logger.Error(err)
-				continue
+			if cs.GetFakeMode() {
+				if blk, err = mock.GetTerminateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
+			} else {
+				if blk, err = cs.client.DoDSettlement.GetTerminateOrderRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+					return cs.account.Sign(hash), nil
+				}); err != nil {
+					cs.logger.Error(err)
+					continue
+				}
 			}
 		} else {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())
@@ -81,12 +116,14 @@ func (cs *ContractService) processDoDContract() {
 		var w pkg.Work
 		worker, _ := pkg.NewWorker(w, blk.Root())
 		blk.Work = worker.NewWork()
-		_, err = cs.client.Ledger.Process(blk)
-		if err != nil {
-			cs.logger.Error(err)
-			continue
+		if !cs.GetFakeMode() {
+			_, err = cs.client.Ledger.Process(blk)
+			if err != nil {
+				cs.logger.Error(err)
+				continue
+			}
+			cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
 		}
-		cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
 	}
 }
 

@@ -30,8 +30,8 @@ func DefaultConfig(dir string) (*Config, error) {
 		},
 		Partners: []*PartnerCfg{
 			{
-				Name:      "PCCW",
-				ID:        "PCCW",
+				Name:      "PCCWG",
+				ID:        "PCCWG",
 				SonataUrl: "http://127.0.0.1:7777",
 				Username:  "",
 				Password:  "",

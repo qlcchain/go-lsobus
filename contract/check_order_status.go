@@ -3,6 +3,8 @@ package contract
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/mock"
+
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
@@ -26,10 +28,16 @@ func (cs *ContractService) checkOrderStatus() {
 
 func (cs *ContractService) getOrderStatus() {
 	addr := cs.account.Address()
-	id, err := cs.client.DoDSettlement.GetPendingResourceCheck(addr)
-	if err != nil {
-		cs.logger.Error(err)
-		return
+	var err error
+	var id []*qlcSdk.DoDPendingResourceCheckInfo
+	if cs.GetFakeMode() {
+		id = mock.GetPendingResourceCheck(addr)
+	} else {
+		id, err = cs.client.DoDSettlement.GetPendingResourceCheck(addr)
+		if err != nil {
+			cs.logger.Error(err)
+			return
+		}
 	}
 	for _, v := range id {
 		var productActive []string
@@ -80,22 +88,30 @@ func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, Internal
 		InternalId: InternalId,
 		ProductId:  products,
 	}
-
-	if blk, err := cs.client.DoDSettlement.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-		return cs.account.Sign(hash), nil
-	}); err != nil {
-		return err
+	blk := new(pkg.StateBlock)
+	var err error
+	if cs.GetFakeMode() {
+		if blk, err = mock.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
 	} else {
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-
-		_, err := cs.client.Ledger.Process(blk)
+		if blk, err = cs.client.DoDSettlement.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
+	}
+	var w pkg.Work
+	worker, _ := pkg.NewWorker(w, blk.Root())
+	blk.Work = worker.NewWork()
+	if !cs.GetFakeMode() {
+		_, err = cs.client.Ledger.Process(blk)
 		if err != nil {
 			cs.logger.Errorf("process block error: %s", err)
 			return err
 		}
-		//		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }
@@ -104,21 +120,30 @@ func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash pkg.Hash
 	param := &qlcSdk.DoDSettleResponseParam{
 		RequestHash: requestHash,
 	}
-	if blk, err := cs.client.DoDSettlement.GetUpdateOrderInfoRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-		return cs.account.Sign(hash), nil
-	}); err != nil {
-		return err
+	blk := new(pkg.StateBlock)
+	var err error
+	if cs.GetFakeMode() {
+		if blk, err = mock.GetUpdateOrderInfoRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
 	} else {
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-
-		_, err := cs.client.Ledger.Process(blk)
+		if blk, err = cs.client.DoDSettlement.GetUpdateOrderInfoRewardBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
+	}
+	var w pkg.Work
+	worker, _ := pkg.NewWorker(w, blk.Root())
+	blk.Work = worker.NewWork()
+	if !cs.GetFakeMode() {
+		_, err = cs.client.Ledger.Process(blk)
 		if err != nil {
 			cs.logger.Errorf("process block error: %s", err)
 			return err
 		}
-		//	cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }
