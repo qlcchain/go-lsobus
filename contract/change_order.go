@@ -3,6 +3,8 @@ package contract
 import (
 	"errors"
 
+	"github.com/qlcchain/go-lsobus/mock"
+
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
@@ -11,38 +13,45 @@ import (
 )
 
 func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
-	if cs.chainReady {
-		addr := cs.account.Address().String()
-		if addr == param.Buyer.Address {
-			op, err := cs.convertProtoToChangeOrderParam(param)
-			if err != nil {
-				return "", err
-			}
-			if blk, err := cs.client.DoDSettlement.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+	addr := cs.account.Address().String()
+	if addr == param.Buyer.Address {
+		op, err := cs.convertProtoToChangeOrderParam(param)
+		if err != nil {
+			return "", err
+		}
+		blk := new(pkg.StateBlock)
+		if cs.GetFakeMode() {
+			if blk, err = mock.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
 				return cs.account.Sign(hash), nil
 			}); err != nil {
 				return "", err
-			} else {
-				var w pkg.Work
-				worker, _ := pkg.NewWorker(w, blk.Root())
-				blk.Work = worker.NewWork()
-
-				hash, err := cs.client.Ledger.Process(blk)
-				if err != nil {
-					cs.logger.Errorf("process block error: %s", err)
-					return "", err
-				}
-				cs.logger.Infof("process hash %s success", hash.String())
-				internalId := blk.Previous.String()
-				cs.orderIdOnChain.Store(internalId, "")
-				return internalId, nil
 			}
-		} else {
-			cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
+		} else if cs.chainReady {
+			if blk, err = cs.client.DoDSettlement.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+				return cs.account.Sign(hash), nil
+			}); err != nil {
+				return "", err
+			}
+		} else if !cs.chainReady {
+			return "", chainNotReady
 		}
-		return "", errors.New("buyer address not match")
+		var w pkg.Work
+		worker, _ := pkg.NewWorker(w, blk.Root())
+		blk.Work = worker.NewWork()
+		if !cs.GetFakeMode() {
+			hash, err := cs.client.Ledger.Process(blk)
+			if err != nil {
+				cs.logger.Errorf("process block error: %s", err)
+				return "", err
+			}
+			cs.logger.Infof("process hash %s success", hash.String())
+		}
+		internalId := blk.Previous.String()
+		cs.orderIdOnChain.Store(internalId, "")
+		return internalId, nil
 	} else {
-		return "", errors.New("chain is not ready")
+		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
+		return "", buyerAddrNotMatch
 	}
 }
 

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/qlcchain/go-lsobus/mock"
+
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/orchestra"
@@ -80,16 +82,25 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 		Status:     qlcSdk.DoDSettleOrderStateSuccess,
 		FailReason: "",
 	}
-
-	if blk, err := cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-		return cs.account.Sign(hash), nil
-	}); err != nil {
-		return err
+	blk := new(pkg.StateBlock)
+	var err error
+	if cs.GetFakeMode() {
+		if blk, err = mock.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
 	} else {
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-
+		if blk, err = cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
+	}
+	var w pkg.Work
+	worker, _ := pkg.NewWorker(w, blk.Root())
+	blk.Work = worker.NewWork()
+	if !cs.GetFakeMode() {
 		hash, err := cs.client.Ledger.Process(blk)
 		if err != nil {
 			cs.logger.Errorf("process block error: %s", err)
