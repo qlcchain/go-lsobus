@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	"github.com/qlcchain/go-lsobus/sonata"
-
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -251,7 +249,7 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 		s.BuildItemPrice(uniItem, params.BillingParams)
 
 		// Term
-		uniItem.PricingTerm = sonata.NewInt32(36)
+		//uniItem.PricingTerm = sonata.NewInt32(36)
 	}
 
 	return uniItem
@@ -297,7 +295,7 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 		lineItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
 
 		// Price
-		//s.BuildItemPrice(lineItem, params.BillingParams)
+		s.BuildItemPrice(lineItem, params.BillingParams)
 
 		// Term
 		//lineItem.PricingTerm = sonata.NewInt32(36)
@@ -321,6 +319,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	} else if params.BillingType == BillingTypePAYG {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
+		itemPrice.Price.UnitOfMesure = params.MeasureUnit
 	} else if params.BillingType == BillingTypeUsage {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
@@ -358,4 +357,7 @@ func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreat
 func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
 	order.PaymentType = params.PaymentType
 	order.BillingType = params.BillingType
+	if order.BillingType == "DOD" {
+		order.BillingType = "DOM"
+	}
 }

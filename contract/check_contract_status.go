@@ -80,10 +80,10 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		}
 
 		if v.PaymentType.String() != "null" {
-			billingParams.PaymentType = v.PaymentType.String()
+			billingParams.PaymentType = strings.ToUpper(v.PaymentType.String())
 		}
 		if v.BillingType.String() != "null" {
-			billingParams.BillingType = v.BillingType.String()
+			billingParams.BillingType = strings.ToUpper(v.BillingType.String())
 		}
 		if v.BillingUnit.String() != "null" {
 			billingParams.BillingUnit = v.BillingUnit.String()
