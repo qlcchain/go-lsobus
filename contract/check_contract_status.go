@@ -124,10 +124,10 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			ID:   orderInfo.Seller.Address.String(),
 			Name: orderInfo.Seller.Name,
 		},
-		ExternalID: internalId,
-		ELineItems: eLines,
-		//PaymentType: "",
-		//BillingType: "",
+		ExternalID:  internalId,
+		ELineItems:  eLines,
+		PaymentType: eLines[0].BillingParams.PaymentType,
+		BillingType: eLines[0].BillingParams.BillingType,
 	}
 	err := cs.orchestra.ExecOrderCreate(op)
 	if err != nil {

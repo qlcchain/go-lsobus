@@ -15,6 +15,7 @@ import (
 	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/abiosoft/ishell"
+
 	"github.com/qlcchain/go-lsobus/cmd/util"
 )
 

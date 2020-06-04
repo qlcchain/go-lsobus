@@ -36,6 +36,8 @@ func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
 }
 
 func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
+	s.logger.Debugf("params: %s", s.DumpValue(orderParams))
+
 	reqParams := s.BuildCreateParams(orderParams)
 
 	httpCli := s.NewHTTPClient()
@@ -159,23 +161,25 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 		}
 
 		// Related Products
-		if lineParams.SrcPortID != "" {
-			relType := string("RELIES_ON")
-			relProd := &ordmod.ProductRelationship{Type: &relType}
-			relProd.Product = &ordmod.ProductRef{}
-			relProdID := lineParams.SrcPortID
-			relProd.Product.ID = &relProdID
-			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
-		}
+		/*
+			if lineParams.SrcPortID != "" {
+				relType := string("RELIES_ON")
+				relProd := &ordmod.ProductRelationship{Type: &relType}
+				relProd.Product = &ordmod.ProductRef{}
+				relProdID := lineParams.SrcPortID
+				relProd.Product.ID = &relProdID
+				lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
+			}
 
-		if lineParams.DstPortID != "" {
-			relType := string("RELIES_ON")
-			relProd := &ordmod.ProductRelationship{Type: &relType}
-			relProd.Product = &ordmod.ProductRef{}
-			relProdID := lineParams.DstPortID
-			relProd.Product.ID = &relProdID
-			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
-		}
+			if lineParams.DstPortID != "" {
+				relType := string("RELIES_ON")
+				relProd := &ordmod.ProductRelationship{Type: &relType}
+				relProd.Product = &ordmod.ProductRef{}
+				relProdID := lineParams.DstPortID
+				relProd.Product.ID = &relProdID
+				lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
+			}
+		*/
 
 		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, lineItem)
 		lineItemList = append(lineItemList, lineItem)
@@ -293,7 +297,7 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 		lineItem.Quote = &ordmod.QuoteRef{ID: &params.QuoteID, QuoteItem: params.QuoteItemID}
 
 		// Price
-		s.BuildItemPrice(lineItem, params.BillingParams)
+		//s.BuildItemPrice(lineItem, params.BillingParams)
 
 		// Term
 		//lineItem.PricingTerm = sonata.NewInt32(36)
@@ -308,7 +312,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	}
 
 	// Price
-	item.PricingMethod = ordmod.PricingMethodContract
+	//item.PricingMethod = ordmod.PricingMethodContract
 	//item.PricingReference = params.ContractID
 
 	itemPrice := &ordmod.OrderItemPrice{}

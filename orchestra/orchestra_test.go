@@ -1,11 +1,12 @@
 package orchestra
 
 import (
-	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/qlcchain/go-lsobus/config"
 )
