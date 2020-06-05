@@ -33,6 +33,8 @@ func NewAPIProductOfferingManagement(baseUrl string) *APIProductOfferingManageme
 }
 
 type ProductOfferingFindParams struct {
+	ApiToken string
+
 	Provider *string `json:"provider,omitempty"`
 	Type     *string `json:"type,omitempty"`
 	Deleted  *bool   `json:"deleted,omitempty"`
@@ -41,6 +43,8 @@ type ProductOfferingFindParams struct {
 }
 
 type ProductOfferingGetParams struct {
+	ApiToken string
+
 	ProductOfferingID string
 }
 
@@ -68,6 +72,11 @@ func (a *APIProductOfferingManagement) ProductOfferingFind(params *ProductOfferi
 		}
 		if params.PageSize != nil {
 			req.QueryParams["page_size"] = strconv.Itoa(*params.PageSize)
+		}
+
+		if params.ApiToken != "" {
+			req.Headers = make(map[string]string)
+			req.Headers["Authorization"] = "Bearer " + params.ApiToken
 		}
 	}
 
@@ -114,6 +123,11 @@ func (a *APIProductOfferingManagement) ProductOfferingGet(params *ProductOfferin
 		BaseURL:     fmt.Sprintf("%s/%s", a.BaseURL, params.ProductOfferingID),
 		Headers:     nil,
 		QueryParams: nil,
+	}
+
+	if params.ApiToken != "" {
+		req.Headers = make(map[string]string)
+		req.Headers["Authorization"] = "Bearer " + params.ApiToken
 	}
 
 	rsp, err := a.Client.Send(req)

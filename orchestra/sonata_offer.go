@@ -25,6 +25,8 @@ func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 	offapi := offer.NewAPIProductOfferingManagement(offUrl)
 
 	reqParams := &offer.ProductOfferingFindParams{}
+	reqParams.ApiToken = s.GetApiToken()
+
 	rspParams, err := offapi.ProductOfferingFind(reqParams)
 	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOfferFindResponse(reqParams)
@@ -43,6 +45,8 @@ func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
 	offapi := offer.NewAPIProductOfferingManagement(offUrl)
 
 	reqParams := &offer.ProductOfferingGetParams{ProductOfferingID: params.ID}
+	reqParams.ApiToken = s.GetApiToken()
+
 	rspParams, err := offapi.ProductOfferingGet(reqParams)
 	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOfferGetResponse(reqParams)
