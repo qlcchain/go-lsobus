@@ -20,7 +20,7 @@ require (
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0
-	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200602063352-10054d398ff6
+	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200605022441-6bbaea993e83
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.0.0
 	go.uber.org/atomic v1.6.0

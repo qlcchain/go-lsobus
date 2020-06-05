@@ -35,6 +35,7 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 		} else if !cs.chainReady {
 			return "", chainNotReady
 		}
+
 		var w pkg.Work
 		worker, _ := pkg.NewWorker(w, blk.Root())
 		blk.Work = worker.NewWork()
