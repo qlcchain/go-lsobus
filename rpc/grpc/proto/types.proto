@@ -28,17 +28,18 @@ message User {
 message ConnectionStaticParam {
   string itemId = 1;
   string buyerProductId = 2;
-  string productId = 3;
-  string srcCompanyName = 4;
-  string srcRegion = 5;
-  string srcCity = 6;
-  string srcDataCenter = 7;
-  string srcPort = 8;
-  string dstCompanyName = 9;
-  string dstRegion = 10;
-  string dstCity = 11;
-  string dstDataCenter = 12;
-  string dstPort = 13;
+  string ProductOfferingId = 3;
+  string productId = 4;
+  string srcCompanyName = 5;
+  string srcRegion = 6;
+  string srcCity = 7;
+  string srcDataCenter = 8;
+  string srcPort = 9;
+  string dstCompanyName = 10;
+  string dstRegion = 11;
+  string dstCity = 12;
+  string dstDataCenter = 13;
+  string dstPort = 14;
 }
 
 message ConnectionDynamicParam {

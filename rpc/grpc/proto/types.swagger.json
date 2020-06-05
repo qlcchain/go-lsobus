@@ -243,6 +243,9 @@
         "buyerProductId": {
           "type": "string"
         },
+        "ProductOfferingId": {
+          "type": "string"
+        },
         "productId": {
           "type": "string"
         },
