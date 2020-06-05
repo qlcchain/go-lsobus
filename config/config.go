@@ -5,6 +5,7 @@ type Config struct {
 	DataDir  string        `json:"dataDir"`
 	LogLevel string        `json:"logLevel"` //info,warn,debug.
 	ChainUrl string        `json:"chainUrl"` //chain url.
+	FakeMode bool          `json:"fakeMode"` //fake mode for sonata
 	RPC      RPCConfig     `json:"rpc"`
 	Partners []*PartnerCfg `json:"partners"`
 }
