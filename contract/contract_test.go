@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	ct "github.com/qlcchain/go-lsobus/services/context"
+
 	"github.com/google/uuid"
 	"github.com/qlcchain/go-lsobus/cmd/util"
 	"github.com/qlcchain/go-lsobus/config"
@@ -12,11 +14,13 @@ import (
 
 func setupTestCase(t *testing.T) (func(t *testing.T), *ContractService) {
 	cfgFile := filepath.Join(config.TestDataDir(), uuid.New().String(), config.CfgFileName)
+	cc := ct.NewServiceContext(cfgFile)
+	cfg, err := cc.Config()
+	setupOrchestraConfig(cfg)
 	cs, err := NewContractService(cfgFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	setupOrchestraConfig(cs)
 	if err = cs.Init(); err != nil {
 		t.Fatal(err)
 	}
@@ -32,8 +36,8 @@ func setupTestCase(t *testing.T) (func(t *testing.T), *ContractService) {
 	}, cs
 }
 
-func setupOrchestraConfig(cs *ContractService) {
-	cs.cfg.Partners = nil
+func setupOrchestraConfig(cfg *config.Config) {
+	cfg.Partners = nil
 	p1 := &config.PartnerCfg{
 		Name:      "PCCWG",
 		ID:        "PCCWG",
@@ -41,7 +45,8 @@ func setupOrchestraConfig(cs *ContractService) {
 		Username:  "test",
 		Password:  "test",
 	}
-	cs.cfg.Partners = append(cs.cfg.Partners, p1)
+	cfg.Partners = append(cfg.Partners, p1)
+	cfg.FakeMode = true
 }
 
 func TestContractService_GetOrderInfoByInternalId(t *testing.T) {

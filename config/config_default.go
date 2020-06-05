@@ -22,6 +22,7 @@ func DefaultConfig(dir string) (*Config, error) {
 		DataDir:  dir,
 		LogLevel: "error",
 		ChainUrl: "ws://127.0.0.1:19736",
+		FakeMode: false,
 		RPC: RPCConfig{
 			Enable:             true,
 			ListenAddress:      "tcp://0.0.0.0:9998",

@@ -64,7 +64,7 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	or := orchestra.NewOrchestra(cfgFile)
-	or.SetFakeMode(true)
+	or.SetFakeMode(cfg.FakeMode)
 	cs := &ContractService{
 		cfg:               cfg,
 		account:           cc.Account(),
