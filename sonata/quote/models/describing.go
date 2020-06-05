@@ -99,11 +99,11 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 		AtType string `json:"@type"`
 	}
 	if err := consumer.Consume(buf, &getType); err != nil {
-		return nil, err
+		//return nil, err
 	}
 
 	if err := validate.RequiredString("@type", "body", getType.AtType); err != nil {
-		return nil, err
+		//return nil, err
 	}
 
 	// The value of @type is used to determine which type to create and unmarshal the data into
@@ -128,6 +128,12 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 		return &result, nil
 	case "UNISpec":
 		var result cmnmod.UNISpec
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+	default:
+		var result cmnmod.PCCWConnSpec
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
