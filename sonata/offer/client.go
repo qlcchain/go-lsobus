@@ -7,14 +7,18 @@ import (
 	"net/http"
 	"strconv"
 
+	"go.uber.org/zap"
+
 	"github.com/go-openapi/runtime"
 
 	"github.com/qlcchain/go-lsobus/common/rest"
+	"github.com/qlcchain/go-lsobus/log"
 )
 
 type APIProductOfferingManagement struct {
 	BaseURL string
 	Client  *rest.Client
+	logger  *zap.SugaredLogger
 }
 
 func NewAPIProductOfferingManagement(baseUrl string) *APIProductOfferingManagement {
@@ -24,6 +28,7 @@ func NewAPIProductOfferingManagement(baseUrl string) *APIProductOfferingManageme
 			HTTPClient: &http.Client{},
 		},
 	}
+	a.logger = log.NewLogger("APIProductOffering")
 	return a
 }
 
@@ -75,9 +80,23 @@ func (a *APIProductOfferingManagement) ProductOfferingFind(params *ProductOfferi
 	}
 
 	resp := &FindResponse{}
+
+	// response header X-Result-Count
+	xrcHdrs := rsp.Headers["X-Result-Count"]
+	if len(xrcHdrs) > 0 {
+		resp.XResultCount = xrcHdrs[0]
+	}
+
+	// response header X-Total_Count
+	xtcHdrs := rsp.Headers["X-Total_Count"]
+	if len(xtcHdrs) > 0 {
+		resp.XTotalCount = xtcHdrs[0]
+	}
+
+	// response payload
 	bdIO := bytes.NewBuffer([]byte(rsp.Body))
 	cs := runtime.JSONConsumer()
-	err = cs.Consume(bdIO, resp)
+	err = cs.Consume(bdIO, &resp.Payload)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +124,7 @@ func (a *APIProductOfferingManagement) ProductOfferingGet(params *ProductOfferin
 	resp := &GetResponse{}
 	bdIO := bytes.NewBuffer([]byte(rsp.Body))
 	cs := runtime.JSONConsumer()
-	err = cs.Consume(bdIO, resp)
+	err = cs.Consume(bdIO, &(resp.Payload))
 	if err != nil {
 		return nil, err
 	}

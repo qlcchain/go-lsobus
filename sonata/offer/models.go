@@ -1,18 +1,18 @@
 package offer
 
 type FindResponse struct {
-	Data []*ProductOffering `json:"data,omitempty"`
-	Mata *Meta              `json:"mata,omitempty"`
+	/*The number of resources retrieved in the response
+	 */
+	XResultCount string
+	/*The total number of matching resources
+	 */
+	XTotalCount string
+
+	Payload []*ProductOffering
 }
 
 type GetResponse struct {
-	Data *ProductOffering `json:"data,omitempty"`
-}
-
-type Meta struct {
-	Total   int `json:"total,omitempty"`
-	Page    int `json:"page,omitempty"`
-	PerPage int `json:"per_page,omitempty"`
+	Payload *ProductOffering
 }
 
 type ProductOffering struct {

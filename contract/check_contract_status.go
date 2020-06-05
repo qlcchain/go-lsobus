@@ -80,10 +80,10 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		}
 
 		if v.PaymentType.String() != "null" {
-			billingParams.PaymentType = v.PaymentType.String()
+			billingParams.PaymentType = strings.ToUpper(v.PaymentType.String())
 		}
 		if v.BillingType.String() != "null" {
-			billingParams.BillingType = v.BillingType.String()
+			billingParams.BillingType = strings.ToUpper(v.BillingType.String())
 		}
 		if v.BillingUnit.String() != "null" {
 			billingParams.BillingUnit = v.BillingUnit.String()
@@ -102,7 +102,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			DstMetroID:    v.DstCity,
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
-			CosName:       v.ServiceClass.String(),
+			CosName:       strings.ToUpper(v.ServiceClass.String()),
 			BaseItemParams: orchestra.BaseItemParams{
 				BillingParams:  billingParams,
 				BuyerProductID: v.BuyerProductId,
@@ -124,10 +124,10 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			ID:   orderInfo.Seller.Address.String(),
 			Name: orderInfo.Seller.Name,
 		},
-		ExternalID: internalId,
-		ELineItems: eLines,
-		//PaymentType: "",
-		//BillingType: "",
+		ExternalID:  internalId,
+		ELineItems:  eLines,
+		PaymentType: eLines[0].BillingParams.PaymentType,
+		BillingType: eLines[0].BillingParams.BillingType,
 	}
 	err := cs.orchestra.ExecOrderCreate(op)
 	if err != nil {

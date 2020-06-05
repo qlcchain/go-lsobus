@@ -32,8 +32,8 @@ func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 		return err
 	}
 
-	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.Data))
-	params.RspOfferList = rspParams.Data
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.Payload))
+	params.RspOfferList = rspParams.Payload
 
 	return nil
 }
@@ -50,8 +50,8 @@ func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
 		return nil
 	}
 
-	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.Data))
-	params.RspOffer = rspParams.Data
+	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.Payload))
+	params.RspOffer = rspParams.Payload
 
 	return nil
 }

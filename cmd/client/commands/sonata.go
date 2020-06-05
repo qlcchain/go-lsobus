@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"os"
 	"time"
 
@@ -285,6 +286,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		params.ELineItems = append(params.ELineItems, lineItem)
 	}
 
+	params.BillingType = "DOM"
+	//params.BillingType = "PAYG"
+	params.PaymentType = "INVOICE"
+	//params.PaymentType = "CREDITCARD"
+
 	return nil
 }
 
@@ -293,6 +299,7 @@ func fillBillingParamsByCmdFlags(cmd *cobra.Command) *orchestra.BillingParams {
 
 	params := &orchestra.BillingParams{}
 	params.BillingType = "DOD"
+	params.PaymentType = "invoice"
 
 	params.Currency, err = cmd.Flags().GetString("currency")
 	if err != nil {
@@ -361,6 +368,10 @@ func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) er
 	params.ID, err = cmd.Flags().GetString("id")
 	if err != nil {
 		return err
+	}
+
+	if params.ID == "" {
+		return errors.New("id can not be empty")
 	}
 
 	return nil

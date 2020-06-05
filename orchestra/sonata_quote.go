@@ -34,6 +34,8 @@ func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
 }
 
 func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
+	s.logger.Debugf("params: %s", s.DumpValue(orderParams))
+
 	reqParams := s.BuildCreateParams(orderParams)
 
 	httpCli := s.NewHTTPClient()

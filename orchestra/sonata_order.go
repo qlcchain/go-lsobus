@@ -3,8 +3,6 @@ package orchestra
 import (
 	"time"
 
-	"github.com/qlcchain/go-lsobus/sonata"
-
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -36,6 +34,8 @@ func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
 }
 
 func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
+	s.logger.Debugf("params: %s", s.DumpValue(orderParams))
+
 	reqParams := s.BuildCreateParams(orderParams)
 
 	httpCli := s.NewHTTPClient()
@@ -159,23 +159,25 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 		}
 
 		// Related Products
-		if lineParams.SrcPortID != "" {
-			relType := string("RELIES_ON")
-			relProd := &ordmod.ProductRelationship{Type: &relType}
-			relProd.Product = &ordmod.ProductRef{}
-			relProdID := lineParams.SrcPortID
-			relProd.Product.ID = &relProdID
-			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
-		}
+		/*
+			if lineParams.SrcPortID != "" {
+				relType := string("RELIES_ON")
+				relProd := &ordmod.ProductRelationship{Type: &relType}
+				relProd.Product = &ordmod.ProductRef{}
+				relProdID := lineParams.SrcPortID
+				relProd.Product.ID = &relProdID
+				lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
+			}
 
-		if lineParams.DstPortID != "" {
-			relType := string("RELIES_ON")
-			relProd := &ordmod.ProductRelationship{Type: &relType}
-			relProd.Product = &ordmod.ProductRef{}
-			relProdID := lineParams.DstPortID
-			relProd.Product.ID = &relProdID
-			lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
-		}
+			if lineParams.DstPortID != "" {
+				relType := string("RELIES_ON")
+				relProd := &ordmod.ProductRelationship{Type: &relType}
+				relProd.Product = &ordmod.ProductRef{}
+				relProdID := lineParams.DstPortID
+				relProd.Product.ID = &relProdID
+				lineItem.Product.ProductRelationship = append(lineItem.Product.ProductRelationship, relProd)
+			}
+		*/
 
 		reqParams.ProductOrder.OrderItem = append(reqParams.ProductOrder.OrderItem, lineItem)
 		lineItemList = append(lineItemList, lineItem)
@@ -247,7 +249,7 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 		s.BuildItemPrice(uniItem, params.BillingParams)
 
 		// Term
-		uniItem.PricingTerm = sonata.NewInt32(36)
+		//uniItem.PricingTerm = sonata.NewInt32(36)
 	}
 
 	return uniItem
@@ -308,7 +310,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	}
 
 	// Price
-	item.PricingMethod = ordmod.PricingMethodContract
+	//item.PricingMethod = ordmod.PricingMethodContract
 	//item.PricingReference = params.ContractID
 
 	itemPrice := &ordmod.OrderItemPrice{}
@@ -317,6 +319,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	} else if params.BillingType == BillingTypePAYG {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
+		itemPrice.Price.UnitOfMesure = params.MeasureUnit
 	} else if params.BillingType == BillingTypeUsage {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
@@ -354,4 +357,7 @@ func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreat
 func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
 	order.PaymentType = params.PaymentType
 	order.BillingType = params.BillingType
+	if order.BillingType == "DOD" {
+		order.BillingType = "DOM"
+	}
 }

@@ -92,7 +92,7 @@ func (m *PCCWConnSpec) UnmarshalJSON(raw []byte) error {
 
 	if base.AtType != result.AtType() {
 		/* Not the type we're looking for. */
-		return errors.New(422, "invalid @type value: %q", base.AtType)
+		//return errors.New(422, "invalid @type value: %q", base.AtType)
 	}
 	result.PCCWConnSpecV1 = data.PCCWConnSpecV1
 

@@ -7,8 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qlcchain/go-lsobus/cmd/util"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	"github.com/qlcchain/go-lsobus/cmd/util"
 
 	"google.golang.org/grpc"
 
