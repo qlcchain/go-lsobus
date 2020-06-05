@@ -11,7 +11,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
@@ -139,7 +138,7 @@ func unmarshalDescribing(data []byte, consumer runtime.Consumer) (Describing, er
 		}
 		return &result, nil
 	}
-	return nil, errors.New(422, "invalid @type value: %q", getType.AtType)
+	//return nil, errors.New(422, "invalid @type value: %q", getType.AtType)
 }
 
 // Validate validates this describing
