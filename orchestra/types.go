@@ -109,6 +109,8 @@ type FindParams struct {
 	ProductOfferingID      string
 	ProductOrderID         string
 
+	XResultCount int32 //The number of resources retrieved in the response
+	XTotalCount  int32 //The total number of matching resources
 	RspSiteList  []*sitmod.GeographicSiteFindResp
 	RspPoqList   []*poqmod.ProductOfferingQualificationFind
 	RspQuoteList []*quomod.QuoteFind

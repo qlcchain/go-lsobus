@@ -93,6 +93,8 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspOrderList = rspParams.GetPayload()
+	params.XResultCount = rspParams.XResultCount
+	params.XTotalCount = rspParams.XTotalCount
 
 	return nil
 }

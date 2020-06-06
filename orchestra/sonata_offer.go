@@ -1,6 +1,8 @@
 package orchestra
 
 import (
+	"github.com/go-openapi/swag"
+
 	"github.com/qlcchain/go-lsobus/mock"
 	"github.com/qlcchain/go-lsobus/sonata/offer"
 )
@@ -36,6 +38,8 @@ func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.Payload))
 	params.RspOfferList = rspParams.Payload
+	params.XResultCount, err = swag.ConvertInt32(rspParams.XResultCount)
+	params.XTotalCount, err = swag.ConvertInt32(rspParams.XTotalCount)
 
 	return nil
 }

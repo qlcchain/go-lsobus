@@ -3,7 +3,10 @@ package commands
 import (
 	"errors"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/spf13/cobra"
 
@@ -80,6 +83,8 @@ func addFlagsForFindParams(cmd *cobra.Command) {
 
 	cmd.Flags().String("projectID", "", "Project ID")
 	cmd.Flags().String("state", "", "Service state or status")
+	cmd.Flags().String("externalID", "", "External ID")
+
 	cmd.Flags().String("prodSpecID", "", "Production specification ID")
 	cmd.Flags().String("prodOrderID", "", "Production order ID")
 }
@@ -291,6 +296,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	params.PaymentType = "INVOICE"
 	//params.PaymentType = "CREDITCARD"
 
+	upOrdActStr := strings.ToUpper(params.OrderActivity)
+	if upOrdActStr == "INSTALL" || upOrdActStr == "ADD" {
+		params.ExternalID = uuid.New().String()
+	}
+
 	return nil
 }
 
@@ -342,6 +352,11 @@ func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) 
 	}
 
 	params.State, err = cmd.Flags().GetString("state")
+	if err != nil {
+		return err
+	}
+
+	params.ExternalID, err = cmd.Flags().GetString("externalID")
 	if err != nil {
 		return err
 	}

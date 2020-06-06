@@ -8,6 +8,7 @@ import (
 	ct "github.com/qlcchain/go-lsobus/services/context"
 
 	"github.com/google/uuid"
+
 	"github.com/qlcchain/go-lsobus/cmd/util"
 	"github.com/qlcchain/go-lsobus/config"
 )

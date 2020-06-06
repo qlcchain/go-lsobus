@@ -3,9 +3,10 @@ package contract
 import (
 	"testing"
 
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"github.com/qlcchain/go-lsobus/cmd/util"
 	"github.com/qlcchain/go-lsobus/mock"
-	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 )
 
 func TestContractService_ConvertProtoToTerminateOrderParam(t *testing.T) {

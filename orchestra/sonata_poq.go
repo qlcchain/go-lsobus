@@ -83,6 +83,9 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
 	params.RspPoqList = rspParams.GetPayload()
+	params.XResultCount = rspParams.XResultCount
+	params.XTotalCount = rspParams.XTotalCount
+
 	return nil
 }
 

@@ -10,11 +10,12 @@ import (
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"github.com/google/uuid"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	"github.com/qlcchain/go-lsobus/config"
 	"github.com/qlcchain/go-lsobus/contract"
 	"github.com/qlcchain/go-lsobus/mock"
 	ct "github.com/qlcchain/go-lsobus/services/context"
-	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 )
 
 func setupTestCase(t *testing.T) (func(t *testing.T), *OrderApi) {

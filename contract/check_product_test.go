@@ -6,8 +6,9 @@ import (
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	"github.com/google/uuid"
-	"github.com/qlcchain/go-lsobus/mock"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	"github.com/qlcchain/go-lsobus/mock"
 )
 
 func TestContractService_GetProductId(t *testing.T) {
