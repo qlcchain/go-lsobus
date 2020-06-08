@@ -97,6 +97,10 @@ func (cs *ContractService) SetAccount(account *types.Account) {
 	cs.account = account
 }
 
+func (cs *ContractService) GetOrchestra() *orchestra.Orchestra {
+	return cs.orchestra
+}
+
 func (cs *ContractService) Init() error {
 	err := cs.orchestra.Init()
 	if err != nil {

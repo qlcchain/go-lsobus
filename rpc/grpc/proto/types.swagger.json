@@ -31,6 +31,84 @@
         ]
       }
     },
+    "/orchestra/exec/create": {
+      "post": {
+        "operationId": "ExecCreate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrchestraAPI"
+        ]
+      }
+    },
+    "/orchestra/exec/find": {
+      "post": {
+        "operationId": "ExecFind",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrchestraAPI"
+        ]
+      }
+    },
+    "/orchestra/exec/get": {
+      "post": {
+        "operationId": "ExecGet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoOrchestraCommonRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrchestraAPI"
+        ]
+      }
+    },
     "/order/change": {
       "post": {
         "operationId": "ChangeOrder",
@@ -315,6 +393,36 @@
           "items": {
             "$ref": "#/definitions/protoConnectionParam"
           }
+        }
+      }
+    },
+    "protoOrchestraCommonRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "data": {
+          "type": "string"
+        }
+      }
+    },
+    "protoOrchestraCommonResponse": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "resultCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "data": {
+          "type": "string"
         }
       }
     },

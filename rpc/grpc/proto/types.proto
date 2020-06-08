@@ -2,6 +2,7 @@ syntax = "proto3";
 package proto;
 option go_package = ".;proto";
 
+import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 
 message VersionRequest{}
@@ -156,3 +157,35 @@ service OrderAPI{
   }
 }
 
+message OrchestraCommonRequest {
+  string action = 1;
+  string data = 2;
+}
+
+message OrchestraCommonResponse {
+  string action = 1;
+  int32  totalCount = 2;
+  int32  resultCount = 3;
+  string data = 4;
+}
+
+service OrchestraAPI{
+  rpc ExecCreate(OrchestraCommonRequest) returns (OrchestraCommonResponse){
+    option (google.api.http) = {
+      post: "/orchestra/exec/create"
+      body: "*"
+    };
+  }
+  rpc ExecFind(OrchestraCommonRequest) returns (OrchestraCommonResponse){
+    option (google.api.http) = {
+      post: "/orchestra/exec/find"
+      body: "*"
+    };
+  }
+  rpc ExecGet(OrchestraCommonRequest) returns (OrchestraCommonResponse){
+    option (google.api.http) = {
+      post: "/orchestra/exec/get"
+      body: "*"
+    };
+  }
+}
