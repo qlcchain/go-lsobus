@@ -3,36 +3,38 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/bitly/go-simplejson"
+
 	"github.com/qlcchain/go-lsobus/cmd/agent/client"
 	"github.com/qlcchain/go-lsobus/cmd/agent/client/orchestra_api"
 	"github.com/qlcchain/go-lsobus/cmd/agent/client/order_api"
 	"github.com/qlcchain/go-lsobus/cmd/agent/models"
-	"net/url"
-	"strings"
 )
 
 type ProductParam struct {
-	BuyerAddr string
-	BuyerName string
-	SellerAddr string
-	SellerName string
+	BuyerAddr      string
+	BuyerName      string
+	SellerAddr     string
+	SellerName     string
 	ProductOfferID string
 
-	SrcPort string
+	SrcPort  string
 	SrcLocID string
-	DstPort string
+	DstPort  string
 	DstLocID string
 
-	Name string
+	Name      string
 	Bandwidth int32
-	CosName string
+	CosName   string
 	StartTime int64
-	EndTime int64
+	EndTime   int64
 }
 
 type ProductOrder struct {
-	Param *ProductParam
+	Param  *ProductParam
 	Client *client.TypesProto
 
 	QuoteID     string
@@ -55,8 +57,8 @@ func (o *ProductOrder) Init() error {
 	}
 
 	tranCfg := client.TransportConfig{
-		Schemes: []string{retUrl.Scheme},
-		Host: retUrl.Host,
+		Schemes:  []string{retUrl.Scheme},
+		Host:     retUrl.Host,
 		BasePath: "/",
 	}
 	o.Client = client.NewHTTPClientWithConfig(nil, &tranCfg)
@@ -64,7 +66,7 @@ func (o *ProductOrder) Init() error {
 }
 
 func (o *ProductOrder) CreateQuote() error {
-	reqDataJson, err:= o.buildQuoteReqJson()
+	reqDataJson, err := o.buildQuoteReqJson()
 	if err != nil {
 		return err
 	}
@@ -110,20 +112,20 @@ func (o *ProductOrder) buildQuoteReqJson() ([]byte, error) {
 	quoteParam.ELineItems = append(quoteParam.ELineItems, lineItem)
 
 	/*
-	quoteJson, err := simplejson.NewJson([]byte())
-	if err != nil {
-		return nil, err
-	}
+		quoteJson, err := simplejson.NewJson([]byte())
+		if err != nil {
+			return nil, err
+		}
 
-	itemJson := quoteJson.Get("quoteItem").GetIndex(0)
-	descJson := itemJson.GetPath("product", "productSpecification", "describing")
-	descJson.Set("bandwidth", o.Param.Bandwidth)
-	descJson.Set("classOfService", o.Param.CosName)
-	descJson.Set("srcLocationId", o.Param.SrcLocID)
-	descJson.Set("destLocationId", o.Param.DstLocID)
-	descJson.Set("startedAt", time.Unix(o.Param.StartTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
-	descJson.Set("terminatedAt", time.Unix(o.Param.EndTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
-	 */
+		itemJson := quoteJson.Get("quoteItem").GetIndex(0)
+		descJson := itemJson.GetPath("product", "productSpecification", "describing")
+		descJson.Set("bandwidth", o.Param.Bandwidth)
+		descJson.Set("classOfService", o.Param.CosName)
+		descJson.Set("srcLocationId", o.Param.SrcLocID)
+		descJson.Set("destLocationId", o.Param.DstLocID)
+		descJson.Set("startedAt", time.Unix(o.Param.StartTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
+		descJson.Set("terminatedAt", time.Unix(o.Param.EndTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
+	*/
 
 	return json.Marshal(quoteParam)
 }
@@ -149,8 +151,8 @@ func (o *ProductOrder) parseQuoteRspJson() error {
 
 func (o *ProductOrder) CreateNewOrder() error {
 	o.OrderReq = &models.ProtoCreateOrderParam{}
-	o.OrderReq.Buyer = &models.ProtoUser{Name:o.Param.BuyerName, Address:o.Param.BuyerAddr}
-	o.OrderReq.Seller = &models.ProtoUser{Name:o.Param.SellerName, Address:o.Param.SellerAddr}
+	o.OrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
+	o.OrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
 
 	connParam := &models.ProtoConnectionParam{}
 	connParam.StaticParam = &models.ProtoConnectionStaticParam{}

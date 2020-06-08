@@ -3,8 +3,9 @@ package commands
 import (
 	"fmt"
 	"os"
-	"github.com/spf13/cobra"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 var rootCmd *cobra.Command
@@ -41,7 +42,7 @@ func InitCmd() {
 			pp.ProductOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
 			pp.StartTime = time.Now().Unix()
-			pp.EndTime = pp.StartTime + 5 * 24 * 3600
+			pp.EndTime = pp.StartTime + 5*24*3600
 			pp.Bandwidth = 100
 			pp.CosName = "gold"
 			pp.SrcLocID = "5ae7e56bbbc9a8001231fa5d"

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/qlcchain/go-lsobus/cmd/agent/commands"
 	"os"
+
+	"github.com/qlcchain/go-lsobus/cmd/agent/commands"
 )
 
 func main() {
