@@ -110,7 +110,7 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 	}
 
 	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
-	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCWG", Name: "PCCWG"}
 
 	itemAction, err := cmd.Flags().GetString("itemAction")
 	if err != nil {
@@ -344,7 +344,7 @@ func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) 
 	var err error
 
 	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
-	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCWG", Name: "PCCWG"}
 
 	params.ProjectID, err = cmd.Flags().GetString("projectID")
 	if err != nil {
@@ -378,7 +378,7 @@ func fillGetParamsByCmdFlags(params *orchestra.GetParams, cmd *cobra.Command) er
 	var err error
 
 	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
-	params.Seller = &orchestra.PartnerParams{ID: "PCCW", Name: "PCCW"}
+	params.Seller = &orchestra.PartnerParams{ID: "PCCWG", Name: "PCCWG"}
 
 	params.ID, err = cmd.Flags().GetString("id")
 	if err != nil {

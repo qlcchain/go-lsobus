@@ -28,6 +28,8 @@ func NewOrchestraApi(orch *orchestra.Orchestra) *OrchestraApi {
 }
 
 func (oa *OrchestraApi) ExecCreate(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+	oa.logger.Debugf("ExecCreate request %+v", param)
+
 	orchParams := oa.Request2OrchCreateParams(param)
 
 	var execErr error
@@ -44,6 +46,7 @@ func (oa *OrchestraApi) ExecCreate(ctx context.Context, param *proto.OrchestraCo
 		return nil, errors.New("invalid ExecAction")
 	}
 	if execErr != nil {
+		oa.logger.Errorf("%s err %s", param.GetAction(), execErr)
 		return nil, execErr
 	}
 
@@ -57,10 +60,14 @@ func (oa *OrchestraApi) ExecCreate(ctx context.Context, param *proto.OrchestraCo
 	}
 	rsp.Data = string(dataBytes)
 
+	oa.logger.Debugf("ExecCreate response %+v", rsp)
+
 	return rsp, nil
 }
 
 func (oa *OrchestraApi) ExecFind(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+	oa.logger.Debugf("ExecFind request %+v", param)
+
 	orchParams := oa.Request2OrchFindParams(param)
 
 	var execErr error
@@ -80,6 +87,7 @@ func (oa *OrchestraApi) ExecFind(ctx context.Context, param *proto.OrchestraComm
 		return nil, errors.New("invalid ExecAction")
 	}
 	if execErr != nil {
+		oa.logger.Errorf("%s err %s", param.GetAction(), execErr)
 		return nil, execErr
 	}
 
@@ -93,10 +101,14 @@ func (oa *OrchestraApi) ExecFind(ctx context.Context, param *proto.OrchestraComm
 	}
 	rsp.Data = string(dataBytes)
 
+	oa.logger.Debugf("ExecFind response %+v", rsp)
+
 	return rsp, nil
 }
 
 func (oa *OrchestraApi) ExecGet(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+	oa.logger.Debugf("ExecGet request %+v", param)
+
 	orchParams := oa.Request2OrchGetParams(param)
 
 	var execErr error
@@ -116,6 +128,7 @@ func (oa *OrchestraApi) ExecGet(ctx context.Context, param *proto.OrchestraCommo
 		return nil, errors.New("invalid ExecAction")
 	}
 	if execErr != nil {
+		oa.logger.Errorf("%s err %s", param.GetAction(), execErr)
 		return nil, execErr
 	}
 
@@ -128,6 +141,8 @@ func (oa *OrchestraApi) ExecGet(ctx context.Context, param *proto.OrchestraCommo
 		return nil, err
 	}
 	rsp.Data = string(dataBytes)
+
+	oa.logger.Debugf("ExecGet response %+v", rsp)
 
 	return rsp, nil
 }

@@ -13,6 +13,9 @@ MAIN = $(shell pwd)/cmd/main.go
 CLIENT_BINARY = glsobus-client
 CLIENT_MAIN = $(shell pwd)/cmd/client/main.go
 
+AGENT_BINARY = cbc-agent
+AGENT_MAIN = $(shell pwd)/cmd/agent/main.go
+
 BUILDDIR = $(shell pwd)/build
 VERSION ?= 0.0.1
 GITREV = $(shell git rev-parse --short HEAD)
@@ -37,6 +40,10 @@ build:
 client:
 	go build ${LDFLAGS} -o $(BUILDDIR)/${CLIENT_BINARY} -i $(CLIENT_MAIN)
 	@echo "Build $(CLIENT_BINARY) done."
+
+agent:
+	go build ${LDFLAGS} -o $(BUILDDIR)/${AGENT_BINARY} -i $(AGENT_MAIN)
+	@echo "Build $(AGENT_BINARY) done."
 
 changelog:
 	git-chglog $(VERSION) > CHANGELOG.md
