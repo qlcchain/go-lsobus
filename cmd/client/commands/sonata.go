@@ -60,6 +60,8 @@ func addFlagsForOrderParams(cmd *cobra.Command) {
 	cmd.Flags().UintSlice("srcVlanID", nil, "Source CE VLAN IDs of UNI")
 	cmd.Flags().String("dstUniID", "", "Destination UNI ID of connection")
 	cmd.Flags().UintSlice("dstVlanID", nil, "Destination CE VLAN IDs of UNI")
+	cmd.Flags().String("dstCompanyID", "", "Destination Company ID of UNI")
+	cmd.Flags().String("dstMetroID", "", "Destination Metro ID of UNI")
 
 	cmd.Flags().String("srcLocationID", "", "Source location ID of connection")
 	cmd.Flags().String("dstLocationID", "", "Destination location ID of connection")
@@ -160,6 +162,8 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
 
+		uniItem.BuyerProductID = uuid.New().String()
+
 		params.UNIItems = append(params.UNIItems, uniItem)
 	}
 
@@ -200,6 +204,8 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		}
 
 		uniItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
+
+		uniItem.BuyerProductID = uuid.New().String()
 
 		params.UNIItems = append(params.UNIItems, uniItem)
 	}
@@ -279,6 +285,11 @@ func fillOrderParamsByCmdFlags(params *orchestra.OrderParams, cmd *cobra.Command
 		}
 
 		lineItem.BillingParams = fillBillingParamsByCmdFlags(cmd)
+
+		lineItem.BuyerProductID = uuid.New().String()
+
+		lineItem.DstCompanyID = "5d02fa08a5b531000a764046"
+		lineItem.DstMetroID = "9d242983f7a504eebb3eb478"
 
 		params.ELineItems = append(params.ELineItems, lineItem)
 	}

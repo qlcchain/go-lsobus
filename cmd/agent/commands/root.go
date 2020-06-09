@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +52,7 @@ func InitCmd() {
 			pp.DstLocID = "5ae7e56bbbc9a8001231fa5d"
 			pp.DstPort = "5d269f1760e409000ad83c58"
 			pp.Name = "cbc-customer-1-line-1"
+			pp.BuyerProductID = uuid.New().String()
 
 			po := &ProductOrder{Param: pp}
 			err := po.Init()

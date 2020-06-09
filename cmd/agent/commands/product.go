@@ -2,8 +2,10 @@ package commands
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/bitly/go-simplejson"
@@ -31,15 +33,20 @@ type ProductParam struct {
 	CosName   string
 	StartTime int64
 	EndTime   int64
+
+	BuyerProductID string
 }
 
 type ProductOrder struct {
 	Param  *ProductParam
 	Client *client.TypesProto
 
-	QuoteID     string
-	QuoteItemID string
-	InternalID  string
+	QuoteID       string
+	QuoteItemID   string
+	QuoteCurrency string
+	QuotePrice    float64
+
+	InternalID string
 
 	QuoteReq *models.ProtoOrchestraCommonRequest
 	QuoteRsp *models.ProtoOrchestraCommonResponse
@@ -87,7 +94,8 @@ func (o *ProductOrder) CreateQuote() error {
 		return err
 	}
 
-	fmt.Printf("Create Quote is OK, QuoteID %s, QuoteItemID %s\n", o.QuoteID, o.QuoteItemID)
+	fmt.Printf("Create Quote is OK, QuoteID %s, QuoteItemID %s, Price: %f/%s\n",
+		o.QuoteID, o.QuoteItemID, o.QuotePrice, o.QuoteCurrency)
 
 	return nil
 }
@@ -141,7 +149,19 @@ func (o *ProductOrder) parseQuoteRspJson() error {
 		return err
 	}
 
-	o.QuoteItemID, err = quoteJson.Get("quoteItem").GetIndex(0).Get("id").String()
+	quoteItem := quoteJson.Get("quoteItem").GetIndex(0)
+
+	o.QuoteItemID, err = quoteItem.Get("id").String()
+	if err != nil {
+		return err
+	}
+
+	quotePrice := quoteItem.Get("preCalculatedPrice").Get("price")
+	o.QuoteCurrency, err = quotePrice.Get("preTaxAmount").Get("unit").String()
+	if err != nil {
+		return err
+	}
+	o.QuotePrice, err = quotePrice.Get("preTaxAmount").Get("value").Float64()
 	if err != nil {
 		return err
 	}
@@ -150,6 +170,10 @@ func (o *ProductOrder) parseQuoteRspJson() error {
 }
 
 func (o *ProductOrder) CreateNewOrder() error {
+	if o.QuoteRsp == nil {
+		return errors.New("quote not exist")
+	}
+
 	o.OrderReq = &models.ProtoCreateOrderParam{}
 	o.OrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
 	o.OrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
@@ -157,15 +181,24 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam := &models.ProtoConnectionParam{}
 	connParam.StaticParam = &models.ProtoConnectionStaticParam{}
 	connParam.StaticParam.ProductOfferingID = o.Param.ProductOfferID
+	connParam.StaticParam.BuyerProductID = o.Param.BuyerProductID
 	connParam.StaticParam.ItemID = "1"
 	connParam.StaticParam.SrcPort = o.Param.SrcPort
 	connParam.StaticParam.DstPort = o.Param.DstPort
+	connParam.StaticParam.DstCompanyName = ""
+	connParam.StaticParam.DstCity = ""
 
 	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
-	connParam.DynamicParam.QuoteID = o.QuoteID
-	connParam.DynamicParam.QuoteItemID = o.QuoteItemID
 	connParam.DynamicParam.Bandwidth = fmt.Sprintf("%d Mbps", o.Param.Bandwidth)
 	connParam.DynamicParam.ServiceClass = o.Param.CosName
+	connParam.DynamicParam.QuoteID = o.QuoteID
+	connParam.DynamicParam.QuoteItemID = o.QuoteItemID
+	connParam.DynamicParam.Currency = o.QuoteCurrency
+	connParam.DynamicParam.Price = float32(o.QuotePrice)
+	connParam.DynamicParam.BillingType = "dod"
+	connParam.DynamicParam.PaymentType = "invoice"
+	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))
+	connParam.DynamicParam.EndTime = strconv.Itoa(int(o.Param.EndTime))
 
 	o.OrderReq.ConnectionParam = append(o.OrderReq.ConnectionParam, connParam)
 
