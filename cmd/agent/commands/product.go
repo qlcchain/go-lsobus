@@ -222,7 +222,7 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam.DynamicParam.QuoteItemID = o.QuoteItemID
 	connParam.DynamicParam.Currency = o.QuoteCurrency
 	connParam.DynamicParam.Price = float32(o.QuotePrice)
-	connParam.DynamicParam.BillingType = "dod"
+	connParam.DynamicParam.BillingType = "DOD"
 	connParam.DynamicParam.PaymentType = "invoice"
 	connParam.DynamicParam.BillingUnit = "day"
 	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))

@@ -52,14 +52,14 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 	orderActivity := ""
 	itemAction := ""
 	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
-		orderActivity = "install"
-		itemAction = "add"
+		orderActivity = "INSTALL"
+		itemAction = "INSTALL"
 	} else if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeChange {
-		orderActivity = "change"
-		itemAction = "change"
+		orderActivity = "CHANGE"
+		itemAction = "CHANGE"
 	} else if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
-		orderActivity = "disconnect"
-		itemAction = "remove"
+		orderActivity = "DISCONNECT"
+		itemAction = "DISCONNECT"
 	}
 
 	eLines := make([]*orchestra.ELineItemParams, 0)
