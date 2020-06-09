@@ -3,23 +3,30 @@ package grpcServer
 import (
 	"context"
 
+	"go.uber.org/zap"
+
 	"github.com/qlcchain/go-lsobus/contract"
+	"github.com/qlcchain/go-lsobus/log"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 type OrderApi struct {
-	cs *contract.ContractService
+	logger *zap.SugaredLogger
+	cs     *contract.ContractService
 }
 
 func NewOrderApi(cs *contract.ContractService) *OrderApi {
 	return &OrderApi{
-		cs: cs,
+		cs:     cs,
+		logger: log.NewLogger("OrderApi"),
 	}
 }
 
 func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderId, error) {
+	oa.logger.Debugf("CreateOrder name %s", param.String())
 	id, err := oa.cs.GetCreateOrderBlock(param)
 	if err != nil {
+		oa.logger.Debugf("GetCreateOrderBlock err %s", err)
 		return nil, err
 	}
 	return &proto.OrderId{
@@ -28,8 +35,10 @@ func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderPar
 }
 
 func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderId, error) {
+	oa.logger.Debugf("ChangeOrder name %s", param.String())
 	id, err := oa.cs.GetChangeOrderBlock(param)
 	if err != nil {
+		oa.logger.Debugf("GetChangeOrderBlock err %s", err)
 		return nil, err
 	}
 	return &proto.OrderId{
@@ -38,8 +47,10 @@ func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderPar
 }
 
 func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderId, error) {
+	oa.logger.Debugf("TerminateOrder name %s", param.String())
 	id, err := oa.cs.GetTerminateOrderBlock(param)
 	if err != nil {
+		oa.logger.Debugf("GetTerminateOrderBlock err %s", err)
 		return nil, err
 	}
 	return &proto.OrderId{
@@ -48,8 +59,10 @@ func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOr
 }
 
 func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfo, error) {
+	oa.logger.Debugf("GetOrderInfo name %s", id.String())
 	orderInfo, err := oa.cs.GetOrderInfoByInternalId(id.InternalId)
 	if err != nil {
+		oa.logger.Debugf("GetOrderInfoByInternalId err %s", err)
 		return nil, err
 	}
 	info := new(proto.OrderInfo)

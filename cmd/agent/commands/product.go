@@ -195,14 +195,27 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam := &models.ProtoConnectionParam{}
 	connParam.StaticParam = &models.ProtoConnectionStaticParam{}
 	connParam.StaticParam.ProductOfferingID = o.Param.ProductOfferID
+
 	connParam.StaticParam.BuyerProductID = o.Param.BuyerProductID
 	connParam.StaticParam.ItemID = "1"
+
+	// Change or Terminate Existing Product
+	//connParam.StaticParam.ProductID = ""
+
+	connParam.StaticParam.SrcRegion = "KR"
+	connParam.StaticParam.SrcCity = "9d242983f7a504eebb3eb478"
+	connParam.StaticParam.SrcDataCenter = "5ae7e56bbbc9a8001231fa5d"
+	connParam.StaticParam.SrcCompanyName = "5d02fa08a5b531000a764046"
 	connParam.StaticParam.SrcPort = o.Param.SrcPort
+
+	connParam.StaticParam.DstRegion = "JP"
+	connParam.StaticParam.DstCity = "9d242983f7a504eebb3eb478"
+	connParam.StaticParam.DstDataCenter = "5ae7e56bbbc9a8001231fa5d"
+	connParam.StaticParam.DstCompanyName = "5d02fa08a5b531000a764046"
 	connParam.StaticParam.DstPort = o.Param.DstPort
-	connParam.StaticParam.DstCompanyName = ""
-	connParam.StaticParam.DstCity = ""
 
 	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
+	connParam.DynamicParam.ConnectionName = o.Param.Name
 	connParam.DynamicParam.Bandwidth = fmt.Sprintf("%d Mbps", o.Param.Bandwidth)
 	connParam.DynamicParam.ServiceClass = o.Param.CosName
 	connParam.DynamicParam.QuoteID = o.QuoteID
@@ -211,6 +224,7 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam.DynamicParam.Price = float32(o.QuotePrice)
 	connParam.DynamicParam.BillingType = "dod"
 	connParam.DynamicParam.PaymentType = "invoice"
+	connParam.DynamicParam.BillingUnit = "day"
 	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))
 	connParam.DynamicParam.EndTime = strconv.Itoa(int(o.Param.EndTime))
 

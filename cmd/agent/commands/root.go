@@ -37,10 +37,13 @@ func InitCmd() {
 		Long:  `create new connection`,
 		Run: func(cmd *cobra.Command, args []string) {
 			pp := &ProductParam{}
-			pp.BuyerName = "CBC"
-			pp.BuyerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
+
 			pp.SellerName = "PCCWG"
-			pp.SellerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
+			pp.SellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
+
+			pp.BuyerName = "CBC"
+			pp.BuyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
+
 			pp.ProductOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
 			pp.StartTime = time.Now().Unix()

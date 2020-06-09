@@ -64,7 +64,19 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
-		eLine := &orchestra.ELineItemParams{}
+		eLine := &orchestra.ELineItemParams{
+			SrcPortID:     v.SrcPort,
+			DstPortID:     v.DstPort,
+			DstCompanyID:  v.DstCompanyName,
+			DstMetroID:    v.DstCity,
+			SrcLocationID: v.SrcDataCenter,
+			DstLocationID: v.DstDataCenter,
+			CosName:       strings.ToUpper(v.ServiceClass.String()),
+			BaseItemParams: orchestra.BaseItemParams{
+				BuyerProductID: v.BuyerProductId,
+			},
+		}
+
 		eLine.ItemID = v.ItemId
 		billingParams := &orchestra.BillingParams{}
 		if len(v.Bandwidth) != 0 {
@@ -96,19 +108,8 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		billingParams.EndTime = v.EndTime
 		billingParams.Currency = v.Currency
 		billingParams.Price = float32(v.Price)
-		eLine = &orchestra.ELineItemParams{
-			SrcPortID:     v.SrcPort,
-			DstPortID:     v.DstPort,
-			DstCompanyID:  v.DstCompanyName,
-			DstMetroID:    v.DstCity,
-			SrcLocationID: v.SrcDataCenter,
-			DstLocationID: v.DstDataCenter,
-			CosName:       strings.ToUpper(v.ServiceClass.String()),
-			BaseItemParams: orchestra.BaseItemParams{
-				BillingParams:  billingParams,
-				BuyerProductID: v.BuyerProductId,
-			},
-		}
+		eLine.BillingParams = billingParams
+
 		eLine.Name = v.ConnectionName
 		eLine.QuoteID = v.QuoteId
 		eLine.QuoteItemID = v.QuoteItemId
