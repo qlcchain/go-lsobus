@@ -2,7 +2,6 @@ syntax = "proto3";
 package proto;
 option go_package = ".;proto";
 
-import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 
 message VersionRequest{}
@@ -27,39 +26,41 @@ message User {
 }
 
 message ConnectionStaticParam {
-  string itemId = 1;
-  string buyerProductId = 2;
-  string ProductOfferingId = 3;
-  string productId = 4;
-  string srcCompanyName = 5;
-  string srcRegion = 6;
-  string srcCity = 7;
-  string srcDataCenter = 8;
-  string srcPort = 9;
-  string dstCompanyName = 10;
-  string dstRegion = 11;
-  string dstCity = 12;
-  string dstDataCenter = 13;
-  string dstPort = 14;
+  string buyerProductId = 1;
+  string ProductOfferingId = 2;
+  string productId = 3;
+  string srcCompanyName = 4;
+  string srcRegion = 5;
+  string srcCity = 6;
+  string srcDataCenter = 7;
+  string srcPort = 8;
+  string dstCompanyName = 9;
+  string dstRegion = 10;
+  string dstCity = 11;
+  string dstDataCenter = 12;
+  string dstPort = 13;
 }
 
 message ConnectionDynamicParam {
   string orderId = 1;
-  string quoteId = 2;
-  string quoteItemId =3;
-  string connectionName = 4;
-  string paymentType = 5;
-  string billingType = 6;
-  string currency = 7;
-  string serviceClass = 8;
-  string bandwidth = 9;
-  string billingUnit = 10;
-  float price = 11;
-  float Addition = 12;
-  int64 startTime = 13;
-  string startTimeStr = 14;
-  int64 endTime = 15;
-  string endTimeStrTimeStr = 16;
+  string InternalId = 2;
+  string ItemId = 3;
+  string OrderItemId = 4;
+  string quoteId = 5;
+  string quoteItemId = 6;
+  string connectionName = 7;
+  string paymentType = 8;
+  string billingType = 9;
+  string currency = 10;
+  string serviceClass = 11;
+  string bandwidth = 12;
+  string billingUnit = 13;
+  float price = 14;
+  float Addition = 15;
+  int64 startTime = 16;
+  string startTimeStr = 17;
+  int64 endTime = 18;
+  string endTimeStrTimeStr = 19;
 }
 
 message ConnectionParam {

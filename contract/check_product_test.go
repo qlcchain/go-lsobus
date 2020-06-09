@@ -22,17 +22,17 @@ func TestContractService_GetProductId(t *testing.T) {
 	}
 	orderInfo.Seller.Address = cs.account.Address()
 	id1 := uuid.New().String()
-	cs.orderIdFromSonata.Store(id1, orderInfo)
+	cs.orderIdOnChainSeller.Store(id1, "")
 	cs.SetFakeMode(true)
 	cs.getProductId()
-	if _, ok := cs.orderIdFromSonata.Load(id1); ok {
+	if _, ok := cs.orderIdOnChainSeller.Load(id1); ok {
 		t.Fatal("id should not exit")
 	}
 	orderInfo.OrderType, _ = qlcSdk.ParseDoDSettleOrderType("change")
 	id2 := uuid.New().String()
-	cs.orderIdFromSonata.Store(id2, orderInfo)
+	cs.orderIdOnChainSeller.Store(id2, orderInfo)
 	cs.getProductId()
-	if _, ok := cs.orderIdFromSonata.Load(id2); ok {
+	if _, ok := cs.orderIdOnChainSeller.Load(id2); ok {
 		t.Fatal("id should not exit")
 	}
 }

@@ -48,7 +48,7 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 			cs.logger.Infof("process hash %s success", hash.String())
 		}
 		internalId := blk.Previous.String()
-		cs.orderIdOnChain.Store(internalId, "")
+		cs.orderIdOnChainBuyer.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
@@ -80,6 +80,18 @@ func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrd
 		conn.ProductId = v.ProductId
 		if len(v.DynamicParam.QuoteItemId) != 0 {
 			conn.QuoteItemId = v.DynamicParam.QuoteItemId
+		}
+
+		if len(v.DynamicParam.ItemId) != 0 {
+			conn.ItemId = v.DynamicParam.ItemId
+		}
+
+		if len(v.DynamicParam.OrderItemId) != 0 {
+			conn.OrderItemId = v.DynamicParam.OrderItemId
+		}
+
+		if len(v.DynamicParam.InternalId) != 0 {
+			conn.InternalId = v.DynamicParam.InternalId
 		}
 
 		if len(v.DynamicParam.PaymentType) != 0 {

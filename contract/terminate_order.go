@@ -46,7 +46,7 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 			cs.logger.Infof("process hash %s success", hash.String())
 		}
 		internalId := blk.Previous.String()
-		cs.orderIdOnChain.Store(internalId, "")
+		cs.orderIdOnChainBuyer.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
@@ -105,6 +105,9 @@ func (cs *ContractService) convertProtoToTerminateOrderParam(param *proto.Termin
 			ProductId: v.ProductId,
 			DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
 				OrderId:        v.DynamicParam.OrderId,
+				InternalId:     v.DynamicParam.InternalId,
+				ItemId:         v.DynamicParam.ItemId,
+				OrderItemId:    v.DynamicParam.OrderItemId,
 				QuoteId:        v.DynamicParam.QuoteId,
 				QuoteItemId:    v.DynamicParam.QuoteItemId,
 				ConnectionName: v.DynamicParam.ConnectionName,

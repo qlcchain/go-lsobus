@@ -28,70 +28,61 @@ func (cs *ContractService) checkProduct() {
 }
 
 func (cs *ContractService) getProductId() {
-	cs.orderIdFromSonata.Range(func(key, value interface{}) bool {
+	cs.orderIdOnChainSeller.Range(func(key, value interface{}) bool {
 		idOnChain := key.(string)
-		orderInfo := value.(*qlcSdk.DoDSettleOrderInfo)
-		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo.OrderId)
+		orderInfo, err := cs.GetOrderInfoByInternalId(idOnChain)
+		if err != nil {
+			cs.logger.Error(err)
+			return true
+		}
+		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo)
 		if err != nil {
 			cs.logger.Error(err)
 			return true
 		}
 
 		cs.logger.Infof("get product success ,orderId is %s", orderInfo.OrderId)
-
-		err = cs.updateOrderInfoToChain(idOnChain, productIds, orderInfo)
+		err = cs.updateProductInfoToChain(idOnChain, productIds, orderInfo)
 		if err != nil {
 			cs.logger.Error(err)
 			return true
 		}
-		cs.logger.Infof("update order info to chain success ,orderId is %s", orderInfo.OrderId)
-		cs.orderIdFromSonata.Delete(idOnChain)
+		cs.logger.Info("update product info to chain success")
+		cs.orderIdOnChainSeller.Delete(idOnChain)
 		return true
 	})
 }
 
-func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
+func (cs *ContractService) updateProductInfoToChain(idOnChain string, productIds []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
 	var id pkg.Hash
 	_ = id.Of(idOnChain)
-	ProductIds := make([]*qlcSdk.DoDSettleProductItem, 0)
+	productInfos := make([]*qlcSdk.DoDSettleProductInfo, 0)
 	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
-		for _, v := range products {
-			cs.logger.Infof("productId is %s,buyProductID id is %s", v.productID, v.buyerProductID)
-			pi := &qlcSdk.DoDSettleProductItem{
-				ProductId:      v.productID,
-				BuyerProductId: v.buyerProductID,
+		for _, v := range productIds {
+			cs.logger.Infof("productID is %s,orderItemId id is %s", v.productID, v.orderItemID)
+			pi := &qlcSdk.DoDSettleProductInfo{
+				OrderItemId: v.orderItemID,
+				ProductId:   v.productID,
 			}
-			ProductIds = append(ProductIds, pi)
-		}
-	} else {
-		for _, v := range orderInfo.Connections {
-			cs.logger.Infof("productId is %s,buyerProductId id is %s", v.ProductId, v.BuyerProductId)
-			pi := &qlcSdk.DoDSettleProductItem{
-				ProductId:      v.ProductId,
-				BuyerProductId: v.BuyerProductId,
-			}
-			ProductIds = append(ProductIds, pi)
+			productInfos = append(productInfos, pi)
 		}
 	}
 
-	param := &qlcSdk.DoDSettleUpdateOrderInfoParam{
-		Buyer:      cs.account.Address(),
-		InternalId: id,
-		OrderId:    orderInfo.OrderId,
-		ProductIds: ProductIds,
-		Status:     qlcSdk.DoDSettleOrderStateSuccess,
-		FailReason: "",
+	param := &qlcSdk.DoDSettleUpdateProductInfoParam{
+		Address:     cs.account.Address(),
+		OrderId:     orderInfo.OrderId,
+		ProductInfo: productInfos,
 	}
 	blk := new(pkg.StateBlock)
 	var err error
 	if cs.GetFakeMode() {
-		if blk, err = mock.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		if blk, err = mock.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
 			return cs.account.Sign(hash), nil
 		}); err != nil {
 			return err
 		}
 	} else {
-		if blk, err = cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		if blk, err = cs.client.DoDSettlement.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
 			return cs.account.Sign(hash), nil
 		}); err != nil {
 			return err
@@ -111,10 +102,10 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, products []*
 	return nil
 }
 
-func (cs *ContractService) inventoryFind(sellName, orderId string) ([]*Product, error) {
+func (cs *ContractService) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
 	fp := &orchestra.FindParams{
 		Seller:         &orchestra.PartnerParams{Name: sellName},
-		ProductOrderID: orderId,
+		ProductOrderID: orderInfo.OrderId,
 	}
 	err := cs.orchestra.ExecInventoryFind(fp)
 	if err != nil {
@@ -124,12 +115,25 @@ func (cs *ContractService) inventoryFind(sellName, orderId string) ([]*Product, 
 	if len(fp.RspInvList) == 0 {
 		return nil, errors.New("no inventory list ")
 	}
-	for _, v := range fp.RspInvList {
-		pt := &Product{
-			buyerProductID: v.BuyerProductID,
-			productID:      *v.ID,
+	for _, conn := range orderInfo.Connections {
+		var b bool
+		for _, productSummary := range fp.RspInvList {
+			for _, productOrderRef := range productSummary.ProductOrder {
+				if conn.OrderItemId == *productOrderRef.OrderItemID {
+					pt := &Product{
+						orderItemID: *productOrderRef.OrderItemID,
+						productID:   *productSummary.ID,
+					}
+					productIds = append(productIds, pt)
+					b = true
+					break
+				}
+				if b {
+					break
+				}
+			}
 		}
-		productIds = append(productIds, pt)
 	}
+
 	return productIds, nil
 }

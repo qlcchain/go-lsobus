@@ -35,25 +35,25 @@ var (
 )
 
 type ContractService struct {
-	cfg               *config.Config
-	account           *types.Account
-	logger            *zap.SugaredLogger
-	client            *qlcSdk.QLCClient
-	ctx               context.Context
-	cancel            context.CancelFunc
-	handlerIds        map[common.TopicType]string
-	eb                event.EventBus
-	chainReady        bool
-	quit              chan bool
-	orderIdOnChain    *sync.Map
-	orderIdFromSonata *sync.Map
-	orchestra         *orchestra.Orchestra
-	fakeMode          bool
+	cfg                  *config.Config
+	account              *types.Account
+	logger               *zap.SugaredLogger
+	client               *qlcSdk.QLCClient
+	ctx                  context.Context
+	cancel               context.CancelFunc
+	handlerIds           map[common.TopicType]string
+	eb                   event.EventBus
+	chainReady           bool
+	quit                 chan bool
+	orderIdOnChainSeller *sync.Map
+	orderIdOnChainBuyer  *sync.Map
+	orchestra            *orchestra.Orchestra
+	fakeMode             bool
 }
 
 type Product struct {
-	buyerProductID string
-	productID      string
+	orderItemID string
+	productID   string
 }
 
 func NewContractService(cfgFile string) (*ContractService, error) {
@@ -66,17 +66,17 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 	or := orchestra.NewOrchestra(cfgFile)
 	or.SetFakeMode(cfg.FakeMode)
 	cs := &ContractService{
-		cfg:               cfg,
-		account:           cc.Account(),
-		logger:            log.NewLogger("contract"),
-		ctx:               ctx,
-		cancel:            cancel,
-		handlerIds:        make(map[common.TopicType]string),
-		eb:                cc.EventBus(),
-		quit:              make(chan bool, 1),
-		orderIdOnChain:    new(sync.Map),
-		orderIdFromSonata: new(sync.Map),
-		orchestra:         or,
+		cfg:                  cfg,
+		account:              cc.Account(),
+		logger:               log.NewLogger("contract"),
+		ctx:                  ctx,
+		cancel:               cancel,
+		handlerIds:           make(map[common.TopicType]string),
+		eb:                   cc.EventBus(),
+		quit:                 make(chan bool, 1),
+		orderIdOnChainSeller: new(sync.Map),
+		orderIdOnChainBuyer:  new(sync.Map),
+		orchestra:            or,
 	}
 	return cs, nil
 }
@@ -113,7 +113,7 @@ func (cs *ContractService) Start() error {
 	go cs.checkDoDContract()
 	go cs.connectRpcServer()
 	go cs.checkContractStatus()
-	go cs.checkOrderStatus()
+	go cs.checkProductStatus()
 	go cs.checkProduct()
 	return nil
 }

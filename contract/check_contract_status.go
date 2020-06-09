@@ -6,6 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/qlcchain/go-lsobus/mock"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	"github.com/qlcchain/go-lsobus/orchestra"
@@ -26,7 +29,7 @@ func (cs *ContractService) checkContractStatus() {
 }
 
 func (cs *ContractService) getContractStatus() {
-	cs.orderIdOnChain.Range(func(key, value interface{}) bool {
+	cs.orderIdOnChainBuyer.Range(func(key, value interface{}) bool {
 		internalId := key.(string)
 		orderInfo, err := cs.GetOrderInfoByInternalId(internalId)
 		if err != nil {
@@ -42,7 +45,7 @@ func (cs *ContractService) getContractStatus() {
 				return true
 			}
 			cs.logger.Infof("order place success,order id from sonata is:%s", orderId)
-			cs.orderIdOnChain.Delete(internalId)
+			cs.orderIdOnChainBuyer.Delete(internalId)
 		}
 		return true
 	})
@@ -138,6 +141,70 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 	}
 	orderId := op.RspOrder.ID
 	orderInfo.OrderId = *orderId
-	cs.orderIdFromSonata.Store(internalId, orderInfo)
+	for _, v := range op.RspOrder.OrderItem {
+		for _, value := range orderInfo.Connections {
+			if value.ItemId == v.ExternalID {
+				value.OrderItemId = *v.ID
+				break
+			}
+		}
+	}
+	err = cs.updateOrderInfoToChain(internalId, orderInfo)
+	if err != nil {
+		return "", err
+	}
+	//cs.orderIdFromSonata.Store(internalId, orderInfo)
 	return *orderId, nil
+}
+
+func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
+	var id pkg.Hash
+	_ = id.Of(idOnChain)
+	orderItemIds := make([]*qlcSdk.DoDSettleOrderItem, 0)
+	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
+		for _, v := range orderInfo.Connections {
+			cs.logger.Infof("itemId is %s,orderItemId id is %s", v.ItemId, v.OrderItemId)
+			pi := &qlcSdk.DoDSettleOrderItem{
+				ItemId:      v.ItemId,
+				OrderItemId: v.OrderItemId,
+			}
+			orderItemIds = append(orderItemIds, pi)
+		}
+	}
+
+	param := &qlcSdk.DoDSettleUpdateOrderInfoParam{
+		Buyer:       cs.account.Address(),
+		InternalId:  id,
+		OrderId:     orderInfo.OrderId,
+		OrderItemId: orderItemIds,
+		Status:      qlcSdk.DoDSettleOrderStateSuccess,
+		FailReason:  "",
+	}
+	blk := new(pkg.StateBlock)
+	var err error
+	if cs.GetFakeMode() {
+		if blk, err = mock.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
+	} else {
+		if blk, err = cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+			return cs.account.Sign(hash), nil
+		}); err != nil {
+			return err
+		}
+	}
+	var w pkg.Work
+	worker, _ := pkg.NewWorker(w, blk.Root())
+	blk.Work = worker.NewWork()
+	if !cs.GetFakeMode() {
+		hash, err := cs.client.Ledger.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return err
+		}
+		cs.logger.Infof("process hash %s success", hash.String())
+	}
+	return nil
 }

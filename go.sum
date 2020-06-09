@@ -818,6 +818,16 @@ github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200602063352-10054d398ff6 h1:YwkBvqyCt
 github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200602063352-10054d398ff6/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
 github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200605022441-6bbaea993e83 h1:uVVsycQJeIh4HrMeQtYkHWayC05dkypqikwYnng7IuY=
 github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200605022441-6bbaea993e83/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609064040-625c8e053627 h1:F+7aeAilLl0dGF3CcnS/agjdFHxjL4iyT2xF32oCtXM=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609064040-625c8e053627/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609154411-08ef617b475e h1:PL/ETAAc1ABbJxiX/Q/VWQTn1nzBBtyxO2zCRq04dcc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609154411-08ef617b475e/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609155651-f49c0a1cee86 h1:XbQ8lii1pdEATkpQlM72i31QYWuA2CqGqShhDUxRlrA=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609155651-f49c0a1cee86/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609162333-28713385c06d h1:YozxwF6MPtFD32lKWj0j1InA+JS1qkRQOnInXzPusPc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609162333-28713385c06d/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609171316-834bad453e5e h1:IC7gE7tgIB98cCAsUUmqzq/qD5YWbFuPdU+DnDAh584=
+github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200609171316-834bad453e5e/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
 github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 h1:eUm8ma4+yPknhXtkYlWh3tMkE6gBjXZToDned9s2gbQ=
 github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=

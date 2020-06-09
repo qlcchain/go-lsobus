@@ -15,5 +15,5 @@ func TestContractService_GetOrderStatus(t *testing.T) {
 	}
 	cs.account = pkg.NewAccount(pri)
 	cs.SetFakeMode(true)
-	cs.getOrderStatus()
+	cs.getProductStatus()
 }

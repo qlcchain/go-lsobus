@@ -81,7 +81,6 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByIn
 	for _, v := range orderInfo.Connections {
 		conn := &proto.ConnectionParam{
 			StaticParam: &proto.ConnectionStaticParam{
-				ItemId:            v.ItemId,
 				BuyerProductId:    v.BuyerProductId,
 				ProductOfferingId: v.ProductOfferingId,
 				ProductId:         v.ProductId,
@@ -98,6 +97,9 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByIn
 			},
 			DynamicParam: &proto.ConnectionDynamicParam{
 				OrderId:        v.OrderId,
+				InternalId:     v.InternalId,
+				ItemId:         v.ItemId,
+				OrderItemId:    v.OrderItemId,
 				QuoteId:        v.QuoteId,
 				QuoteItemId:    v.QuoteItemId,
 				ConnectionName: v.ConnectionName,

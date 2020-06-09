@@ -63,7 +63,6 @@ func OrderInfo() (*qlcSdk.DoDSettleOrderInfo, error) {
 	}
 	conn := &qlcSdk.DoDSettleConnectionParam{
 		DoDSettleConnectionStaticParam: qlcSdk.DoDSettleConnectionStaticParam{
-			ItemId:         uuid.New().String(),
 			BuyerProductId: uuid.New().String(),
 			SrcCompanyName: "CBC",
 			SrcRegion:      "CHN",
@@ -77,6 +76,7 @@ func OrderInfo() (*qlcSdk.DoDSettleOrderInfo, error) {
 			DstPort:        "port02",
 		},
 		DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
+			ItemId:         uuid.New().String(),
 			ConnectionName: "conn",
 			QuoteId:        "1",
 			QuoteItemId:    "1",
@@ -165,7 +165,6 @@ func ProtoCreateOrderParams() *proto.CreateOrderParam {
 
 	conn1 := &pb.ConnectionParam{
 		StaticParam: &pb.ConnectionStaticParam{
-			ItemId:         uuid.New().String(),
 			BuyerProductId: uuid.New().String(),
 			ProductId:      uuid.New().String(),
 			SrcCompanyName: "CBC",
@@ -180,6 +179,7 @@ func ProtoCreateOrderParams() *proto.CreateOrderParam {
 			DstPort:        "port02",
 		},
 		DynamicParam: &pb.ConnectionDynamicParam{
+			ItemId:         uuid.New().String(),
 			ConnectionName: uuid.New().String(),
 			OrderId:        uuid.New().String(),
 			QuoteId:        uuid.New().String(),
@@ -199,7 +199,6 @@ func ProtoCreateOrderParams() *proto.CreateOrderParam {
 	param.ConnectionParam = append(param.ConnectionParam, conn1)
 	conn2 := &pb.ConnectionParam{
 		StaticParam: &pb.ConnectionStaticParam{
-			ItemId:         uuid.New().String(),
 			BuyerProductId: uuid.New().String(),
 			SrcCompanyName: "CBC",
 			SrcRegion:      "CHN",
@@ -213,6 +212,7 @@ func ProtoCreateOrderParams() *proto.CreateOrderParam {
 			DstPort:        "port2",
 		},
 		DynamicParam: &pb.ConnectionDynamicParam{
+			ItemId:         uuid.New().String(),
 			ConnectionName: uuid.New().String(),
 			QuoteId:        uuid.New().String(),
 			QuoteItemId:    uuid.New().String(),
@@ -437,6 +437,18 @@ func GetUpdateOrderInfoBlock(op *qlcSdk.DoDSettleUpdateOrderInfoParam, sign qlcS
 	return blk, nil
 }
 
+func GetUpdateProductInfoBlock(op *qlcSdk.DoDSettleUpdateProductInfoParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {
+	blk := StateBlockWithoutWork()
+	var err error
+	if sign != nil {
+		blk.Signature, err = sign(blk.GetHash())
+		if err != nil {
+			return nil, err
+		}
+	}
+	return blk, nil
+}
+
 func GetPendingRequest(addr pkg.Address) []*qlcSdk.DoDPendingRequestRsp {
 	pend := make([]*qlcSdk.DoDPendingRequestRsp, 0)
 	order1, _ := OrderInfo()
@@ -466,9 +478,9 @@ func GetPendingResourceCheck(addr pkg.Address) []*qlcSdk.DoDPendingResourceCheck
 		SendHash:   RandomHash(),
 		OrderId:    uuid.New().String(),
 		InternalId: RandomHash(),
-		Products:   make([]*qlcSdk.DoDSettleProductWithActiveInfo, 0),
+		Products:   make([]*qlcSdk.DoDSettleProductInfo, 0),
 	}
-	product1 := &qlcSdk.DoDSettleProductWithActiveInfo{
+	product1 := &qlcSdk.DoDSettleProductInfo{
 		ProductId: uuid.New().String(),
 		Active:    false,
 	}
@@ -477,27 +489,15 @@ func GetPendingResourceCheck(addr pkg.Address) []*qlcSdk.DoDPendingResourceCheck
 		SendHash:   RandomHash(),
 		OrderId:    uuid.New().String(),
 		InternalId: RandomHash(),
-		Products:   make([]*qlcSdk.DoDSettleProductWithActiveInfo, 0),
+		Products:   make([]*qlcSdk.DoDSettleProductInfo, 0),
 	}
-	product2 := &qlcSdk.DoDSettleProductWithActiveInfo{
+	product2 := &qlcSdk.DoDSettleProductInfo{
 		ProductId: uuid.New().String(),
 		Active:    false,
 	}
 	info2.Products = append(info1.Products, product2)
 	infos = append(infos, info1, info2)
 	return infos
-}
-
-func GetResourceReadyBlock(param *qlcSdk.DoDSettleResourceReadyParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {
-	blk := StateBlockWithoutWork()
-	var err error
-	if sign != nil {
-		blk.Signature, err = sign(blk.GetHash())
-		if err != nil {
-			return nil, err
-		}
-	}
-	return blk, nil
 }
 
 func GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {

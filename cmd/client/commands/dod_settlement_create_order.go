@@ -221,7 +221,6 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 		if billingType == qlcSdk.DoDSettleBillingTypePAYG {
 			conn = &pb.ConnectionParam{
 				StaticParam: &pb.ConnectionStaticParam{
-					ItemId:         quoteItemId,
 					BuyerProductId: quoteItemId,
 					SrcCompanyName: "CBC",
 					SrcRegion:      "CHN",
@@ -235,6 +234,7 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 					DstPort:        dstPortP,
 				},
 				DynamicParam: &pb.ConnectionDynamicParam{
+					ItemId:         quoteItemId,
 					ConnectionName: fmt.Sprintf("connection%d", rand.Int()),
 					QuoteId:        quoteIdP,
 					QuoteItemId:    quoteItemId,
@@ -260,20 +260,21 @@ func DSCreateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, srcPo
 
 			conn = &pb.ConnectionParam{
 				StaticParam: &pb.ConnectionStaticParam{
-					ItemId:         quoteItemId,
-					BuyerProductId: quoteItemId,
-					SrcCompanyName: "CBC",
-					SrcRegion:      "CHN",
-					SrcCity:        "HK",
-					SrcDataCenter:  "DCX",
-					SrcPort:        srcPortP,
-					DstCompanyName: "CBC",
-					DstRegion:      "USA",
-					DstCity:        "NYC",
-					DstDataCenter:  "DCY",
-					DstPort:        dstPortP,
+					BuyerProductId:    quoteItemId,
+					ProductOfferingId: "29f855fb-4760-4e77-877e-3318906ee4bc",
+					SrcCompanyName:    "CBC",
+					SrcRegion:         "CHN",
+					SrcCity:           "HK",
+					SrcDataCenter:     "DCX",
+					SrcPort:           srcPortP,
+					DstCompanyName:    "CBC",
+					DstRegion:         "USA",
+					DstCity:           "NYC",
+					DstDataCenter:     "DCY",
+					DstPort:           dstPortP,
 				},
 				DynamicParam: &pb.ConnectionDynamicParam{
+					ItemId:         quoteItemId,
 					ConnectionName: fmt.Sprintf("connection%d", rand.Int()),
 					QuoteId:        quoteItemId,
 					QuoteItemId:    quoteItemId,

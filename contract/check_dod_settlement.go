@@ -123,6 +123,7 @@ func (cs *ContractService) processDoDContract() {
 				continue
 			}
 			cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
+			cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 		}
 	}
 }

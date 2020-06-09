@@ -12,7 +12,7 @@ import (
 	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 )
 
-func (cs *ContractService) checkOrderStatus() {
+func (cs *ContractService) checkProductStatus() {
 	ticker := time.NewTicker(checkOrderStatusInterval)
 	for {
 		select {
@@ -20,13 +20,13 @@ func (cs *ContractService) checkOrderStatus() {
 			return
 		case <-ticker.C:
 			if cs.chainReady {
-				cs.getOrderStatus()
+				cs.getProductStatus()
 			}
 		}
 	}
 }
 
-func (cs *ContractService) getOrderStatus() {
+func (cs *ContractService) getProductStatus() {
 	addr := cs.account.Address()
 	var err error
 	var id []*qlcSdk.DoDPendingResourceCheckInfo
@@ -40,7 +40,7 @@ func (cs *ContractService) getOrderStatus() {
 		}
 	}
 	for _, v := range id {
-		var productActive []string
+		var productActive []*qlcSdk.DoDSettleProductInfo
 		for _, value := range v.Products {
 			if !value.Active {
 				gp := &orchestra.GetParams{
@@ -54,13 +54,17 @@ func (cs *ContractService) getOrderStatus() {
 				}
 				if gp.RspInv.Status == models.ProductStatusActive {
 					cs.logger.Infof("product %s is active", value.ProductId)
-					value.Active = true
-					productActive = append(productActive, value.ProductId)
+					productInfo := &qlcSdk.DoDSettleProductInfo{
+						OrderItemId: value.OrderItemId,
+						ProductId:   value.ProductId,
+						Active:      true,
+					}
+					productActive = append(productActive, productInfo)
 				}
 			}
 		}
 		if len(productActive) != 0 {
-			err = cs.updateProductStatusToChain(addr, v.InternalId, productActive)
+			err = cs.updateProductStatusToChain(addr, v.OrderId, productActive)
 			if err != nil {
 				cs.logger.Error(err)
 			}
@@ -82,22 +86,22 @@ func (cs *ContractService) getOrderStatus() {
 	}
 }
 
-func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, InternalId pkg.Hash, products []string) error {
-	param := &qlcSdk.DoDSettleResourceReadyParam{
-		Address:    addr,
-		InternalId: InternalId,
-		ProductId:  products,
+func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, orderId string, products []*qlcSdk.DoDSettleProductInfo) error {
+	param := &qlcSdk.DoDSettleUpdateProductInfoParam{
+		Address:     addr,
+		OrderId:     orderId,
+		ProductInfo: products,
 	}
 	blk := new(pkg.StateBlock)
 	var err error
 	if cs.GetFakeMode() {
-		if blk, err = mock.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		if blk, err = mock.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
 			return cs.account.Sign(hash), nil
 		}); err != nil {
 			return err
 		}
 	} else {
-		if blk, err = cs.client.DoDSettlement.GetResourceReadyBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+		if blk, err = cs.client.DoDSettlement.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
 			return cs.account.Sign(hash), nil
 		}); err != nil {
 			return err
@@ -107,11 +111,12 @@ func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, Internal
 	worker, _ := pkg.NewWorker(w, blk.Root())
 	blk.Work = worker.NewWork()
 	if !cs.GetFakeMode() {
-		_, err = cs.client.Ledger.Process(blk)
+		hash, err := cs.client.Ledger.Process(blk)
 		if err != nil {
 			cs.logger.Errorf("process block error: %s", err)
 			return err
 		}
+		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }

@@ -250,6 +250,15 @@
         "orderId": {
           "type": "string"
         },
+        "InternalId": {
+          "type": "string"
+        },
+        "ItemId": {
+          "type": "string"
+        },
+        "OrderItemId": {
+          "type": "string"
+        },
         "quoteId": {
           "type": "string"
         },
@@ -315,9 +324,6 @@
     "protoConnectionStaticParam": {
       "type": "object",
       "properties": {
-        "itemId": {
-          "type": "string"
-        },
         "buyerProductId": {
           "type": "string"
         },

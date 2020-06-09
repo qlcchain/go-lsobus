@@ -44,7 +44,7 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 			cs.logger.Infof("process hash %s success", hash.String())
 		}
 		internalId := blk.Previous.String()
-		cs.orderIdOnChain.Store(internalId, "")
+		cs.orderIdOnChainBuyer.Store(internalId, "")
 		return internalId, nil
 	} else {
 		cs.logger.Errorf("buyer address not match,have %s,want %s", param.Buyer.Address, addr)
@@ -91,7 +91,6 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		if billingType == qlcSdk.DoDSettleBillingTypePAYG {
 			conn = &qlcSdk.DoDSettleConnectionParam{
 				DoDSettleConnectionStaticParam: qlcSdk.DoDSettleConnectionStaticParam{
-					ItemId:            v.StaticParam.ItemId,
 					BuyerProductId:    v.StaticParam.BuyerProductId,
 					ProductOfferingId: v.StaticParam.ProductOfferingId,
 					ProductId:         v.StaticParam.ProductId,
@@ -108,6 +107,9 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				},
 				DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
+					InternalId:     v.DynamicParam.InternalId,
+					ItemId:         v.DynamicParam.ItemId,
+					OrderItemId:    v.DynamicParam.OrderItemId,
 					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,
 					ConnectionName: v.DynamicParam.ConnectionName,
@@ -123,7 +125,6 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 		} else {
 			conn = &qlcSdk.DoDSettleConnectionParam{
 				DoDSettleConnectionStaticParam: qlcSdk.DoDSettleConnectionStaticParam{
-					ItemId:            v.StaticParam.ItemId,
 					BuyerProductId:    v.StaticParam.BuyerProductId,
 					ProductOfferingId: v.StaticParam.ProductOfferingId,
 					ProductId:         v.StaticParam.ProductId,
@@ -140,6 +141,9 @@ func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrd
 				},
 				DoDSettleConnectionDynamicParam: qlcSdk.DoDSettleConnectionDynamicParam{
 					OrderId:        v.DynamicParam.OrderId,
+					InternalId:     v.DynamicParam.InternalId,
+					ItemId:         v.DynamicParam.ItemId,
+					OrderItemId:    v.DynamicParam.OrderItemId,
 					QuoteId:        v.DynamicParam.QuoteId,
 					QuoteItemId:    v.DynamicParam.QuoteItemId,
 					ConnectionName: v.DynamicParam.ConnectionName,
