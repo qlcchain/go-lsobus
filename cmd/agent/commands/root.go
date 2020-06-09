@@ -12,6 +12,7 @@ import (
 
 var rootCmd *cobra.Command
 var lsobusUrl string
+var flgDebug bool
 
 func InitCmd() {
 	rootCmd = &cobra.Command{
@@ -22,6 +23,7 @@ func InitCmd() {
 		},
 	}
 
+	rootCmd.PersistentFlags().BoolVar(&flgDebug, "debug", false, "enable debug")
 	rootCmd.PersistentFlags().StringVar(&lsobusUrl, "lsobusUrl", "http://127.0.0.1:9998", "http url of go-lsobus")
 
 	connectionCmd := &cobra.Command{
@@ -60,6 +62,15 @@ func InitCmd() {
 		},
 	}
 	connectionCmd.AddCommand(connDeleteCmd)
+
+	connGetCmd := &cobra.Command{
+		Use:   "get",
+		Short: "get connection info",
+		Long:  `get connection info`,
+		Run:   runConnectionGetCmd,
+	}
+	connGetCmd.Flags().String("internalId", "", "order internal id")
+	connectionCmd.AddCommand(connGetCmd)
 }
 
 func Execute(osArgs []string) {
@@ -133,7 +144,30 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = po.GetOrderInfo()
+	for {
+		err = po.GetOrderInfo()
+		if err != nil {
+			fmt.Println(err)
+			time.Sleep(5 * time.Second)
+		}
+	}
+}
+
+func runConnectionGetCmd(cmd *cobra.Command, args []string) {
+	internalId, err := cmd.Flags().GetString("internalId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	po := &ProductOrder{Param: &ProductParam{}}
+	err = po.Init()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.GetOrderInfoByInternalId(internalId)
 	if err != nil {
 		fmt.Println(err)
 		return

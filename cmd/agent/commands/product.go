@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -258,6 +259,53 @@ func (o *ProductOrder) GetOrderInfo() error {
 	o.OrderInfoRsp = rsp.GetPayload()
 
 	fmt.Printf("Get Order Info is OK, OrderID %s, OrderState %s\n", o.OrderInfoRsp.OrderID, o.OrderInfoRsp.OrderState)
+
+	return nil
+}
+
+func (o *ProductOrder) GetOrderInfoByInternalId(internalId string) error {
+	req := order_api.NewGetOrderInfoParams()
+	req.InternalID = &internalId
+
+	rsp, err := o.Client.OrderAPI.GetOrderInfo(req)
+	if err != nil {
+		return err
+	}
+	orderInfo := rsp.GetPayload()
+
+	infoData, err := json.Marshal(orderInfo)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Get Order Info is OK, %s\n", string(infoData))
+
+	return nil
+}
+
+func (o *ProductOrder) CheckOrderStatus() error {
+	var err error
+
+	for {
+		if err != nil {
+			fmt.Printf("wait to get order info, err %s", err)
+			time.Sleep(5 * time.Second)
+		}
+
+		err := o.GetOrderInfo()
+		if err != nil {
+			continue
+		}
+		if o.OrderInfoRsp == nil {
+			err = errors.New("OrderInfo not exist")
+			continue
+		}
+
+		if o.OrderInfoRsp.OrderState == "" {
+			fmt.Printf("wait to get order info, err %s", err)
+			break
+		}
+	}
 
 	return nil
 }

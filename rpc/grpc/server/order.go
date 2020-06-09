@@ -23,7 +23,7 @@ func NewOrderApi(cs *contract.ContractService) *OrderApi {
 }
 
 func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderId, error) {
-	oa.logger.Debugf("CreateOrder name %s", param.String())
+	oa.logger.Debugf("CreateOrder param %s", param.String())
 	id, err := oa.cs.GetCreateOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetCreateOrderBlock err %s", err)
@@ -35,7 +35,7 @@ func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderPar
 }
 
 func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderId, error) {
-	oa.logger.Debugf("ChangeOrder name %s", param.String())
+	oa.logger.Debugf("ChangeOrder param %s", param.String())
 	id, err := oa.cs.GetChangeOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetChangeOrderBlock err %s", err)
@@ -47,7 +47,7 @@ func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderPar
 }
 
 func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderId, error) {
-	oa.logger.Debugf("TerminateOrder name %s", param.String())
+	oa.logger.Debugf("TerminateOrder param %s", param.String())
 	id, err := oa.cs.GetTerminateOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetTerminateOrderBlock err %s", err)
@@ -59,7 +59,7 @@ func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOr
 }
 
 func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfo, error) {
-	oa.logger.Debugf("GetOrderInfo name %s", id.String())
+	oa.logger.Debugf("GetOrderInfo param %s", id.String())
 	orderInfo, err := oa.cs.GetOrderInfoByInternalId(id.InternalId)
 	if err != nil {
 		oa.logger.Debugf("GetOrderInfoByInternalId err %s", err)
