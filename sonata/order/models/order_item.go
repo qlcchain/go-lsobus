@@ -32,6 +32,9 @@ type OrderItem struct {
 	// billing account
 	BillingAccount *BillingAccountRef `json:"billingAccount,omitempty"`
 
+	// ID given by the consumer and only understandable by him (to facilitate his searches afterwards)
+	ExternalID string `json:"externalId,omitempty"`
+
 	// Identifier of the line item (generally it is a sequence number 01, 02, 03, ...)
 	// Required: true
 	ID *string `json:"id"`

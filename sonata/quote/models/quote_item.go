@@ -29,6 +29,9 @@ type QuoteItem struct {
 	// Required: true
 	Action ProductActionType `json:"action"`
 
+	// ID given by the consumer and only understandable by him (to facilitate his searches afterwards)
+	ExternalID string `json:"externalId,omitempty"`
+
 	// Identifier of the quote item (generally it is a sequence number 01, 02, 03, ...).
 	// Required: true
 	ID *string `json:"id"`

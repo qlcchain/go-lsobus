@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
+
 	"github.com/bitly/go-simplejson"
 
 	"github.com/qlcchain/go-lsobus/cmd/agent/client"
@@ -102,9 +104,14 @@ func (o *ProductOrder) CreateQuote() error {
 
 func (o *ProductOrder) buildQuoteReqJson() ([]byte, error) {
 	quoteParam := &models.OrderParams{}
+	quoteParam.ExternalID = uuid.New().String()
+	quoteParam.ProjectID = "CBC-AGENT"
+
 	quoteParam.OrderActivity = "INSTALL"
 	quoteParam.Buyer = &models.PartnerParams{Name: o.Param.BuyerName, ID: o.Param.BuyerAddr}
 	quoteParam.Seller = &models.PartnerParams{Name: o.Param.SellerName, ID: o.Param.SellerAddr}
+	quoteParam.BillingType = "DOD"
+	quoteParam.PaymentType = "INVOICE"
 
 	lineItem := &models.ELineItemParams{}
 	lineItem.ItemID = "1"
@@ -117,6 +124,13 @@ func (o *ProductOrder) buildQuoteReqJson() ([]byte, error) {
 	//lineItem.DstPortID = o.Param.DstPort
 	lineItem.SrcLocationID = o.Param.SrcLocID
 	lineItem.DstLocationID = o.Param.DstLocID
+
+	lineItem.BillingParams = &models.BillingParams{}
+	lineItem.BillingParams.BillingType = quoteParam.BillingType
+	lineItem.BillingParams.PaymentType = quoteParam.PaymentType
+	lineItem.BillingParams.StartTime = o.Param.StartTime
+	lineItem.BillingParams.EndTime = o.Param.EndTime
+
 	quoteParam.ELineItems = append(quoteParam.ELineItems, lineItem)
 
 	/*

@@ -65,6 +65,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 	eLines := make([]*orchestra.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
 		eLine := &orchestra.ELineItemParams{}
+		eLine.ItemID = v.ItemId
 		billingParams := &orchestra.BillingParams{}
 		if len(v.Bandwidth) != 0 {
 			bws := strings.Split(v.Bandwidth, " ")

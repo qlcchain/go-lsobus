@@ -33,6 +33,9 @@ type ProductSummary struct {
 	// product specification
 	ProductSpecification *ProductSpecificationSummary `json:"productSpecification,omitempty"`
 
+	// product order
+	ProductOrder []*ProductOrderRef `json:"productOrder"`
+
 	// The date from which the product starts
 	// Format: date-time
 	StartDate strfmt.DateTime `json:"startDate,omitempty"`

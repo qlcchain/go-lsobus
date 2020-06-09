@@ -73,7 +73,13 @@ func (g *GRPCServer) newGateway(grpcAddress, gwAddress string) error {
 	defer cancel()
 
 	gwmux := runtime.NewServeMux()
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+	// no need proxy for internal gateway to internal grpc server
+	optDial := grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+		network := "tcp"
+		g.logger.Debugf("WithContextDialer addr %s", addr)
+		return (&net.Dialer{}).DialContext(ctx, network, addr)
+	})
+	opts := []grpc.DialOption{grpc.WithInsecure(), optDial}
 	err := pb.RegisterChainAPIHandlerFromEndpoint(ctx, gwmux, grpcAddress, opts)
 	if err != nil {
 		return fmt.Errorf("gateway register: %s", err)
