@@ -354,6 +354,9 @@ func fillBillingParamsByCmdFlags(cmd *cobra.Command) *orchestra.BillingParams {
 func fillFindParamsByCmdFlags(params *orchestra.FindParams, cmd *cobra.Command) error {
 	var err error
 
+	params.Offset = "1"
+	params.Limit = "1000"
+
 	params.Buyer = &orchestra.PartnerParams{ID: "CBC", Name: "CBC"}
 	params.Seller = &orchestra.PartnerParams{ID: "PCCWG", Name: "PCCWG"}
 
