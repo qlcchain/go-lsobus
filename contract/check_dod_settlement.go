@@ -117,13 +117,13 @@ func (cs *ContractService) processDoDContract() {
 		worker, _ := pkg.NewWorker(w, blk.Root())
 		blk.Work = worker.NewWork()
 		if !cs.GetFakeMode() {
-			_, err = cs.client.Ledger.Process(blk)
-			if err != nil {
-				cs.logger.Error(err)
+			if err = cs.processBlockAndWaitConfirmed(blk); err != nil {
+				cs.logger.Errorf("process block error: %s", err)
 				continue
+			} else {
+				cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
+				cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 			}
-			cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
-			cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 		}
 	}
 }

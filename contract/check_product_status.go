@@ -34,8 +34,7 @@ func (cs *ContractService) getProductStatus() {
 		id = mock.GetPendingResourceCheck(addr)
 	} else {
 		id, err = cs.client.DoDSettlement.GetPendingResourceCheck(addr)
-		if err != nil {
-			cs.logger.Error(err)
+		if id == nil {
 			return
 		}
 	}
@@ -54,6 +53,7 @@ func (cs *ContractService) getProductStatus() {
 				}
 				if gp.RspInv.Status == models.ProductStatusActive {
 					cs.logger.Infof("product %s is active", value.ProductId)
+					value.Active = true
 					productInfo := &qlcSdk.DoDSettleProductInfo{
 						OrderItemId: value.OrderItemId,
 						ProductId:   value.ProductId,
@@ -79,8 +79,8 @@ func (cs *ContractService) getProductStatus() {
 				err = cs.updateOrderCompleteStatusToChain(v.SendHash)
 				if err != nil {
 					cs.logger.Error(err)
+					continue
 				}
-				cs.logger.Infof("update order %s complete status to chain success", v.OrderId)
 			}
 		}
 	}
@@ -111,12 +111,14 @@ func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, orderId 
 	worker, _ := pkg.NewWorker(w, blk.Root())
 	blk.Work = worker.NewWork()
 	if !cs.GetFakeMode() {
-		hash, err := cs.client.Ledger.Process(blk)
-		if err != nil {
+		if err = cs.processBlockAndWaitConfirmed(blk); err != nil {
 			cs.logger.Errorf("process block error: %s", err)
 			return err
+		} else {
+			for _, v := range products {
+				cs.logger.Infof("update product %s active status to chain success", v.ProductId)
+			}
 		}
-		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }
@@ -144,8 +146,7 @@ func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash pkg.Hash
 	worker, _ := pkg.NewWorker(w, blk.Root())
 	blk.Work = worker.NewWork()
 	if !cs.GetFakeMode() {
-		_, err = cs.client.Ledger.Process(blk)
-		if err != nil {
+		if err = cs.processBlockAndWaitConfirmed(blk); err != nil {
 			cs.logger.Errorf("process block error: %s", err)
 			return err
 		}

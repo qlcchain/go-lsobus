@@ -162,15 +162,13 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *q
 	var id pkg.Hash
 	_ = id.Of(idOnChain)
 	orderItemIds := make([]*qlcSdk.DoDSettleOrderItem, 0)
-	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
-		for _, v := range orderInfo.Connections {
-			cs.logger.Infof("itemId is %s,orderItemId id is %s", v.ItemId, v.OrderItemId)
-			pi := &qlcSdk.DoDSettleOrderItem{
-				ItemId:      v.ItemId,
-				OrderItemId: v.OrderItemId,
-			}
-			orderItemIds = append(orderItemIds, pi)
+	for _, v := range orderInfo.Connections {
+		cs.logger.Infof("itemId is %s,orderItemId id is %s", v.ItemId, v.OrderItemId)
+		pi := &qlcSdk.DoDSettleOrderItem{
+			ItemId:      v.ItemId,
+			OrderItemId: v.OrderItemId,
 		}
+		orderItemIds = append(orderItemIds, pi)
 	}
 
 	param := &qlcSdk.DoDSettleUpdateOrderInfoParam{

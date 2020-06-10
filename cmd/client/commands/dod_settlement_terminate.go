@@ -134,6 +134,7 @@ func DSTerminateOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, pr
 				Currency:    "USD",
 				QuoteId:     "1",
 				QuoteItemId: "1",
+				ItemId:      "1",
 			},
 		}
 		conn.ProductId = productId

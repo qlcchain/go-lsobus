@@ -37,7 +37,7 @@ func (cs *ContractService) getProductId() {
 		}
 		if !cs.GetFakeMode() {
 			if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
-				cs.logger.Info("waiting for buyer to place order")
+				cs.logger.Info("waiting for buyer place order")
 				return true
 			}
 		}
@@ -72,38 +72,36 @@ func (cs *ContractService) updateProductInfoToChain(idOnChain string, productIds
 			}
 			productInfos = append(productInfos, pi)
 		}
-	}
 
-	param := &qlcSdk.DoDSettleUpdateProductInfoParam{
-		Address:     cs.account.Address(),
-		OrderId:     orderInfo.OrderId,
-		ProductInfo: productInfos,
-	}
-	blk := new(pkg.StateBlock)
-	var err error
-	if cs.GetFakeMode() {
-		if blk, err = mock.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-			return cs.account.Sign(hash), nil
-		}); err != nil {
-			return err
+		param := &qlcSdk.DoDSettleUpdateProductInfoParam{
+			Address:     cs.account.Address(),
+			OrderId:     orderInfo.OrderId,
+			ProductInfo: productInfos,
 		}
-	} else {
-		if blk, err = cs.client.DoDSettlement.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-			return cs.account.Sign(hash), nil
-		}); err != nil {
-			return err
+		blk := new(pkg.StateBlock)
+		var err error
+		if cs.GetFakeMode() {
+			if blk, err = mock.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+				return cs.account.Sign(hash), nil
+			}); err != nil {
+				return err
+			}
+		} else {
+			if blk, err = cs.client.DoDSettlement.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
+				return cs.account.Sign(hash), nil
+			}); err != nil {
+				return err
+			}
 		}
-	}
-	var w pkg.Work
-	worker, _ := pkg.NewWorker(w, blk.Root())
-	blk.Work = worker.NewWork()
-	if !cs.GetFakeMode() {
-		hash, err := cs.client.Ledger.Process(blk)
-		if err != nil {
-			cs.logger.Errorf("process block error: %s", err)
-			return err
+		var w pkg.Work
+		worker, _ := pkg.NewWorker(w, blk.Root())
+		blk.Work = worker.NewWork()
+		if !cs.GetFakeMode() {
+			if err = cs.processBlockAndWaitConfirmed(blk); err != nil {
+				cs.logger.Errorf("process block error: %s", err)
+				return err
+			}
 		}
-		cs.logger.Infof("process hash %s success", hash.String())
 	}
 	return nil
 }

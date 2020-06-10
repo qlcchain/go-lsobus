@@ -3,6 +3,7 @@ package contract
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -154,4 +155,33 @@ func (cs *ContractService) unsubscribeEvent() error {
 		}
 	}
 	return nil
+}
+
+func (cs *ContractService) processBlockAndWaitConfirmed(block *types.StateBlock) error {
+	_, err := cs.client.Ledger.Process(block)
+	if err != nil {
+		return fmt.Errorf("process block error: %s", err)
+	}
+	return cs.waitBlockConfirmed(block.GetHash())
+}
+
+func (cs *ContractService) waitBlockConfirmed(hash types.Hash) error {
+	t := time.NewTimer(time.Second * 180)
+	defer t.Stop()
+	for {
+		select {
+		case <-t.C:
+			return errors.New("consensus confirmed timeout")
+		default:
+			confirmed, err := cs.client.Ledger.BlockConfirmedStatus(hash)
+			if err != nil {
+				return err
+			}
+			if confirmed {
+				return nil
+			} else {
+				time.Sleep(1 * time.Second)
+			}
+		}
+	}
 }

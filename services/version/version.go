@@ -40,5 +40,5 @@ func ShortVersion() string {
 	if parse, err := time.Parse(time.RFC3339, BuildTime); err == nil {
 		t = parse.Local().Format("2006-01-02 15:04:05-0700")
 	}
-	return fmt.Sprintf("gqlc %s-%s @ %s", Version, GitRev, t)
+	return fmt.Sprintf("go-lsobus %s-%s @ %s", Version, GitRev, t)
 }

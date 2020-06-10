@@ -216,6 +216,7 @@ func DSChangeOrder(buyerAddressP, buyerNameP, sellerAddressP, sellerNameP, start
 				DynamicParam: &pb.ConnectionDynamicParam{
 					QuoteId:     quoteIdP,
 					QuoteItemId: "1",
+					ItemId:      "1",
 					Bandwidth:   bandwidthP,
 					StartTime:   startTime,
 					EndTime:     endTime,
