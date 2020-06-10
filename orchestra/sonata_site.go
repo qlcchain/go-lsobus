@@ -39,9 +39,7 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateSiteFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*sitapi.GeographicSiteFindUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -61,9 +59,7 @@ func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateSiteGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*sitapi.GeographicSiteGetUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 
@@ -71,4 +67,13 @@ func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
 	params.RspSite = rspParams.GetPayload()
 
 	return nil
+}
+
+func (s *sonataSiteImpl) handleResponseError(rspErr error) {
+	switch rspErr.(type) {
+	case *sitapi.GeographicSiteFindUnauthorized:
+		s.ClearApiToken()
+	case *sitapi.GeographicSiteGetUnauthorized:
+		s.ClearApiToken()
+	}
 }

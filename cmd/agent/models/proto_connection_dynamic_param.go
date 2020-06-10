@@ -18,6 +18,15 @@ type ProtoConnectionDynamicParam struct {
 	// addition
 	Addition float32 `json:"Addition,omitempty"`
 
+	// internal Id
+	InternalID string `json:"InternalId,omitempty"`
+
+	// item Id
+	ItemID string `json:"ItemId,omitempty"`
+
+	// order item Id
+	OrderItemID string `json:"OrderItemId,omitempty"`
+
 	// bandwidth
 	Bandwidth string `json:"bandwidth,omitempty"`
 

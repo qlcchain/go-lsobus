@@ -47,9 +47,7 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 		rspParams = mock.SonataGenerateOrderCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*ordapi.ProductOrderCreateUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -85,9 +83,7 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateOrderFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		if _, ok := err.(*ordapi.ProductOrderFindUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 
@@ -110,9 +106,7 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateOrderGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		if _, ok := err.(*ordapi.ProductOrderGetUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -361,5 +355,16 @@ func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, pa
 	order.BillingType = params.BillingType
 	if order.BillingType == "DOD" {
 		order.BillingType = "DOM"
+	}
+}
+
+func (s *sonataOrderImpl) handleResponseError(rspErr error) {
+	switch rspErr.(type) {
+	case *ordapi.ProductOrderCreateUnauthorized, *ordapi.ProductOrderCreateForbidden:
+		s.ClearApiToken()
+	case *ordapi.ProductOrderFindUnauthorized, *ordapi.ProductOrderFindForbidden:
+		s.ClearApiToken()
+	case *ordapi.ProductOrderGetUnauthorized, *ordapi.ProductOrderGetForbidden:
+		s.ClearApiToken()
 	}
 }

@@ -61,9 +61,7 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGenerateInvFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*invapi.ProductFindUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 
@@ -84,9 +82,7 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGenerateInvGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*invapi.ProductGetUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 
@@ -94,4 +90,13 @@ func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
 	params.RspInv = rspParams.GetPayload()
 
 	return nil
+}
+
+func (s *sonataInvImpl) handleResponseError(rspErr error) {
+	switch rspErr.(type) {
+	case *invapi.ProductFindUnauthorized, *invapi.ProductFindForbidden:
+		s.ClearApiToken()
+	case *invapi.ProductGetUnauthorized, *invapi.ProductGetForbidden:
+		s.ClearApiToken()
+	}
 }

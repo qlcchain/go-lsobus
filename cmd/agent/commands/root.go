@@ -144,12 +144,10 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	for {
-		err = po.GetOrderInfo()
-		if err != nil {
-			fmt.Println(err)
-			time.Sleep(5 * time.Second)
-		}
+	err = po.CheckOrderStatus()
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 }
 

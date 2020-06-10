@@ -198,7 +198,6 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam.StaticParam.ProductOfferingID = o.Param.ProductOfferID
 
 	connParam.StaticParam.BuyerProductID = o.Param.BuyerProductID
-	connParam.StaticParam.ItemID = "1"
 
 	// Change or Terminate Existing Product
 	//connParam.StaticParam.ProductID = ""
@@ -216,6 +215,7 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam.StaticParam.DstPort = o.Param.DstPort
 
 	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
+	connParam.DynamicParam.ItemID = uuid.New().String()
 	connParam.DynamicParam.ConnectionName = o.Param.Name
 	connParam.DynamicParam.Bandwidth = fmt.Sprintf("%d Mbps", o.Param.Bandwidth)
 	connParam.DynamicParam.ServiceClass = o.Param.CosName
@@ -258,7 +258,8 @@ func (o *ProductOrder) GetOrderInfo() error {
 
 	o.OrderInfoRsp = rsp.GetPayload()
 
-	fmt.Printf("Get Order Info is OK, OrderID %s, OrderState %s\n", o.OrderInfoRsp.OrderID, o.OrderInfoRsp.OrderState)
+	fmt.Printf("Get Order Info is OK, ContractState %s, OrderID %s, OrderState %s\n",
+		o.OrderInfoRsp.ContractState, o.OrderInfoRsp.OrderID, o.OrderInfoRsp.OrderState)
 
 	return nil
 }
@@ -285,24 +286,33 @@ func (o *ProductOrder) GetOrderInfoByInternalId(internalId string) error {
 
 func (o *ProductOrder) CheckOrderStatus() error {
 	var err error
+	var lastContractState string
+	var lastOrderState string
 
 	for {
+		time.Sleep(10 * time.Second)
+
+		err = o.GetOrderInfo()
 		if err != nil {
 			fmt.Printf("wait to get order info, err %s", err)
-			time.Sleep(5 * time.Second)
-		}
-
-		err := o.GetOrderInfo()
-		if err != nil {
 			continue
 		}
 		if o.OrderInfoRsp == nil {
-			err = errors.New("OrderInfo not exist")
+			fmt.Printf("OrderInfo not exist")
 			continue
 		}
 
-		if o.OrderInfoRsp.OrderState == "" {
-			fmt.Printf("wait to get order info, err %s", err)
+		if o.OrderInfoRsp.ContractState != lastContractState {
+			fmt.Printf("Update ContractState %s", o.OrderInfoRsp.ContractState)
+			lastContractState = o.OrderInfoRsp.ContractState
+		}
+
+		if o.OrderInfoRsp.OrderState != lastOrderState {
+			fmt.Printf("Update OrderState %s", o.OrderInfoRsp.OrderState)
+			lastOrderState = o.OrderInfoRsp.OrderState
+		}
+
+		if o.OrderInfoRsp.OrderState == "complete" {
 			break
 		}
 	}

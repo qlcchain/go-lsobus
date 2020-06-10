@@ -43,9 +43,7 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 		rspParams = mock.SonataGeneratePoqCreateResponse(reqParams)
 	} else if err != nil {
 		s.logger.Errorf("send request, error %s", err)
-		if _, ok := err.(*poqapi.ProductOfferingQualificationCreateUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -76,9 +74,7 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 		rspParams = mock.SonataGeneratePoqFindResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		if _, ok := err.(*poqapi.ProductOfferingQualificationFindUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -100,9 +96,7 @@ func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
 		rspParams = mock.SonataGeneratePoqGetResponse(reqParams)
 	} else if err != nil {
 		s.logger.Error("send request,", "error:", err)
-		if _, ok := err.(*poqapi.ProductOfferingQualificationGetUnauthorized); ok {
-			s.ClearApiToken()
-		}
+		s.handleResponseError(err)
 		return err
 	}
 	s.logger.Debugf("receive response, payload %s", s.DumpValue(rspParams.GetPayload()))
@@ -253,4 +247,15 @@ func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductO
 	}
 
 	return lineItem
+}
+
+func (s *sonataPOQImpl) handleResponseError(rspErr error) {
+	switch rspErr.(type) {
+	case *poqapi.ProductOfferingQualificationCreateUnauthorized, *poqapi.ProductOfferingQualificationCreateForbidden:
+		s.ClearApiToken()
+	case *poqapi.ProductOfferingQualificationFindUnauthorized, *poqapi.ProductOfferingQualificationFindForbidden:
+		s.ClearApiToken()
+	case *poqapi.ProductOfferingQualificationGetUnauthorized, *poqapi.ProductOfferingQualificationGetForbidden:
+		s.ClearApiToken()
+	}
 }

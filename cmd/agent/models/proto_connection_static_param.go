@@ -36,9 +36,6 @@ type ProtoConnectionStaticParam struct {
 	// dst region
 	DstRegion string `json:"dstRegion,omitempty"`
 
-	// item Id
-	ItemID string `json:"itemId,omitempty"`
-
 	// product Id
 	ProductID string `json:"productId,omitempty"`
 

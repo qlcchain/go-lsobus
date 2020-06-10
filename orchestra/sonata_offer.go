@@ -33,6 +33,7 @@ func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOfferFindResponse(reqParams)
 	} else if err != nil {
+		s.handleResponseError(err)
 		return err
 	}
 
@@ -55,6 +56,7 @@ func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
 	if s.GetFakeMode() {
 		rspParams = mock.SonataGenerateOfferGetResponse(reqParams)
 	} else if err != nil {
+		s.handleResponseError(err)
 		return nil
 	}
 
@@ -62,4 +64,7 @@ func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
 	params.RspOffer = rspParams.Payload
 
 	return nil
+}
+
+func (s *sonataOfferImpl) handleResponseError(rspErr error) {
 }
