@@ -287,8 +287,8 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 		if quoteItem.ID != nil {
 			quoteItem.ExternalID = *quoteItem.ID
 		}
-		itemUuid := uuid.New().String()
-		quoteItem.ID = &itemUuid
+		//itemUuid := uuid.New().String()
+		//quoteItem.ID = &itemUuid
 		quoteItem.State = quomod.QuoteItemStateTypeREADY
 
 		var uniSpec *cmnmod.UNISpec
@@ -405,8 +405,8 @@ func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParam
 		if orderItem.ID != nil {
 			orderItem.ExternalID = *orderItem.ID
 		}
-		itemUuid := uuid.New().String()
-		orderItem.ID = &itemUuid
+		//itemUuid := uuid.New().String()
+		//orderItem.ID = &itemUuid
 		orderItem.State = ordmod.ProductOrderItemStateTypeCompleted
 	}
 
