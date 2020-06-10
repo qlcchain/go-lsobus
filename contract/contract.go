@@ -28,6 +28,7 @@ const (
 	checkOrderStatusInterval      = 10 * time.Second
 	checkProductInterval          = 10 * time.Second
 	connectRpcServerInterval      = 5 * time.Second
+	toBeCompletedOrderIdFile    = "orderId.txt" // the contract ID to be completed needs to be recorded in a file to prevent LsoBus from exiting abnormally
 )
 
 var (

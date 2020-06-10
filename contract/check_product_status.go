@@ -1,6 +1,7 @@
 package contract
 
 import (
+	"strings"
 	"time"
 
 	"github.com/qlcchain/go-lsobus/mock"
@@ -51,7 +52,7 @@ func (cs *ContractService) getProductStatus() {
 					cs.logger.Error(err)
 					continue
 				}
-				if gp.RspInv.Status == models.ProductStatusActive {
+				if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusActive)) {
 					cs.logger.Infof("product %s is active", value.ProductId)
 					value.Active = true
 					productInfo := &qlcSdk.DoDSettleProductInfo{
