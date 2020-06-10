@@ -31,10 +31,10 @@ type Product struct {
 	AtType string `json:"@type,omitempty"`
 
 	// agreement
-	Agreement []*Agreement `json:"agreement"`
+	Agreement []*Agreement `json:"agreement,omitempty"`
 
 	// billing account
-	BillingAccount []*BillingAccountRef `json:"billingAccount"`
+	BillingAccount []*BillingAccountRef `json:"billingAccount,omitempty"`
 
 	// This identifier is optionally provided during the Product ordering and stored for informative purpose in the Seller inventory.
 	BuyerProductID string `json:"buyerProductId,omitempty"`
@@ -54,37 +54,37 @@ type Product struct {
 	ProductOffering *ProductOfferingRef `json:"productOffering,omitempty"`
 
 	// product order
-	ProductOrder []*ProductOrderRef `json:"productOrder"`
+	ProductOrder []*ProductOrderRef `json:"productOrder,omitempty"`
 
 	// product price
-	ProductPrice []*ProductPrice `json:"productPrice"`
+	ProductPrice []*ProductPrice `json:"productPrice,omitempty"`
 
 	// product relationship
-	ProductRelationship []*ProductRelationship `json:"productRelationship"`
+	ProductRelationship []*ProductRelationship `json:"productRelationship,omitempty"`
 
 	// product specification
 	ProductSpecification *ProductSpecificationRef `json:"productSpecification,omitempty"`
 
 	// product term
-	ProductTerm []*ProductTerm `json:"productTerm"`
+	ProductTerm []*ProductTerm `json:"productTerm,omitempty"`
 
 	// related party
-	RelatedParty []*RelatedParty `json:"relatedParty"`
+	RelatedParty []*RelatedParty `json:"relatedParty,omitempty"`
 
 	// site
-	Site []*GeographicSite `json:"site"`
+	Site []*GeographicSite `json:"site,omitempty"`
 
 	// Start date is when the product is active for the first time (when the install in the product order has been processed).
 	// Required: true
 	// Format: date-time
-	StartDate *strfmt.DateTime `json:"startDate"`
+	StartDate *strfmt.DateTime `json:"startDate,omitempty"`
 
 	// status
 	// Required: true
-	Status ProductStatus `json:"status"`
+	Status ProductStatus `json:"status,omitempty"`
 
 	// status change
-	StatusChange []*StatusChange `json:"statusChange"`
+	StatusChange []*StatusChange `json:"statusChange,omitempty"`
 
 	// Termination date (commercial) is when the product has been terminated (when the disconnect in the product order has been processed).
 	// Format: date-time

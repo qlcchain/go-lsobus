@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qlcchain/go-lsobus/mock"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	"github.com/qlcchain/go-lsobus/mock"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 

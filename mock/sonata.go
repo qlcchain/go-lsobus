@@ -76,6 +76,9 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prod1.ID = &prodID1
 		prod1.BuyerProductID = "1"
 		prod1.ProductSpecification = &invmod.ProductSpecificationSummary{}
+		ord1ItemId1 := "1"
+		ord1 := &invmod.ProductOrderRef{ID: reqParams.ProductOrderID, OrderItemID: &ord1ItemId1}
+		prod1.ProductOrder = append(prod1.ProductOrder, ord1)
 		prod1.StartDate.Scan(time.Now().Add(time.Duration(rand.Intn(48)) * time.Hour))
 		prod1.Status = invmod.ProductStatusActive
 
@@ -98,6 +101,11 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prod1.StartDate.Scan(time.Now().Add(time.Duration(rand.Intn(48)) * time.Hour))
 		prod1.Status = invmod.ProductStatusActive
 
+		ordId1 := "1"
+		ordItemId1 := "1"
+		ord1 := &invmod.ProductOrderRef{ID: &ordId1, OrderItemID: &ordItemId1}
+		prod1.ProductOrder = append(prod1.ProductOrder, ord1)
+
 		prod2 := &invmod.ProductSummary{}
 		rspParams.Payload = append(rspParams.Payload, prod2)
 
@@ -110,6 +118,11 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prod2.ProductSpecification.ID = &prodSpecID2
 		prod2.StartDate.Scan(time.Now().Add(time.Duration(rand.Intn(48)) * time.Hour))
 		prod2.Status = invmod.ProductStatusActive
+
+		ordId2 := "2"
+		ordItemId2 := "2"
+		ord2 := &invmod.ProductOrderRef{ID: &ordId2, OrderItemID: &ordItemId2}
+		prod2.ProductOrder = append(prod2.ProductOrder, ord2)
 	}
 
 	if reqParams.ProductSpecificationID == nil || *reqParams.ProductSpecificationID == "ELineSpec" {
@@ -125,6 +138,11 @@ func SonataGenerateInvFindResponse(reqParams *invapi.ProductFindParams) *invapi.
 		prod3.ProductSpecification.ID = &prodSpecID1
 		prod3.StartDate.Scan(time.Now().Add(time.Duration(rand.Intn(48)) * time.Hour))
 		prod3.Status = invmod.ProductStatusActive
+
+		ordId3 := "3"
+		ordItemId3 := "3"
+		ord3 := &invmod.ProductOrderRef{ID: &ordId3, OrderItemID: &ordItemId3}
+		prod3.ProductOrder = append(prod3.ProductOrder, ord3)
 	}
 
 	rspParams.XResultCount = strconv.Itoa(len(rspParams.Payload))
@@ -143,6 +161,11 @@ func SonataGenerateInvGetResponse(reqParams *invapi.ProductGetParams) *invapi.Pr
 	prodItem.LastUpdateDate.Scan(time.Now())
 	prodItem.ProductSpecification = &invmod.ProductSpecificationRef{}
 	prodItem.ProductSpecification.ID = sonata.NewString("ELineSpec")
+
+	ordId1 := "1"
+	ordItemId1 := "1"
+	ord1 := &invmod.ProductOrderRef{ID: &ordId1, OrderItemID: &ordItemId1}
+	prodItem.ProductOrder = append(prodItem.ProductOrder, ord1)
 
 	rspParams.Payload = prodItem
 
@@ -261,6 +284,11 @@ func SonataGenerateQuoteCreateResponse(reqParams *quoapi.QuoteCreateParams) *quo
 	rspQuote.State = quomod.QuoteStateTypeREADY
 
 	for _, quoteItem := range rspQuote.QuoteItem {
+		if quoteItem.ID != nil {
+			quoteItem.ExternalID = *quoteItem.ID
+		}
+		itemUuid := uuid.New().String()
+		quoteItem.ID = &itemUuid
 		quoteItem.State = quomod.QuoteItemStateTypeREADY
 
 		var uniSpec *cmnmod.UNISpec
@@ -374,6 +402,11 @@ func SonataGenerateOrderCreateResponse(reqParams *ordapi.ProductOrderCreateParam
 	rspOrder.CompletionDate.Scan(time.Now())
 
 	for _, orderItem := range rspOrder.OrderItem {
+		if orderItem.ID != nil {
+			orderItem.ExternalID = *orderItem.ID
+		}
+		itemUuid := uuid.New().String()
+		orderItem.ID = &itemUuid
 		orderItem.State = ordmod.ProductOrderItemStateTypeCompleted
 	}
 

@@ -30,7 +30,7 @@ type Quote struct {
 	AtType string `json:"@type,omitempty"`
 
 	// agreement
-	Agreement []*AgreementRef `json:"agreement"`
+	Agreement []*AgreementRef `json:"agreement,omitempty"`
 
 	// Description of the quote
 	Description string `json:"description,omitempty"`
@@ -61,7 +61,7 @@ type Quote struct {
 	InstantSyncQuoting bool `json:"instantSyncQuoting"`
 
 	// note
-	Note []*Note `json:"note"`
+	Note []*Note `json:"note,omitempty"`
 
 	// This value MAY be assigned by the Buyer/Seller to identify a project the quoting request is associated with.
 	ProjectID string `json:"projectId,omitempty"`
@@ -80,12 +80,12 @@ type Quote struct {
 
 	// related party
 	// Required: true
-	RelatedParty []*RelatedParty `json:"relatedParty"`
+	RelatedParty []*RelatedParty `json:"relatedParty,omitempty"`
 
 	// This is the date wished by the requester to have the quote completed (meaning priced)
 	// Required: true
 	// Format: date-time
-	RequestedQuoteCompletionDate *strfmt.DateTime `json:"requestedQuoteCompletionDate"`
+	RequestedQuoteCompletionDate *strfmt.DateTime `json:"requestedQuoteCompletionDate,omitempty"`
 
 	// state
 	// Required: true
