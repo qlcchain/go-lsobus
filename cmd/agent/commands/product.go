@@ -38,6 +38,9 @@ type ProductParam struct {
 	EndTime   int64
 
 	BuyerProductID string
+
+	ExistProductID       string
+	ExistConnectionParam *models.ProtoConnectionParam
 }
 
 type ProductOrder struct {
@@ -54,8 +57,10 @@ type ProductOrder struct {
 	QuoteReq *models.ProtoOrchestraCommonRequest
 	QuoteRsp *models.ProtoOrchestraCommonResponse
 
-	OrderReq *models.ProtoCreateOrderParam
-	OrderRsp *models.ProtoOrderID
+	CreateOrderReq    *models.ProtoCreateOrderParam
+	ChangeOrderReq    *models.ProtoChangeOrderParam
+	TerminateOrderReq *models.ProtoTerminateOrderParam
+	CommonOrderRsp    *models.ProtoOrderID
 
 	OrderInfoRsp *models.ProtoOrderInfo
 }
@@ -75,8 +80,8 @@ func (o *ProductOrder) Init() error {
 	return nil
 }
 
-func (o *ProductOrder) CreateQuote() error {
-	reqDataJson, err := o.buildQuoteReqJson()
+func (o *ProductOrder) CreateQuote(action string) error {
+	reqDataJson, err := o.buildQuoteReqJson(action)
 	if err != nil {
 		return err
 	}
@@ -103,20 +108,20 @@ func (o *ProductOrder) CreateQuote() error {
 	return nil
 }
 
-func (o *ProductOrder) buildQuoteReqJson() ([]byte, error) {
+func (o *ProductOrder) buildQuoteReqJson(action string) ([]byte, error) {
 	quoteParam := &models.OrderParams{}
 	quoteParam.ExternalID = uuid.New().String()
 	quoteParam.ProjectID = "CBC-AGENT"
 
-	quoteParam.OrderActivity = "INSTALL"
+	quoteParam.OrderActivity = action
 	quoteParam.Buyer = &models.PartnerParams{Name: o.Param.BuyerName, ID: o.Param.BuyerAddr}
 	quoteParam.Seller = &models.PartnerParams{Name: o.Param.SellerName, ID: o.Param.SellerAddr}
 	quoteParam.BillingType = "DOD"
 	quoteParam.PaymentType = "INVOICE"
 
 	lineItem := &models.ELineItemParams{}
-	lineItem.ItemID = "1"
-	lineItem.Action = "INSTALL"
+	lineItem.ItemID = uuid.New().String()
+	lineItem.Action = action
 	lineItem.Name = o.Param.Name
 	lineItem.CosName = strings.ToUpper(o.Param.CosName)
 	lineItem.Bandwidth = uint(o.Param.Bandwidth)
@@ -125,6 +130,8 @@ func (o *ProductOrder) buildQuoteReqJson() ([]byte, error) {
 	//lineItem.DstPortID = o.Param.DstPort
 	lineItem.SrcLocationID = o.Param.SrcLocID
 	lineItem.DstLocationID = o.Param.DstLocID
+	//lineItem.BuyerProductID = o.Param.BuyerProductID
+	lineItem.ProductID = o.Param.ExistProductID
 
 	lineItem.BillingParams = &models.BillingParams{}
 	lineItem.BillingParams.BillingType = quoteParam.BillingType
@@ -189,18 +196,15 @@ func (o *ProductOrder) CreateNewOrder() error {
 		return errors.New("quote not exist")
 	}
 
-	o.OrderReq = &models.ProtoCreateOrderParam{}
-	o.OrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
-	o.OrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
+	o.CreateOrderReq = &models.ProtoCreateOrderParam{}
+	o.CreateOrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
+	o.CreateOrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
 
 	connParam := &models.ProtoConnectionParam{}
 	connParam.StaticParam = &models.ProtoConnectionStaticParam{}
 	connParam.StaticParam.ProductOfferingID = o.Param.ProductOfferID
 
 	connParam.StaticParam.BuyerProductID = o.Param.BuyerProductID
-
-	// Change or Terminate Existing Product
-	//connParam.StaticParam.ProductID = ""
 
 	connParam.StaticParam.SrcRegion = "KR"
 	connParam.StaticParam.SrcCity = "9d242983f7a504eebb3eb478"
@@ -229,27 +233,123 @@ func (o *ProductOrder) CreateNewOrder() error {
 	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))
 	connParam.DynamicParam.EndTime = strconv.Itoa(int(o.Param.EndTime))
 
-	o.OrderReq.ConnectionParam = append(o.OrderReq.ConnectionParam, connParam)
+	o.CreateOrderReq.ConnectionParam = append(o.CreateOrderReq.ConnectionParam, connParam)
 
 	req := order_api.NewCreateOrderParams()
-	req.Body = o.OrderReq
+	req.Body = o.CreateOrderReq
 
 	rsp, err := o.Client.OrderAPI.CreateOrder(req)
 	if err != nil {
 		return err
 	}
 
-	o.OrderRsp = rsp.GetPayload()
-	o.InternalID = o.OrderRsp.InternalID
+	o.CommonOrderRsp = rsp.GetPayload()
+	o.InternalID = o.CommonOrderRsp.InternalID
 
 	fmt.Printf("Create New Order is OK, InternalID %s\n", o.InternalID)
 
 	return nil
 }
 
+func (o *ProductOrder) CreateChangeOrder() error {
+	if o.Param.ExistConnectionParam == nil {
+		return errors.New("exist product not exist")
+	}
+
+	if o.QuoteRsp == nil {
+		return errors.New("quote not exist")
+	}
+
+	o.ChangeOrderReq = &models.ProtoChangeOrderParam{}
+	o.ChangeOrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
+	o.ChangeOrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
+
+	connParam := &models.ProtoChangeConnectionParam{}
+	connParam.ProductID = o.Param.ExistProductID
+	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
+	connParam.DynamicParam.ItemID = uuid.New().String()
+	connParam.DynamicParam.ConnectionName = o.Param.Name
+	connParam.DynamicParam.Bandwidth = fmt.Sprintf("%d Mbps", o.Param.Bandwidth)
+	connParam.DynamicParam.ServiceClass = o.Param.CosName
+	connParam.DynamicParam.QuoteID = o.QuoteID
+	connParam.DynamicParam.QuoteItemID = o.QuoteItemID
+	connParam.DynamicParam.Currency = o.QuoteCurrency
+	connParam.DynamicParam.Price = float32(o.QuotePrice)
+	connParam.DynamicParam.BillingType = "DOD"
+	connParam.DynamicParam.PaymentType = "invoice"
+	connParam.DynamicParam.BillingUnit = "day"
+	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))
+	connParam.DynamicParam.EndTime = strconv.Itoa(int(o.Param.EndTime))
+
+	o.ChangeOrderReq.ChangeConnectionParam = append(o.ChangeOrderReq.ChangeConnectionParam, connParam)
+
+	req := order_api.NewChangeOrderParams()
+	req.Body = o.ChangeOrderReq
+
+	rsp, err := o.Client.OrderAPI.ChangeOrder(req)
+	if err != nil {
+		return err
+	}
+
+	o.CommonOrderRsp = rsp.GetPayload()
+	o.InternalID = o.CommonOrderRsp.InternalID
+
+	fmt.Printf("Create Change Order is OK, InternalID %s\n", o.InternalID)
+
+	return nil
+}
+
+func (o *ProductOrder) CreateTerminateOrder() error {
+	if o.Param.ExistConnectionParam == nil {
+		return errors.New("exist product not exist")
+	}
+
+	if o.QuoteRsp == nil {
+		return errors.New("quote not exist")
+	}
+
+	o.TerminateOrderReq = &models.ProtoTerminateOrderParam{}
+	o.TerminateOrderReq.Buyer = &models.ProtoUser{Name: o.Param.BuyerName, Address: o.Param.BuyerAddr}
+	o.TerminateOrderReq.Seller = &models.ProtoUser{Name: o.Param.SellerName, Address: o.Param.SellerAddr}
+
+	connParam := &models.ProtoTerminateConnectionParam{}
+	connParam.ProductID = o.Param.ExistProductID
+	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
+	connParam.DynamicParam.ItemID = uuid.New().String()
+	connParam.DynamicParam.ConnectionName = o.Param.Name
+	connParam.DynamicParam.Bandwidth = fmt.Sprintf("%d Mbps", o.Param.Bandwidth)
+	connParam.DynamicParam.ServiceClass = o.Param.CosName
+	connParam.DynamicParam.QuoteID = o.QuoteID
+	connParam.DynamicParam.QuoteItemID = o.QuoteItemID
+	connParam.DynamicParam.Currency = o.QuoteCurrency
+	connParam.DynamicParam.Price = float32(o.QuotePrice)
+	connParam.DynamicParam.BillingType = "DOD"
+	connParam.DynamicParam.PaymentType = "invoice"
+	connParam.DynamicParam.BillingUnit = "day"
+	connParam.DynamicParam.StartTime = strconv.Itoa(int(o.Param.StartTime))
+	connParam.DynamicParam.EndTime = strconv.Itoa(int(o.Param.EndTime))
+
+	o.TerminateOrderReq.TerminateConnectionParam = append(o.TerminateOrderReq.TerminateConnectionParam, connParam)
+
+	req := order_api.NewTerminateOrderParams()
+	req.Body = o.TerminateOrderReq
+
+	rsp, err := o.Client.OrderAPI.TerminateOrder(req)
+	if err != nil {
+		return err
+	}
+
+	o.CommonOrderRsp = rsp.GetPayload()
+	o.InternalID = o.CommonOrderRsp.InternalID
+
+	fmt.Printf("Create Terminate Order is OK, InternalID %s\n", o.InternalID)
+
+	return nil
+}
+
 func (o *ProductOrder) GetOrderInfo() error {
 	req := order_api.NewGetOrderInfoParams()
-	req.InternalID = &(o.OrderRsp.InternalID)
+	req.InternalID = &(o.CommonOrderRsp.InternalID)
 
 	rsp, err := o.Client.OrderAPI.GetOrderInfo(req)
 	if err != nil {
@@ -264,24 +364,17 @@ func (o *ProductOrder) GetOrderInfo() error {
 	return nil
 }
 
-func (o *ProductOrder) GetOrderInfoByInternalId(internalId string) error {
+func (o *ProductOrder) GetOrderInfoByInternalId(internalId string) (*models.ProtoOrderInfo, error) {
 	req := order_api.NewGetOrderInfoParams()
 	req.InternalID = &internalId
 
 	rsp, err := o.Client.OrderAPI.GetOrderInfo(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	orderInfo := rsp.GetPayload()
 
-	infoData, err := json.Marshal(orderInfo)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Get Order Info is OK, %s\n", string(infoData))
-
-	return nil
+	return orderInfo, nil
 }
 
 func (o *ProductOrder) CheckOrderStatus() error {
@@ -294,21 +387,21 @@ func (o *ProductOrder) CheckOrderStatus() error {
 
 		err = o.GetOrderInfo()
 		if err != nil {
-			fmt.Printf("wait to get order info, err %s", err)
+			fmt.Printf("wait to get order info, err %s\n", err)
 			continue
 		}
 		if o.OrderInfoRsp == nil {
-			fmt.Printf("OrderInfo not exist")
+			fmt.Printf("OrderInfo not exist\n")
 			continue
 		}
 
 		if o.OrderInfoRsp.ContractState != lastContractState {
-			fmt.Printf("Update ContractState %s", o.OrderInfoRsp.ContractState)
+			fmt.Printf("Update ContractState %s\n", o.OrderInfoRsp.ContractState)
 			lastContractState = o.OrderInfoRsp.ContractState
 		}
 
 		if o.OrderInfoRsp.OrderState != lastOrderState {
-			fmt.Printf("Update OrderState %s", o.OrderInfoRsp.OrderState)
+			fmt.Printf("Update OrderState %s\n", o.OrderInfoRsp.OrderState)
 			lastOrderState = o.OrderInfoRsp.OrderState
 		}
 

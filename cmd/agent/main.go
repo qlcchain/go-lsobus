@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
-	_ = os.Setenv("SWAGGER_DEBUG", "true")
-	_ = os.Setenv("DEBUG", "true")
+	//_ = os.Setenv("SWAGGER_DEBUG", "true")
+	//_ = os.Setenv("DEBUG", "true")
 
 	commands.InitCmd()
 

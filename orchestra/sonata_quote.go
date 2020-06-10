@@ -271,17 +271,13 @@ func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteI
 	lineItem.ProductOffering = &quomod.ProductOfferingRef{ID: &params.ProdOfferID}
 
 	lineItem.Product = new(quomod.Product)
-	if lineItem.Action != quomod.ProductActionTypeINSTALL {
-		lineItem.Product.ID = &params.ProductID
-	}
+	lineItem.Product.ID = &params.ProductID
 
 	//Product Specification
-	if lineItem.Action != quomod.ProductActionTypeDISCONNECT {
-		lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
-		lineItem.Product.ProductSpecification.ID = "PCCWConnSpec"
-		lineDesc := s.BuildPCCWConnProductSpec(params)
-		lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
-	}
+	lineItem.Product.ProductSpecification = &quomod.ProductSpecificationRef{}
+	lineItem.Product.ProductSpecification.ID = "PCCWConnSpec"
+	lineDesc := s.BuildPCCWConnProductSpec(params)
+	lineItem.Product.ProductSpecification.SetDescribing(lineDesc)
 
 	// Term
 	/*

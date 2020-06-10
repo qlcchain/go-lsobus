@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -49,18 +51,20 @@ func InitCmd() {
 		Use:   "change",
 		Short: "change exist connection",
 		Long:  `change exist connection`,
-		Run: func(cmd *cobra.Command, args []string) {
-		},
+		Run:   runConnectionChangeCmd,
 	}
+	connChangeCmd.Flags().String("internalId", "", "create order internal id")
+	connChangeCmd.Flags().Int32("bandwidth", 0, "bandwidth, unit is Mbps")
+	connChangeCmd.Flags().Int32("duration", 1, "duration in days")
 	connectionCmd.AddCommand(connChangeCmd)
 
 	connDeleteCmd := &cobra.Command{
 		Use:   "delete",
 		Short: "delete exist connection",
 		Long:  `delete exist connection`,
-		Run: func(cmd *cobra.Command, args []string) {
-		},
+		Run:   runConnectionDeleteCmd,
 	}
+	connDeleteCmd.Flags().String("internalId", "", "create order internal id")
 	connectionCmd.AddCommand(connDeleteCmd)
 
 	connGetCmd := &cobra.Command{
@@ -80,11 +84,7 @@ func Execute(osArgs []string) {
 	}
 }
 
-func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
-	var err error
-
-	pp := &ProductParam{}
-
+func fillProductCommonParam(pp *ProductParam) {
 	pp.SellerName = "PCCWG"
 	pp.SellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
 
@@ -92,6 +92,19 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 	pp.BuyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
 
 	pp.ProductOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+
+	pp.SrcLocID = "5ae7e56bbbc9a8001231fa5d"
+	pp.SrcPort = "5d098e7e96f045000a4164fa"
+	pp.DstLocID = "5ae7e56bbbc9a8001231fa5d"
+	pp.DstPort = "5d269f1760e409000ad83c58"
+}
+
+func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
+	var err error
+
+	pp := &ProductParam{}
+
+	fillProductCommonParam(pp)
 
 	duration, err := cmd.Flags().GetInt32("duration")
 	if err != nil {
@@ -119,10 +132,6 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pp.SrcLocID = "5ae7e56bbbc9a8001231fa5d"
-	pp.SrcPort = "5d098e7e96f045000a4164fa"
-	pp.DstLocID = "5ae7e56bbbc9a8001231fa5d"
-	pp.DstPort = "5d269f1760e409000ad83c58"
 	pp.BuyerProductID = uuid.New().String()
 
 	po := &ProductOrder{Param: pp}
@@ -132,13 +141,163 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = po.CreateQuote()
+	err = po.CreateQuote("INSTALL")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	err = po.CreateNewOrder()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CheckOrderStatus()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func runConnectionChangeCmd(cmd *cobra.Command, args []string) {
+	var err error
+
+	pp := &ProductParam{}
+
+	fillProductCommonParam(pp)
+
+	// find existing product by create order internal id
+	internalId, err := cmd.Flags().GetString("internalId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existPo := &ProductOrder{}
+	err = existPo.Init()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existOrderInfo, err := existPo.GetOrderInfoByInternalId(internalId)
+	if err != nil {
+		fmt.Println("failed to GetOrderInfoByInternalId ", err)
+		return
+	}
+	if len(existOrderInfo.Connections) == 0 {
+		fmt.Println("exist connection is empty")
+		return
+	}
+	pp.ExistConnectionParam = existOrderInfo.Connections[0]
+
+	pp.ExistProductID = pp.ExistConnectionParam.StaticParam.ProductID
+	pp.BuyerProductID = pp.ExistConnectionParam.StaticParam.BuyerProductID
+	pp.Name = pp.ExistConnectionParam.DynamicParam.ConnectionName
+	pp.CosName = pp.ExistConnectionParam.DynamicParam.ServiceClass
+
+	duration, err := cmd.Flags().GetInt32("duration")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existSTimeInt, err := strconv.Atoi(pp.ExistConnectionParam.DynamicParam.StartTime)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existETimeInt, err := strconv.Atoi(pp.ExistConnectionParam.DynamicParam.EndTime)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	pp.StartTime = int64(existSTimeInt)
+	if duration > 0 {
+		pp.EndTime = pp.StartTime + int64(duration)*24*3600
+	} else {
+		pp.EndTime = int64(existETimeInt)
+	}
+
+	pp.Bandwidth, err = cmd.Flags().GetInt32("bandwidth")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	po := &ProductOrder{Param: pp}
+	err = po.Init()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CreateQuote("CHANGE")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CreateChangeOrder()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CheckOrderStatus()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
+	var err error
+
+	pp := &ProductParam{}
+
+	fillProductCommonParam(pp)
+
+	// find existing product by create order internal id
+	internalId, err := cmd.Flags().GetString("internalId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existPo := &ProductOrder{}
+	err = existPo.Init()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	existOrderInfo, err := existPo.GetOrderInfoByInternalId(internalId)
+	if err != nil {
+		fmt.Println("failed to GetOrderInfoByInternalId ", err)
+		return
+	}
+	if len(existOrderInfo.Connections) == 0 {
+		fmt.Println("exist connection is empty")
+		return
+	}
+	pp.ExistConnectionParam = existOrderInfo.Connections[0]
+
+	pp.ExistProductID = pp.ExistConnectionParam.StaticParam.ProductID
+	pp.BuyerProductID = pp.ExistConnectionParam.StaticParam.BuyerProductID
+	pp.Name = pp.ExistConnectionParam.DynamicParam.ConnectionName
+	pp.CosName = pp.ExistConnectionParam.DynamicParam.ServiceClass
+
+	po := &ProductOrder{Param: pp}
+	err = po.Init()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CreateQuote("DISCONNECT")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = po.CreateTerminateOrder()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -165,9 +324,17 @@ func runConnectionGetCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = po.GetOrderInfoByInternalId(internalId)
+	orderInfo, err := po.GetOrderInfoByInternalId(internalId)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	infoData, err := json.MarshalIndent(orderInfo, "", "  ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Get Order Info is OK, %s\n", string(infoData))
 }

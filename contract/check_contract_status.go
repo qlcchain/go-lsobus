@@ -119,6 +119,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		eLine.QuoteItemID = v.QuoteItemId
 		eLine.Action = itemAction
 		eLine.ProdOfferID = v.ProductOfferingId
+		eLine.ProductID = v.ProductId
 		eLines = append(eLines, eLine)
 	}
 	op := &orchestra.OrderParams{
