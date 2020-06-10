@@ -35,9 +35,11 @@ func (cs *ContractService) getProductId() {
 			cs.logger.Error(err)
 			return true
 		}
-		if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
-			cs.logger.Info("waiting for buyer to place order")
-			return true
+		if !cs.GetFakeMode() {
+			if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
+				cs.logger.Info("waiting for buyer to place order")
+				return true
+			}
 		}
 		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo)
 		if err != nil {
