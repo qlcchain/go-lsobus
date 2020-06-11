@@ -30,6 +30,7 @@ func (cs *ContractService) checkProductStatus() {
 func (cs *ContractService) getProductStatus() {
 	addr := cs.account.Address()
 	var err error
+	var orderInfo *qlcSdk.DoDSettleOrderInfo
 	var id []*qlcSdk.DoDPendingResourceCheckInfo
 	if cs.GetFakeMode() {
 		id = mock.GetPendingResourceCheck(addr)
@@ -41,6 +42,11 @@ func (cs *ContractService) getProductStatus() {
 	}
 	for _, v := range id {
 		var productActive []*qlcSdk.DoDSettleProductInfo
+		orderInfo, err = cs.GetOrderInfoByInternalId(v.InternalId.String())
+		if err != nil {
+			cs.logger.Error(err)
+			continue
+		}
 		for _, value := range v.Products {
 			if !value.Active {
 				gp := &orchestra.GetParams{
@@ -52,15 +58,28 @@ func (cs *ContractService) getProductStatus() {
 					cs.logger.Error(err)
 					continue
 				}
-				if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusActive)) {
-					cs.logger.Infof("product %s is active", value.ProductId)
-					value.Active = true
-					productInfo := &qlcSdk.DoDSettleProductInfo{
-						OrderItemId: value.OrderItemId,
-						ProductId:   value.ProductId,
-						Active:      true,
+				if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
+					if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusTerminated)) {
+						cs.logger.Infof("product %s is terminated", value.ProductId)
+						value.Active = true
+						productInfo := &qlcSdk.DoDSettleProductInfo{
+							OrderItemId: value.OrderItemId,
+							ProductId:   value.ProductId,
+							Active:      true,
+						}
+						productActive = append(productActive, productInfo)
 					}
-					productActive = append(productActive, productInfo)
+				} else {
+					if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusActive)) {
+						cs.logger.Infof("product %s is active", value.ProductId)
+						value.Active = true
+						productInfo := &qlcSdk.DoDSettleProductInfo{
+							OrderItemId: value.OrderItemId,
+							ProductId:   value.ProductId,
+							Active:      true,
+						}
+						productActive = append(productActive, productInfo)
+					}
 				}
 			}
 		}
