@@ -19,6 +19,11 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 		if err != nil {
 			return "", err
 		}
+		if cs.cfg.Privacy.Enable {
+			op.PrivateFrom = cs.cfg.Privacy.From
+			op.PrivateFor = cs.cfg.Privacy.For
+			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
+		}
 		blk := new(pkg.StateBlock)
 		if cs.GetFakeMode() {
 			if blk, err = mock.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {

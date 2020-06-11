@@ -38,6 +38,12 @@ func DefaultConfig(dir string) (*Config, error) {
 				Password:  "",
 			},
 		},
+		Privacy: PrivacyCfg{
+			Enable:         false,
+			From:           "",
+			For:            []string{},
+			PrivateGroupID: "",
+		},
 	}
 	return &cfg, nil
 }

@@ -185,6 +185,11 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *q
 		Status:      qlcSdk.DoDSettleOrderStateSuccess,
 		FailReason:  "",
 	}
+	if cs.cfg.Privacy.Enable {
+		param.PrivateFrom = cs.cfg.Privacy.From
+		param.PrivateFor = cs.cfg.Privacy.For
+		param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
+	}
 	blk := new(pkg.StateBlock)
 	var err error
 	if cs.GetFakeMode() {

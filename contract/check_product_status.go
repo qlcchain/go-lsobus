@@ -113,6 +113,11 @@ func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, orderId 
 		OrderId:     orderId,
 		ProductInfo: products,
 	}
+	if cs.cfg.Privacy.Enable {
+		param.PrivateFrom = cs.cfg.Privacy.From
+		param.PrivateFor = cs.cfg.Privacy.For
+		param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
+	}
 	blk := new(pkg.StateBlock)
 	var err error
 	if cs.GetFakeMode() {
@@ -147,6 +152,11 @@ func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, orderId 
 func (cs *ContractService) updateOrderCompleteStatusToChain(requestHash pkg.Hash) error {
 	param := &qlcSdk.DoDSettleResponseParam{
 		RequestHash: requestHash,
+	}
+	if cs.cfg.Privacy.Enable {
+		param.PrivateFrom = cs.cfg.Privacy.From
+		param.PrivateFor = cs.cfg.Privacy.For
+		param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 	}
 	blk := new(pkg.StateBlock)
 	var err error

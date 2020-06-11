@@ -8,6 +8,7 @@ type Config struct {
 	FakeMode bool          `json:"fakeMode"` //fake mode for sonata
 	RPC      RPCConfig     `json:"rpc"`
 	Partners []*PartnerCfg `json:"partners"`
+	Privacy  PrivacyCfg    `json:"privacy"`
 }
 
 type RPCConfig struct {
@@ -27,4 +28,11 @@ type PartnerCfg struct {
 	SonataUrl string `json:"sonataUrl"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
+}
+
+type PrivacyCfg struct {
+	Enable         bool     `json:"enabled"`
+	From           string   `json:"from"`
+	For            []string `json:"for"`
+	PrivateGroupID string   `json:"privateGroupID"`
 }

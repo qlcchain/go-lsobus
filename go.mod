@@ -23,7 +23,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200610062741-79f43add1a92
+	github.com/qlcchain/qlc-go-sdk v1.3.6-0.20200611134241-32e00d2b0b32
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.0.0
 	go.uber.org/atomic v1.6.0
