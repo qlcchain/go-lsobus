@@ -122,6 +122,11 @@ func (cs *ContractService) processDoDContract() {
 				continue
 			} else {
 				cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
+				err = cs.readAndWriteProcessingOrder("add", "seller", v.Order.InternalId)
+				if err != nil {
+					cs.logger.Error(err)
+					continue
+				}
 				cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 			}
 		}

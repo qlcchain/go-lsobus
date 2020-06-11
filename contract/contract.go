@@ -2,8 +2,12 @@ package contract
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -28,12 +32,23 @@ const (
 	checkOrderStatusInterval      = 10 * time.Second
 	checkProductInterval          = 10 * time.Second
 	connectRpcServerInterval      = 5 * time.Second
+	processingOrderList           = "processingOrder.json" // a collection of processing order
 )
 
 var (
 	chainNotReady     = errors.New("chain is not ready")
 	buyerAddrNotMatch = errors.New("buyer address not match")
+	noInventoryList   = errors.New("no inventory list ")
 )
+
+type OrderList struct {
+	Role         string `json:"role"`
+	ChainOrderID string `json:"chainOrderID"`
+}
+
+type ProcessingOrderList struct {
+	Processing []*OrderList `json:"processing"`
+}
 
 type ContractService struct {
 	cfg                  *config.Config
@@ -50,6 +65,7 @@ type ContractService struct {
 	orderIdOnChainBuyer  *sync.Map
 	orchestra            *orchestra.Orchestra
 	fakeMode             bool
+	mutex                *sync.Mutex
 }
 
 type Product struct {
@@ -78,6 +94,7 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 		orderIdOnChainSeller: new(sync.Map),
 		orderIdOnChainBuyer:  new(sync.Map),
 		orchestra:            or,
+		mutex:                new(sync.Mutex),
 	}
 	return cs, nil
 }
@@ -106,6 +123,99 @@ func (cs *ContractService) Init() error {
 	err := cs.orchestra.Init()
 	if err != nil {
 		return err
+	}
+	err = cs.readProcessingOrder()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cs *ContractService) readProcessingOrder() error {
+	file := filepath.Join(cs.cfg.DataDir, processingOrderList)
+	_, err := os.Stat(file)
+	if err != nil {
+		f, _ := os.Create(file)
+		defer f.Close()
+		return nil
+	}
+	f, err := ioutil.ReadFile(file)
+	if err != nil {
+		return err
+	}
+	if len(f) == 0 {
+		return nil
+	}
+	var po ProcessingOrderList
+	err = json.Unmarshal(f, &po)
+	if err != nil {
+		return err
+	}
+	for _, v := range po.Processing {
+		if v.Role == "buyer" {
+			cs.orderIdOnChainBuyer.Store(v.ChainOrderID, "")
+		}
+		if v.Role == "seller" {
+			cs.orderIdOnChainSeller.Store(v.ChainOrderID, "")
+		}
+	}
+	return nil
+}
+
+func (cs *ContractService) readAndWriteProcessingOrder(action, role, chainOrderID string) error {
+	cs.mutex.Lock()
+	defer cs.mutex.Unlock()
+	f, err := ioutil.ReadFile(filepath.Join(cs.cfg.DataDir, processingOrderList))
+	if err != nil {
+		return err
+	}
+	var po ProcessingOrderList
+	switch action {
+	case "add":
+		if len(f) != 0 {
+			err = json.Unmarshal(f, &po)
+			if err != nil {
+				return err
+			}
+		}
+		info := &OrderList{
+			Role:         role,
+			ChainOrderID: chainOrderID,
+		}
+		po.Processing = append(po.Processing, info)
+		b, err := json.Marshal(po)
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(cs.cfg.DataDir, processingOrderList), b, 0600)
+		if err != nil {
+			return err
+		}
+	case "delete":
+		if len(f) == 0 {
+			cs.logger.Warnf("chain order id %s does not exit in the file", chainOrderID)
+			return nil
+		}
+		err = json.Unmarshal(f, &po)
+		if err != nil {
+			return err
+		}
+		var temp ProcessingOrderList
+		for _, v := range po.Processing {
+			if v.ChainOrderID != chainOrderID {
+				temp.Processing = append(temp.Processing, v)
+			}
+		}
+		b, err := json.Marshal(temp)
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(cs.cfg.DataDir, processingOrderList), b, 0600)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("unKnow action")
 	}
 	return nil
 }

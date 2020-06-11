@@ -46,6 +46,11 @@ func (cs *ContractService) getContractStatus() {
 				return true
 			}
 			cs.logger.Infof("order place success,order id from sonata is:%s", orderId)
+			err = cs.readAndWriteProcessingOrder("delete", "buyer", internalId)
+			if err != nil {
+				cs.logger.Error(err)
+				return true
+			}
 			cs.orderIdOnChainBuyer.Delete(internalId)
 		}
 		return true

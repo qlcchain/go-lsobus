@@ -82,6 +82,7 @@ func (cs *ContractService) getProductStatus() {
 					cs.logger.Error(err)
 					continue
 				}
+				cs.logger.Infof("update order  %s complete status to chain success", v.OrderId)
 			}
 		}
 	}

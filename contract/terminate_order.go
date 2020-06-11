@@ -46,6 +46,10 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 			cs.logger.Infof("process hash %s success", hash.String())
 		}
 		internalId := blk.Previous.String()
+		err = cs.readAndWriteProcessingOrder("add", "buyer", internalId)
+		if err != nil {
+			return "", err
+		}
 		cs.orderIdOnChainBuyer.Store(internalId, "")
 		return internalId, nil
 	} else {

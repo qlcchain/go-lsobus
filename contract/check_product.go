@@ -1,7 +1,6 @@
 package contract
 
 import (
-	"errors"
 	"time"
 
 	"github.com/qlcchain/go-lsobus/mock"
@@ -43,7 +42,11 @@ func (cs *ContractService) getProductId() {
 		}
 		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo)
 		if err != nil {
-			cs.logger.Error(err)
+			if err == noInventoryList {
+				cs.logger.Info(noInventoryList)
+			} else {
+				cs.logger.Error(err)
+			}
 			return true
 		}
 
@@ -54,6 +57,11 @@ func (cs *ContractService) getProductId() {
 			return true
 		}
 		cs.logger.Info("update product info to chain success")
+		err = cs.readAndWriteProcessingOrder("delete", "seller", idOnChain)
+		if err != nil {
+			cs.logger.Error(err)
+			return true
+		}
 		cs.orderIdOnChainSeller.Delete(idOnChain)
 		return true
 	})
@@ -117,7 +125,7 @@ func (cs *ContractService) inventoryFind(sellName string, orderInfo *qlcSdk.DoDS
 	}
 	var productIds []*Product
 	if len(fp.RspInvList) == 0 {
-		return nil, errors.New("no inventory list ")
+		return nil, noInventoryList
 	}
 	for _, conn := range orderInfo.Connections {
 		var b bool
