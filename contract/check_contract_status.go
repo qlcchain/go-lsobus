@@ -39,13 +39,27 @@ func (cs *ContractService) getContractStatus() {
 		}
 		if orderInfo.ContractState == qlcSdk.DoDSettleContractStateConfirmed {
 			cs.logger.Infof(" contract %s confirmed", internalId)
-			cs.logger.Info(" call sonata API to place order")
-			orderId, err := cs.createOrderToSonataServer(internalId, orderInfo)
+			cs.logger.Info(" check this order have already exit on sonata server")
+			var b bool
+			var orderId string
+			orderId, b = cs.checkOrderAlreadyExitOnSonataServer(internalId)
+			if !b {
+				cs.logger.Info(" call sonata API to place order")
+				orderId, err = cs.createOrderToSonataServer(internalId, orderInfo)
+				if err != nil {
+					cs.logger.Error(err)
+					return true
+				}
+				cs.logger.Infof("order place success,order id from sonata is:%s", orderId)
+			} else {
+				cs.logger.Infof("order %s already placed,just need update to the chain", orderId)
+			}
+			orderInfo.OrderId = orderId
+			err = cs.updateOrderInfoToChain(internalId, orderInfo)
 			if err != nil {
 				cs.logger.Error(err)
 				return true
 			}
-			cs.logger.Infof("order place success,order id from sonata is:%s", orderId)
 			err = cs.readAndWriteProcessingOrder("delete", "buyer", internalId)
 			if err != nil {
 				cs.logger.Error(err)
@@ -55,6 +69,26 @@ func (cs *ContractService) getContractStatus() {
 		}
 		return true
 	})
+}
+
+func (cs *ContractService) checkOrderAlreadyExitOnSonataServer(externalID string) (string, bool) {
+	fp := &orchestra.FindParams{
+		ExternalID: externalID,
+	}
+	err := cs.orchestra.ExecOrderFind(fp)
+	if err != nil {
+		return "", false
+	}
+	if len(fp.RspOrderList) == 0 {
+		return "", false
+	}
+	if len(fp.RspOrderList) > 1 {
+		cs.logger.Warnf("rsp order list should be only one ,but have %d,and the order id are:", len(fp.RspOrderList))
+		for _, v := range fp.RspOrderList {
+			cs.logger.Warn(*v.ID)
+		}
+	}
+	return *fp.RspOrderList[0].ID, true
 }
 
 func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *qlcSdk.DoDSettleOrderInfo) (string, error) {
@@ -147,7 +181,6 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		return "", err
 	}
 	orderId := op.RspOrder.ID
-	orderInfo.OrderId = *orderId
 	for _, v := range op.RspOrder.OrderItem {
 		for _, value := range orderInfo.Connections {
 			if value.ItemId == v.ExternalID {
@@ -156,11 +189,6 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			}
 		}
 	}
-	err = cs.updateOrderInfoToChain(internalId, orderInfo)
-	if err != nil {
-		return "", err
-	}
-	//cs.orderIdFromSonata.Store(internalId, orderInfo)
 	return *orderId, nil
 }
 
