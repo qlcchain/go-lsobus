@@ -62,6 +62,12 @@ type GetOrderInfoParams struct {
 
 	/*InternalID*/
 	InternalID *string
+	/*OrderID*/
+	OrderID *string
+	/*SellerAddress*/
+	SellerAddress *string
+	/*SellerName*/
+	SellerName *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -112,6 +118,39 @@ func (o *GetOrderInfoParams) SetInternalID(internalID *string) {
 	o.InternalID = internalID
 }
 
+// WithOrderID adds the orderID to the get order info params
+func (o *GetOrderInfoParams) WithOrderID(orderID *string) *GetOrderInfoParams {
+	o.SetOrderID(orderID)
+	return o
+}
+
+// SetOrderID adds the orderId to the get order info params
+func (o *GetOrderInfoParams) SetOrderID(orderID *string) {
+	o.OrderID = orderID
+}
+
+// WithSellerAddress adds the sellerAddress to the get order info params
+func (o *GetOrderInfoParams) WithSellerAddress(sellerAddress *string) *GetOrderInfoParams {
+	o.SetSellerAddress(sellerAddress)
+	return o
+}
+
+// SetSellerAddress adds the sellerAddress to the get order info params
+func (o *GetOrderInfoParams) SetSellerAddress(sellerAddress *string) {
+	o.SellerAddress = sellerAddress
+}
+
+// WithSellerName adds the sellerName to the get order info params
+func (o *GetOrderInfoParams) WithSellerName(sellerName *string) *GetOrderInfoParams {
+	o.SetSellerName(sellerName)
+	return o
+}
+
+// SetSellerName adds the sellerName to the get order info params
+func (o *GetOrderInfoParams) SetSellerName(sellerName *string) {
+	o.SellerName = sellerName
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetOrderInfoParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -130,6 +169,54 @@ func (o *GetOrderInfoParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.
 		qInternalID := qrInternalID
 		if qInternalID != "" {
 			if err := r.SetQueryParam("internalId", qInternalID); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if o.OrderID != nil {
+
+		// query param orderId
+		var qrOrderID string
+		if o.OrderID != nil {
+			qrOrderID = *o.OrderID
+		}
+		qOrderID := qrOrderID
+		if qOrderID != "" {
+			if err := r.SetQueryParam("orderId", qOrderID); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if o.SellerAddress != nil {
+
+		// query param seller.address
+		var qrSellerAddress string
+		if o.SellerAddress != nil {
+			qrSellerAddress = *o.SellerAddress
+		}
+		qSellerAddress := qrSellerAddress
+		if qSellerAddress != "" {
+			if err := r.SetQueryParam("seller.address", qSellerAddress); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if o.SellerName != nil {
+
+		// query param seller.name
+		var qrSellerName string
+		if o.SellerName != nil {
+			qrSellerName = *o.SellerName
+		}
+		qSellerName := qrSellerName
+		if qSellerName != "" {
+			if err := r.SetQueryParam("seller.name", qSellerName); err != nil {
 				return err
 			}
 		}

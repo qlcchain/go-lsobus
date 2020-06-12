@@ -102,7 +102,7 @@ func TestOrderApi_TerminateOrder(t *testing.T) {
 func TestOrderApi_GetOrderInfo(t *testing.T) {
 	teardownTestCase, oa := setupTestCase(t)
 	defer teardownTestCase(t)
-	id := &proto.GetOrderInfoByInternalId{
+	id := &proto.GetOrderInfoParam{
 		InternalId: uuid.New().String(),
 	}
 	info, err := oa.GetOrderInfo(context.Background(), id)

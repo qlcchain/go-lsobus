@@ -377,6 +377,20 @@ func (o *ProductOrder) GetOrderInfoByInternalId(internalId string) (*models.Prot
 	return orderInfo, nil
 }
 
+func (o *ProductOrder) GetOrderInfoBySellerAndOrderId(seller string, orderId string) (*models.ProtoOrderInfo, error) {
+	req := order_api.NewGetOrderInfoParams()
+	req.SellerAddress = &seller
+	req.OrderID = &orderId
+
+	rsp, err := o.Client.OrderAPI.GetOrderInfo(req)
+	if err != nil {
+		return nil, err
+	}
+	orderInfo := rsp.GetPayload()
+
+	return orderInfo, nil
+}
+
 func (o *ProductOrder) CheckOrderStatus() error {
 	var err error
 	var lastContractState string

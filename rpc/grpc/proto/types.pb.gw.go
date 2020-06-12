@@ -59,7 +59,7 @@ var (
 )
 
 func request_OrderAPI_GetOrderInfo_0(ctx context.Context, marshaler runtime.Marshaler, client OrderAPIClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetOrderInfoByInternalId
+	var protoReq GetOrderInfoParam
 	var metadata runtime.ServerMetadata
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_OrderAPI_GetOrderInfo_0); err != nil {

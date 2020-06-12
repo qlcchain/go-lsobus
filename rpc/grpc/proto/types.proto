@@ -79,8 +79,10 @@ message OrderId {
   string internalId = 1;
 }
 
-message GetOrderInfoByInternalId {
+message GetOrderInfoParam {
   string internalId = 1;
+  User seller = 2;
+  string orderId = 3;
 }
 
 message OrderLifeTrack {
@@ -139,7 +141,7 @@ service OrderAPI{
       body: "*"
     };
   }
-  rpc GetOrderInfo(GetOrderInfoByInternalId) returns (OrderInfo){
+  rpc GetOrderInfo(GetOrderInfoParam) returns (OrderInfo){
     option (google.api.http) = {
       get: "/order/info"
     };

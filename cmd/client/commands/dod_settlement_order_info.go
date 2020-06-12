@@ -50,7 +50,7 @@ func getOrderInfo(internalId string) error {
 		return err
 	}
 	defer cn.Close()
-	id := &pb.GetOrderInfoByInternalId{
+	id := &pb.GetOrderInfoParam{
 		InternalId: internalId,
 	}
 	c := pb.NewOrderAPIClient(cn)

@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/qlcchain/go-lsobus/cmd/agent/models"
+
 	"github.com/google/uuid"
 
 	"github.com/spf13/cobra"
@@ -54,6 +56,7 @@ func InitCmd() {
 		Run:   runConnectionChangeCmd,
 	}
 	connChangeCmd.Flags().String("internalId", "", "create order internal id")
+	connChangeCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connChangeCmd.Flags().Int32("bandwidth", 0, "bandwidth, unit is Mbps")
 	connChangeCmd.Flags().Int32("duration", 1, "duration in days")
 	connectionCmd.AddCommand(connChangeCmd)
@@ -64,7 +67,8 @@ func InitCmd() {
 		Long:  `delete exist connection`,
 		Run:   runConnectionDeleteCmd,
 	}
-	connDeleteCmd.Flags().String("internalId", "", "create order internal id")
+	connDeleteCmd.Flags().String("internalId", "", "chain order internal id")
+	connDeleteCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connectionCmd.AddCommand(connDeleteCmd)
 
 	connGetCmd := &cobra.Command{
@@ -73,7 +77,8 @@ func InitCmd() {
 		Long:  `get connection info`,
 		Run:   runConnectionGetCmd,
 	}
-	connGetCmd.Flags().String("internalId", "", "order internal id")
+	connGetCmd.Flags().String("internalId", "", "chain order internal id")
+	connGetCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connectionCmd.AddCommand(connGetCmd)
 }
 
@@ -173,17 +178,39 @@ func runConnectionChangeCmd(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
+	// find existing product by seller order id
+	sellerOrderId, err := cmd.Flags().GetString("sellerOrderId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	existPo := &ProductOrder{}
 	err = existPo.Init()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	existOrderInfo, err := existPo.GetOrderInfoByInternalId(internalId)
-	if err != nil {
-		fmt.Println("failed to GetOrderInfoByInternalId ", err)
+
+	var existOrderInfo *models.ProtoOrderInfo
+
+	if internalId != "" {
+		existOrderInfo, err = existPo.GetOrderInfoByInternalId(internalId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoByInternalId ", err)
+			return
+		}
+	} else if sellerOrderId != "" {
+		existOrderInfo, err = existPo.GetOrderInfoBySellerAndOrderId(pp.SellerAddr, sellerOrderId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoBySellerAndOrderId ", err)
+			return
+		}
+	} else {
+		fmt.Println("invalid internalId/sellerOrderId param")
 		return
 	}
+
 	if len(existOrderInfo.Connections) == 0 {
 		fmt.Println("exist connection is empty")
 		return
@@ -262,17 +289,39 @@ func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		return
 	}
+	// find existing product by seller order id
+	sellerOrderId, err := cmd.Flags().GetString("sellerOrderId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var existOrderInfo *models.ProtoOrderInfo
+
 	existPo := &ProductOrder{}
 	err = existPo.Init()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	existOrderInfo, err := existPo.GetOrderInfoByInternalId(internalId)
-	if err != nil {
-		fmt.Println("failed to GetOrderInfoByInternalId ", err)
+
+	if internalId != "" {
+		existOrderInfo, err = existPo.GetOrderInfoByInternalId(internalId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoByInternalId ", err)
+			return
+		}
+	} else if sellerOrderId != "" {
+		existOrderInfo, err = existPo.GetOrderInfoBySellerAndOrderId(pp.SellerAddr, sellerOrderId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoBySellerAndOrderId ", err)
+			return
+		}
+	} else {
+		fmt.Println("invalid internalId/sellerOrderId param")
 		return
 	}
+
 	if len(existOrderInfo.Connections) == 0 {
 		fmt.Println("exist connection is empty")
 		return
@@ -311,22 +360,44 @@ func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
 }
 
 func runConnectionGetCmd(cmd *cobra.Command, args []string) {
+	pp := &ProductParam{}
+	fillProductCommonParam(pp)
+
 	internalId, err := cmd.Flags().GetString("internalId")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	po := &ProductOrder{Param: &ProductParam{}}
+	sellerOrderId, err := cmd.Flags().GetString("sellerOrderId")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	po := &ProductOrder{Param: pp}
 	err = po.Init()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	orderInfo, err := po.GetOrderInfoByInternalId(internalId)
-	if err != nil {
-		fmt.Println(err)
+	var orderInfo *models.ProtoOrderInfo
+
+	if internalId != "" {
+		orderInfo, err = po.GetOrderInfoByInternalId(internalId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoByInternalId ", err)
+			return
+		}
+	} else if sellerOrderId != "" {
+		orderInfo, err = po.GetOrderInfoBySellerAndOrderId(pp.SellerAddr, sellerOrderId)
+		if err != nil {
+			fmt.Println("failed to GetOrderInfoBySellerAndOrderId ", err)
+			return
+		}
+	} else {
+		fmt.Println("invalid internalId/sellerOrderId param")
 		return
 	}
 

@@ -2,6 +2,11 @@ package grpcServer
 
 import (
 	"context"
+	"errors"
+
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	"go.uber.org/zap"
 
@@ -58,13 +63,31 @@ func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOr
 	}, nil
 }
 
-func (oa *OrderApi) GetOrderInfo(ctx context.Context, id *proto.GetOrderInfoByInternalId) (*proto.OrderInfo, error) {
-	oa.logger.Debugf("GetOrderInfo param %s", id.String())
-	orderInfo, err := oa.cs.GetOrderInfoByInternalId(id.InternalId)
-	if err != nil {
-		oa.logger.Debugf("GetOrderInfoByInternalId err %s", err)
-		return nil, err
+func (oa *OrderApi) GetOrderInfo(ctx context.Context, param *proto.GetOrderInfoParam) (*proto.OrderInfo, error) {
+	oa.logger.Debugf("GetOrderInfo param %s", param.String())
+
+	var orderInfo *qlcSdk.DoDSettleOrderInfo
+	var err error
+	if param.InternalId != "" {
+		orderInfo, err = oa.cs.GetOrderInfoByInternalId(param.InternalId)
+		if err != nil {
+			oa.logger.Debugf("GetOrderInfoByInternalId err %s", err)
+			return nil, err
+		}
+	} else if param.OrderId != "" {
+		sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
+		orderInfo, err = oa.cs.GetOrderInfoBySellerAndOrderId(sellerAddr, param.OrderId)
+		if err != nil {
+			oa.logger.Debugf("GetOrderInfoBySellerAndOrderId err %s", err)
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("invalid param")
 	}
+	if orderInfo == nil {
+		return nil, errors.New("orderInfo is nil")
+	}
+
 	info := new(proto.OrderInfo)
 	info.Buyer = &proto.User{
 		Address: orderInfo.Buyer.Address.String(),

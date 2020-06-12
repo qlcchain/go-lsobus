@@ -245,6 +245,22 @@ func (cs *ContractService) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettl
 	}
 }
 
+func (cs *ContractService) GetOrderInfoBySellerAndOrderId(seller types.Address, orderId string) (*qlcSdk.DoDSettleOrderInfo, error) {
+	if cs.GetFakeMode() {
+		return mock.GetOrderInfoByInternalId("")
+	}
+	if cs.chainReady {
+		orderInfo, err := cs.client.DoDSettlement.GetOrderInfoBySellerAndOrderId(seller, orderId)
+		if err != nil {
+			cs.logger.Error(err)
+			return nil, err
+		}
+		return orderInfo, nil
+	} else {
+		return nil, chainNotReady
+	}
+}
+
 func (cs *ContractService) Stop() error {
 	//this must be the first step
 	cs.cancel()

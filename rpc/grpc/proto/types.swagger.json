@@ -178,6 +178,24 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "seller.address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "seller.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
