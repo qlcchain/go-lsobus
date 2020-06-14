@@ -1,6 +1,7 @@
 package contract
 
 import (
+	"strings"
 	"time"
 
 	"github.com/qlcchain/go-lsobus/mock"
@@ -173,7 +174,11 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *qlcSdk.DoDSettleOrde
 		}
 		if quote != nil {
 			if quote.State != qm.QuoteItemStateTypeREADY {
-				cs.logger.Error("order information verify fail")
+				cs.logger.Errorf("quote state %s error,order information verify fail", quote.State)
+				return false
+			}
+			if !strings.EqualFold(*quote.PreCalculatedPrice.Price.PreTaxAmount.Unit, conn.Currency) || *quote.PreCalculatedPrice.Price.PreTaxAmount.Value != float32(conn.Price) {
+				cs.logger.Errorf("order information verify fail, quote %f/%s, conn %f/%s", *quote.PreCalculatedPrice.Price.PreTaxAmount.Value, *quote.PreCalculatedPrice.Price.PreTaxAmount.Unit, conn.Currency, conn.Price, conn.Currency)
 				return false
 			}
 		} else {
