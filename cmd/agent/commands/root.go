@@ -43,6 +43,8 @@ func InitCmd() {
 		Long:  `create new connection`,
 		Run:   runConnectionCreateCmd,
 	}
+	connCreateCmd.Flags().String("sellerAddr", "", "seller address of chain")
+	connCreateCmd.Flags().String("buyerAddr", "", "buyer address of chain")
 	connCreateCmd.Flags().String("connName", "", "connect name")
 	connCreateCmd.Flags().Int32("bandwidth", 0, "bandwidth, unit is Mbps")
 	connCreateCmd.Flags().String("cosName", "gold", "service class")
@@ -89,12 +91,20 @@ func Execute(osArgs []string) {
 	}
 }
 
-func fillProductCommonParam(pp *ProductParam) {
+func fillProductCommonParam(cmd *cobra.Command, pp *ProductParam) error {
+	sellerAddr, _ := cmd.Flags().GetString("sellerAddr")
+	if sellerAddr == "" {
+		sellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
+	}
 	pp.SellerName = "PCCWG"
-	pp.SellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
+	pp.SellerAddr = sellerAddr
 
+	buyerAddr, _ := cmd.Flags().GetString("buyerAddr")
+	if buyerAddr == "" {
+		buyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
+	}
 	pp.BuyerName = "CBC"
-	pp.BuyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
+	pp.BuyerAddr = buyerAddr
 
 	pp.ProductOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
@@ -102,6 +112,29 @@ func fillProductCommonParam(pp *ProductParam) {
 	pp.SrcPort = "5d098e7e96f045000a4164fa"
 	pp.DstLocID = "5ae7e56bbbc9a8001231fa5d"
 	pp.DstPort = "5d269f1760e409000ad83c58"
+
+	return nil
+}
+
+func fillProductExistParam(existOrderInfo *models.ProtoOrderInfo, pp *ProductParam) error {
+	if existOrderInfo.Seller != nil {
+		pp.SellerAddr = existOrderInfo.Seller.Address
+		pp.SellerName = existOrderInfo.Seller.Name
+	}
+
+	if existOrderInfo.Buyer != nil {
+		pp.BuyerAddr = existOrderInfo.Buyer.Address
+		pp.BuyerName = existOrderInfo.Buyer.Name
+	}
+
+	pp.ExistConnectionParam = existOrderInfo.Connections[0]
+
+	pp.ExistProductID = pp.ExistConnectionParam.StaticParam.ProductID
+	pp.BuyerProductID = pp.ExistConnectionParam.StaticParam.BuyerProductID
+	pp.Name = pp.ExistConnectionParam.DynamicParam.ConnectionName
+	pp.CosName = pp.ExistConnectionParam.DynamicParam.ServiceClass
+
+	return nil
 }
 
 func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
@@ -109,7 +142,11 @@ func runConnectionCreateCmd(cmd *cobra.Command, args []string) {
 
 	pp := &ProductParam{}
 
-	fillProductCommonParam(pp)
+	err = fillProductCommonParam(cmd, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	duration, err := cmd.Flags().GetInt32("duration")
 	if err != nil {
@@ -170,7 +207,11 @@ func runConnectionChangeCmd(cmd *cobra.Command, args []string) {
 
 	pp := &ProductParam{}
 
-	fillProductCommonParam(pp)
+	err = fillProductCommonParam(cmd, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// find existing product by create order internal id
 	internalId, err := cmd.Flags().GetString("internalId")
@@ -215,12 +256,12 @@ func runConnectionChangeCmd(cmd *cobra.Command, args []string) {
 		fmt.Println("exist connection is empty")
 		return
 	}
-	pp.ExistConnectionParam = existOrderInfo.Connections[0]
 
-	pp.ExistProductID = pp.ExistConnectionParam.StaticParam.ProductID
-	pp.BuyerProductID = pp.ExistConnectionParam.StaticParam.BuyerProductID
-	pp.Name = pp.ExistConnectionParam.DynamicParam.ConnectionName
-	pp.CosName = pp.ExistConnectionParam.DynamicParam.ServiceClass
+	err = fillProductExistParam(existOrderInfo, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	duration, err := cmd.Flags().GetInt32("duration")
 	if err != nil {
@@ -281,7 +322,11 @@ func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
 
 	pp := &ProductParam{}
 
-	fillProductCommonParam(pp)
+	err = fillProductCommonParam(cmd, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// find existing product by create order internal id
 	internalId, err := cmd.Flags().GetString("internalId")
@@ -326,12 +371,12 @@ func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
 		fmt.Println("exist connection is empty")
 		return
 	}
-	pp.ExistConnectionParam = existOrderInfo.Connections[0]
 
-	pp.ExistProductID = pp.ExistConnectionParam.StaticParam.ProductID
-	pp.BuyerProductID = pp.ExistConnectionParam.StaticParam.BuyerProductID
-	pp.Name = pp.ExistConnectionParam.DynamicParam.ConnectionName
-	pp.CosName = pp.ExistConnectionParam.DynamicParam.ServiceClass
+	err = fillProductExistParam(existOrderInfo, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	po := &ProductOrder{Param: pp}
 	err = po.Init()
@@ -361,7 +406,12 @@ func runConnectionDeleteCmd(cmd *cobra.Command, args []string) {
 
 func runConnectionGetCmd(cmd *cobra.Command, args []string) {
 	pp := &ProductParam{}
-	fillProductCommonParam(pp)
+
+	err := fillProductCommonParam(cmd, pp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	internalId, err := cmd.Flags().GetString("internalId")
 	if err != nil {
