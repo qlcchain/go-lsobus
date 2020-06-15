@@ -88,21 +88,26 @@ func (cs *ContractService) getProductStatus() {
 			if err != nil {
 				cs.logger.Error(err)
 			}
-			orderReady := true
-			for _, value := range v.Products {
-				if !value.Active {
-					orderReady = false
-					break
-				}
+		}
+		var c int
+		orderReady := false
+		for _, value := range v.Products {
+			if value.Active {
+				c++
 			}
-			if orderReady {
-				err = cs.updateOrderCompleteStatusToChain(v.SendHash)
-				if err != nil {
-					cs.logger.Error(err)
-					continue
-				}
-				cs.logger.Infof("update order  %s complete status to chain success", v.OrderId)
+		}
+		if c == len(v.Products) {
+			if c != 0 {
+				orderReady = true
 			}
+		}
+		if orderReady {
+			err = cs.updateOrderCompleteStatusToChain(v.SendHash)
+			if err != nil {
+				cs.logger.Error(err)
+				continue
+			}
+			cs.logger.Infof("update order %s complete status to chain success", v.OrderId)
 		}
 	}
 }
