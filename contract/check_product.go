@@ -32,7 +32,7 @@ func (cs *ContractService) getProductId() {
 	var orderInfo *qlcSdk.DoDSettleOrderInfo
 	var id []*qlcSdk.DoDPendingResourceCheckInfo
 	if cs.GetFakeMode() {
-		id = mock.GetPendingResourceCheck(addr)
+		id = mock.GetPendingResourceCheckForProductId(addr)
 	} else {
 		id, err = cs.client.DoDSettlement.GetPendingResourceCheck(addr)
 		if id == nil {
@@ -74,7 +74,15 @@ func (cs *ContractService) getProductId() {
 				cs.logger.Error(err)
 				continue
 			}
-			cs.orderIdOnChainSeller.Delete(order.InternalId.String())
+			if cs.GetFakeMode() {
+				cs.orderIdOnChainSeller.Range(func(key, value interface{}) bool {
+					id := key.(string)
+					cs.orderIdOnChainSeller.Delete(id)
+					return true
+				})
+			} else {
+				cs.orderIdOnChainSeller.Delete(order.InternalId.String())
+			}
 		}
 	}
 }

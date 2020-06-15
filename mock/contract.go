@@ -500,6 +500,34 @@ func GetPendingResourceCheck(addr pkg.Address) []*qlcSdk.DoDPendingResourceCheck
 	return infos
 }
 
+func GetPendingResourceCheckForProductId(addr pkg.Address) []*qlcSdk.DoDPendingResourceCheckInfo {
+	infos := make([]*qlcSdk.DoDPendingResourceCheckInfo, 0)
+	info1 := &qlcSdk.DoDPendingResourceCheckInfo{
+		SendHash:   RandomHash(),
+		OrderId:    uuid.New().String(),
+		InternalId: RandomHash(),
+		Products:   make([]*qlcSdk.DoDSettleProductInfo, 0),
+	}
+	//product1 := &qlcSdk.DoDSettleProductInfo{
+	//	ProductId: uuid.New().String(),
+	//	Active:    false,
+	//}
+	//info1.Products = append(info1.Products, product1)
+	info2 := &qlcSdk.DoDPendingResourceCheckInfo{
+		SendHash:   RandomHash(),
+		OrderId:    uuid.New().String(),
+		InternalId: RandomHash(),
+		Products:   make([]*qlcSdk.DoDSettleProductInfo, 0),
+	}
+	//product2 := &qlcSdk.DoDSettleProductInfo{
+	//	ProductId: uuid.New().String(),
+	//	Active:    false,
+	//}
+	//info2.Products = append(info1.Products, product2)
+	infos = append(infos, info1, info2)
+	return infos
+}
+
 func GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {
 	blk := StateBlockWithoutWork()
 	var err error
