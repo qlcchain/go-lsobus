@@ -370,7 +370,7 @@ func SonataGenerateQuoteGetResponse(reqParams *quoapi.QuoteGetParams) *quoapi.Qu
 	lineItem.PreCalculatedPrice = &quomod.QuotePrice{}
 	lineItem.PreCalculatedPrice.Price = &quomod.Price{}
 	curUnit := "USD"
-	price := float32(3.14)
+	price := float32(300)
 	lineItem.PreCalculatedPrice.Price.PreTaxAmount = &quomod.Money{Unit: &curUnit, Value: &price}
 	quote.QuoteItem = append(quote.QuoteItem, lineItem)
 	quote.QuoteDate.Scan(time.Now())

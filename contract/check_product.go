@@ -27,44 +27,56 @@ func (cs *ContractService) checkProduct() {
 }
 
 func (cs *ContractService) getProductId() {
-	cs.orderIdOnChainSeller.Range(func(key, value interface{}) bool {
-		idOnChain := key.(string)
-		orderInfo, err := cs.GetOrderInfoByInternalId(idOnChain)
-		if err != nil {
-			cs.logger.Error(err)
-			return true
+	addr := cs.account.Address()
+	var err error
+	var orderInfo *qlcSdk.DoDSettleOrderInfo
+	var id []*qlcSdk.DoDPendingResourceCheckInfo
+	if cs.GetFakeMode() {
+		id = mock.GetPendingResourceCheck(addr)
+	} else {
+		id, err = cs.client.DoDSettlement.GetPendingResourceCheck(addr)
+		if id == nil {
+			return
 		}
-		if !cs.GetFakeMode() {
-			if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
-				cs.logger.Info("waiting for buyer place order")
-				return true
-			}
-		}
-		productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo)
-		if err != nil {
-			if err == noInventoryList {
-				cs.logger.Info(noInventoryList)
-			} else {
+	}
+	for _, order := range id {
+		if len(order.Products) == 0 {
+			orderInfo, err = cs.GetOrderInfoByInternalId(order.InternalId.String())
+			if err != nil {
 				cs.logger.Error(err)
+				continue
 			}
-			return true
-		}
+			if !cs.GetFakeMode() {
+				if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
+					cs.logger.Info("waiting for buyer place order")
+					continue
+				}
+			}
+			productIds, err := cs.inventoryFind(orderInfo.Seller.Name, orderInfo)
+			if err != nil {
+				if err == noInventoryList {
+					cs.logger.Info(noInventoryList)
+				} else {
+					cs.logger.Error(err)
+				}
+				continue
+			}
 
-		cs.logger.Infof("get product success ,orderId is %s", orderInfo.OrderId)
-		err = cs.updateProductInfoToChain(idOnChain, productIds, orderInfo)
-		if err != nil {
-			cs.logger.Error(err)
-			return true
+			cs.logger.Infof("get product success ,orderId is %s", orderInfo.OrderId)
+			err = cs.updateProductInfoToChain(order.InternalId.String(), productIds, orderInfo)
+			if err != nil {
+				cs.logger.Error(err)
+				continue
+			}
+			cs.logger.Info("update product info to chain success")
+			err = cs.readAndWriteProcessingOrder("delete", "seller", order.InternalId.String())
+			if err != nil {
+				cs.logger.Error(err)
+				continue
+			}
+			cs.orderIdOnChainSeller.Delete(order.InternalId.String())
 		}
-		cs.logger.Info("update product info to chain success")
-		err = cs.readAndWriteProcessingOrder("delete", "seller", idOnChain)
-		if err != nil {
-			cs.logger.Error(err)
-			return true
-		}
-		cs.orderIdOnChainSeller.Delete(idOnChain)
-		return true
-	})
+	}
 }
 
 func (cs *ContractService) updateProductInfoToChain(idOnChain string, productIds []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo) error {

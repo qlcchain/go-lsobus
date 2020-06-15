@@ -27,10 +27,10 @@ import (
 )
 
 const (
-	checkNeedSignContractInterval = 15 * time.Second
-	checkContractStatusInterval   = 10 * time.Second
+	checkNeedSignContractInterval = 10 * time.Second
+	checkContractStatusInterval   = 8 * time.Second
 	checkOrderStatusInterval      = 10 * time.Second
-	checkProductInterval          = 10 * time.Second
+	checkProductInterval          = 8 * time.Second
 	connectRpcServerInterval      = 5 * time.Second
 	processingOrderList           = "processingOrder.json" // a collection of processing order
 )

@@ -178,7 +178,7 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *qlcSdk.DoDSettleOrde
 				return false
 			}
 			if !strings.EqualFold(*quote.PreCalculatedPrice.Price.PreTaxAmount.Unit, conn.Currency) || *quote.PreCalculatedPrice.Price.PreTaxAmount.Value != float32(conn.Price) {
-				cs.logger.Errorf("order information verify fail, quote %f/%s, conn %f/%s", *quote.PreCalculatedPrice.Price.PreTaxAmount.Value, *quote.PreCalculatedPrice.Price.PreTaxAmount.Unit, conn.Currency, conn.Price, conn.Currency)
+				cs.logger.Errorf("order information verify fail, quote %f/%s, conn %f/%s", *quote.PreCalculatedPrice.Price.PreTaxAmount.Value, *quote.PreCalculatedPrice.Price.PreTaxAmount.Unit, conn.Price, conn.Currency)
 				return false
 			}
 		} else {
