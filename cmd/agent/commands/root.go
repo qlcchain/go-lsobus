@@ -43,6 +43,7 @@ func InitCmd() {
 		Long:  `create new connection`,
 		Run:   runConnectionCreateCmd,
 	}
+	connCreateCmd.Flags().String("runEnv", "local", "running env, local/dev/stage")
 	connCreateCmd.Flags().String("sellerAddr", "", "seller address of chain")
 	connCreateCmd.Flags().String("buyerAddr", "", "buyer address of chain")
 	connCreateCmd.Flags().String("connName", "", "connect name")
@@ -57,6 +58,7 @@ func InitCmd() {
 		Long:  `change exist connection`,
 		Run:   runConnectionChangeCmd,
 	}
+	connChangeCmd.Flags().String("runEnv", "local", "running env, local/dev/stage")
 	connChangeCmd.Flags().String("internalId", "", "create order internal id")
 	connChangeCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connChangeCmd.Flags().Int32("bandwidth", 0, "bandwidth, unit is Mbps")
@@ -69,6 +71,7 @@ func InitCmd() {
 		Long:  `delete exist connection`,
 		Run:   runConnectionDeleteCmd,
 	}
+	connDeleteCmd.Flags().String("runEnv", "local", "running env, local/dev/stage")
 	connDeleteCmd.Flags().String("internalId", "", "chain order internal id")
 	connDeleteCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connectionCmd.AddCommand(connDeleteCmd)
@@ -79,6 +82,7 @@ func InitCmd() {
 		Long:  `get connection info`,
 		Run:   runConnectionGetCmd,
 	}
+	connGetCmd.Flags().String("runEnv", "local", "running env, local/dev/stage")
 	connGetCmd.Flags().String("internalId", "", "chain order internal id")
 	connGetCmd.Flags().String("sellerOrderId", "", "seller order id")
 	connectionCmd.AddCommand(connGetCmd)
@@ -92,26 +96,61 @@ func Execute(osArgs []string) {
 }
 
 func fillProductCommonParam(cmd *cobra.Command, pp *ProductParam) error {
-	sellerAddr, _ := cmd.Flags().GetString("sellerAddr")
-	if sellerAddr == "" {
-		sellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
+	var err error
+
+	pp.RunEnv, err = cmd.Flags().GetString("runEnv")
+	if pp.RunEnv == "" {
+		pp.RunEnv = "local"
 	}
-	pp.SellerName = "PCCWG"
-	pp.SellerAddr = sellerAddr
+	fmt.Println("RunEnv ", pp.RunEnv)
+
+	if pp.RunEnv == "dev" {
+		err = fillProductDevParam(cmd, pp)
+	} else if pp.RunEnv == "stage" {
+		err = fillProductStageParam(cmd, pp)
+	} else {
+		err = fillProductLocalParam(cmd, pp)
+	}
+	if err != nil {
+		return nil
+	}
+
+	sellerAddr, _ := cmd.Flags().GetString("sellerAddr")
+	if sellerAddr != "" {
+		pp.SellerAddr = sellerAddr
+	}
 
 	buyerAddr, _ := cmd.Flags().GetString("buyerAddr")
-	if buyerAddr == "" {
-		buyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
+	if buyerAddr != "" {
+		pp.BuyerAddr = buyerAddr
 	}
+
+	return nil
+}
+
+func fillProductLocalParam(cmd *cobra.Command, pp *ProductParam) error {
+	pp.SellerName = "PCCWG"
+	pp.SellerAddr = "qlc_18yjtai4cwecsn3aasxx7gky6sprxdpkkcyjm9jxhynw5eq4p4ntm16shxmp"
 	pp.BuyerName = "CBC"
-	pp.BuyerAddr = buyerAddr
+	pp.BuyerAddr = "qlc_1gnqid9up5y998uwig44x1yfrppsdo8f9jfszgqin7pr7ixsyyae1y81w9xp"
 
-	pp.ProductOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+	return nil
+}
 
-	pp.SrcLocID = "5ae7e56bbbc9a8001231fa5d"
-	pp.SrcPort = "5d098e7e96f045000a4164fa"
-	pp.DstLocID = "5ae7e56bbbc9a8001231fa5d"
-	pp.DstPort = "5d269f1760e409000ad83c58"
+func fillProductDevParam(cmd *cobra.Command, pp *ProductParam) error {
+	pp.SellerName = "PCCWG"
+	pp.SellerAddr = "qlc_3bkys6wonkij7zfkti1it3aw88anbn6636x5hni4jkejc47kysa14ygkqsgh"
+	pp.BuyerName = "CBC"
+	pp.BuyerAddr = "qlc_1n7k9jru8teem514csgww713t6xiyya3jedcc5k6ex5zehkwj1c4yhygs1e3"
+
+	return nil
+}
+
+func fillProductStageParam(cmd *cobra.Command, pp *ProductParam) error {
+	pp.SellerName = "PCCWG"
+	pp.SellerAddr = "stage-todo"
+	pp.BuyerName = "CBC"
+	pp.BuyerAddr = "stage-todo"
 
 	return nil
 }

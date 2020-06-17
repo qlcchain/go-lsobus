@@ -20,16 +20,12 @@ import (
 )
 
 type ProductParam struct {
-	BuyerAddr      string
-	BuyerName      string
-	SellerAddr     string
-	SellerName     string
-	ProductOfferID string
+	RunEnv string
 
-	SrcPort  string
-	SrcLocID string
-	DstPort  string
-	DstLocID string
+	BuyerAddr  string
+	BuyerName  string
+	SellerAddr string
+	SellerName string
 
 	Name      string
 	Bandwidth int32
@@ -125,12 +121,19 @@ func (o *ProductOrder) buildQuoteReqJson(action string) ([]byte, error) {
 	lineItem.Name = o.Param.Name
 	lineItem.CosName = strings.ToUpper(o.Param.CosName)
 	lineItem.Bandwidth = uint(o.Param.Bandwidth)
-	lineItem.ProdOfferID = o.Param.ProductOfferID
-	//lineItem.SrcPortID = o.Param.SrcPort
-	//lineItem.DstPortID = o.Param.DstPort
-	lineItem.SrcLocationID = o.Param.SrcLocID
-	lineItem.DstLocationID = o.Param.DstLocID
-	//lineItem.BuyerProductID = o.Param.BuyerProductID
+	if o.Param.RunEnv == "dev" {
+		lineItem.ProdOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+		lineItem.SrcLocationID = "5ae7e56bbbc9a8001231fa5d"
+		lineItem.DstLocationID = "5ae7e56bbbc9a8001231fa5d"
+	} else if o.Param.RunEnv == "stage" {
+		lineItem.ProdOfferID = "stage-todo"
+		lineItem.SrcLocationID = "stage-todo"
+		lineItem.DstLocationID = "stage-todo"
+	} else {
+		lineItem.ProdOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+		lineItem.SrcLocationID = "5ae7e56bbbc9a8001231fa5d"
+		lineItem.DstLocationID = "5ae7e56bbbc9a8001231fa5d"
+	}
 	lineItem.ProductID = o.Param.ExistProductID
 
 	lineItem.BillingParams = &models.BillingParams{}
@@ -140,22 +143,6 @@ func (o *ProductOrder) buildQuoteReqJson(action string) ([]byte, error) {
 	lineItem.BillingParams.EndTime = o.Param.EndTime
 
 	quoteParam.ELineItems = append(quoteParam.ELineItems, lineItem)
-
-	/*
-		quoteJson, err := simplejson.NewJson([]byte())
-		if err != nil {
-			return nil, err
-		}
-
-		itemJson := quoteJson.Get("quoteItem").GetIndex(0)
-		descJson := itemJson.GetPath("product", "productSpecification", "describing")
-		descJson.Set("bandwidth", o.Param.Bandwidth)
-		descJson.Set("classOfService", o.Param.CosName)
-		descJson.Set("srcLocationId", o.Param.SrcLocID)
-		descJson.Set("destLocationId", o.Param.DstLocID)
-		descJson.Set("startedAt", time.Unix(o.Param.StartTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
-		descJson.Set("terminatedAt", time.Unix(o.Param.EndTime, 0).Format("2020-06-04T18:42:13.000+08:00"))
-	*/
 
 	return json.Marshal(quoteParam)
 }
@@ -202,21 +189,50 @@ func (o *ProductOrder) CreateNewOrder() error {
 
 	connParam := &models.ProtoConnectionParam{}
 	connParam.StaticParam = &models.ProtoConnectionStaticParam{}
-	connParam.StaticParam.ProductOfferingID = o.Param.ProductOfferID
-
 	connParam.StaticParam.BuyerProductID = o.Param.BuyerProductID
+	if o.Param.RunEnv == "dev" {
+		connParam.StaticParam.ProductOfferingID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
-	connParam.StaticParam.SrcRegion = "KR"
-	connParam.StaticParam.SrcCity = "9d242983f7a504eebb3eb478"
-	connParam.StaticParam.SrcDataCenter = "5ae7e56bbbc9a8001231fa5d"
-	connParam.StaticParam.SrcCompanyName = "5d02fa08a5b531000a764046"
-	connParam.StaticParam.SrcPort = o.Param.SrcPort
+		connParam.StaticParam.SrcRegion = "KR"
+		connParam.StaticParam.SrcCity = "9d242983f7a504eebb3eb478"
+		connParam.StaticParam.SrcDataCenter = "5ae7e56bbbc9a8001231fa5d"
+		connParam.StaticParam.SrcCompanyName = "5d02fa08a5b531000a764046"
+		connParam.StaticParam.SrcPort = "5d098e7e96f045000a4164fa"
 
-	connParam.StaticParam.DstRegion = "JP"
-	connParam.StaticParam.DstCity = "9d242983f7a504eebb3eb478"
-	connParam.StaticParam.DstDataCenter = "5ae7e56bbbc9a8001231fa5d"
-	connParam.StaticParam.DstCompanyName = "5d02fa08a5b531000a764046"
-	connParam.StaticParam.DstPort = o.Param.DstPort
+		connParam.StaticParam.DstRegion = "JP"
+		connParam.StaticParam.DstCity = "9d242983f7a504eebb3eb478"
+		connParam.StaticParam.DstDataCenter = "5ae7e56bbbc9a8001231fa5d"
+		connParam.StaticParam.DstCompanyName = "5d02fa08a5b531000a764046"
+		connParam.StaticParam.DstPort = "5d269f1760e409000ad83c58"
+	} else if o.Param.RunEnv == "stage" {
+		connParam.StaticParam.ProductOfferingID = "stage-todo"
+
+		connParam.StaticParam.SrcRegion = "stage-todo"
+		connParam.StaticParam.SrcCity = "stage-todo"
+		connParam.StaticParam.SrcDataCenter = "stage-todo"
+		connParam.StaticParam.SrcCompanyName = "stage-todo"
+		connParam.StaticParam.SrcPort = "stage-todo"
+
+		connParam.StaticParam.DstRegion = "stage-todo"
+		connParam.StaticParam.DstCity = "stage-todo"
+		connParam.StaticParam.DstDataCenter = "stage-todo"
+		connParam.StaticParam.DstCompanyName = "stage-todo"
+		connParam.StaticParam.DstPort = "stage-todo"
+	} else {
+		connParam.StaticParam.ProductOfferingID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+
+		connParam.StaticParam.SrcRegion = "KR"
+		connParam.StaticParam.SrcCity = "9d242983f7a504eebb3eb478"
+		connParam.StaticParam.SrcDataCenter = "5ae7e56bbbc9a8001231fa5d"
+		connParam.StaticParam.SrcCompanyName = "5d02fa08a5b531000a764046"
+		connParam.StaticParam.SrcPort = "5d098e7e96f045000a4164fa"
+
+		connParam.StaticParam.DstRegion = "JP"
+		connParam.StaticParam.DstCity = "9d242983f7a504eebb3eb478"
+		connParam.StaticParam.DstDataCenter = "5ae7e56bbbc9a8001231fa5d"
+		connParam.StaticParam.DstCompanyName = "5d02fa08a5b531000a764046"
+		connParam.StaticParam.DstPort = "5d269f1760e409000ad83c58"
+	}
 
 	connParam.DynamicParam = &models.ProtoConnectionDynamicParam{}
 	connParam.DynamicParam.ItemID = uuid.New().String()
