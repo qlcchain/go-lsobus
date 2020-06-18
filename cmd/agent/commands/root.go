@@ -148,9 +148,9 @@ func fillProductDevParam(cmd *cobra.Command, pp *ProductParam) error {
 
 func fillProductStageParam(cmd *cobra.Command, pp *ProductParam) error {
 	pp.SellerName = "PCCWG"
-	pp.SellerAddr = "stage-todo"
+	pp.SellerAddr = "qlc_3bkys6wonkij7zfkti1it3aw88anbn6636x5hni4jkejc47kysa14ygkqsgh"
 	pp.BuyerName = "CBC"
-	pp.BuyerAddr = "stage-todo"
+	pp.BuyerAddr = "qlc_1fadnphw7feaant4scuz7op9wsb67zzyu5feo7w5mo1uy63fhwq36wduzbyf"
 
 	return nil
 }

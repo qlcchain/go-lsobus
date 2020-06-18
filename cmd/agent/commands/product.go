@@ -126,9 +126,9 @@ func (o *ProductOrder) buildQuoteReqJson(action string) ([]byte, error) {
 		lineItem.SrcLocationID = "5ae7e56bbbc9a8001231fa5d"
 		lineItem.DstLocationID = "5ae7e56bbbc9a8001231fa5d"
 	} else if o.Param.RunEnv == "stage" {
-		lineItem.ProdOfferID = "stage-todo"
-		lineItem.SrcLocationID = "stage-todo"
-		lineItem.DstLocationID = "stage-todo"
+		lineItem.ProdOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
+		lineItem.SrcLocationID = "5db662305d545c000bc68aaf"
+		lineItem.DstLocationID = "5db662305d545c000bc68aaf"
 	} else {
 		lineItem.ProdOfferID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 		lineItem.SrcLocationID = "5ae7e56bbbc9a8001231fa5d"
@@ -205,19 +205,19 @@ func (o *ProductOrder) CreateNewOrder() error {
 		connParam.StaticParam.DstCompanyName = "5d02fa08a5b531000a764046"
 		connParam.StaticParam.DstPort = "5d269f1760e409000ad83c58"
 	} else if o.Param.RunEnv == "stage" {
-		connParam.StaticParam.ProductOfferingID = "stage-todo"
+		connParam.StaticParam.ProductOfferingID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
-		connParam.StaticParam.SrcRegion = "stage-todo"
-		connParam.StaticParam.SrcCity = "stage-todo"
-		connParam.StaticParam.SrcDataCenter = "stage-todo"
-		connParam.StaticParam.SrcCompanyName = "stage-todo"
-		connParam.StaticParam.SrcPort = "stage-todo"
+		connParam.StaticParam.SrcRegion = "co"
+		connParam.StaticParam.SrcCity = "5d7593c0a266e1000afd5335"
+		connParam.StaticParam.SrcDataCenter = "5db662305d545c000bc68aaf"
+		connParam.StaticParam.SrcCompanyName = "5eeacca2a73b53001545aa60"
+		connParam.StaticParam.SrcPort = "5eeacf65deb2d40014f2c2b5"
 
-		connParam.StaticParam.DstRegion = "stage-todo"
-		connParam.StaticParam.DstCity = "stage-todo"
-		connParam.StaticParam.DstDataCenter = "stage-todo"
-		connParam.StaticParam.DstCompanyName = "stage-todo"
-		connParam.StaticParam.DstPort = "stage-todo"
+		connParam.StaticParam.DstRegion = "co"
+		connParam.StaticParam.DstCity = "5d7593c0a266e1000afd5335"
+		connParam.StaticParam.DstDataCenter = "5db662305d545c000bc68aaf"
+		connParam.StaticParam.DstCompanyName = "5eeacca2a73b53001545aa60"
+		connParam.StaticParam.DstPort = "5eead050def54c001413f04b"
 	} else {
 		connParam.StaticParam.ProductOfferingID = "29f855fb-4760-4e77-877e-3318906ee4bc"
 
