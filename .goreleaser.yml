@@ -1,7 +1,7 @@
 project_name: go-lsobus
 env:
   - GO111MODULE=on
-#  - GOPROXY=https://goproxy.cn,direct
+  - GOPROXY=https://goproxy.cn,direct
 before:
   hooks:
   # you may remove this if you don't use vgo
@@ -39,6 +39,40 @@ builds:
       - CC=x86_64-w64-mingw32-gcc
       - CXX=x86_64-w64-mingw32-g++
     main: ./cmd/main.go
+    goos:
+      - windows
+    goarch:
+      - amd64
+  - id: cbc-agent-darwin
+    ldflags: -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    binary: cbc-agent
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
+    main: ./cmd/agent/main.go
+    goos:
+      - darwin
+    goarch:
+      - amd64
+  - id: cbc-agent-linux
+    ldflags: -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    binary: cbc-agent
+    env:
+      - CGO_ENABLED=1
+    main: ./cmd/agent/main.go
+    goos:
+      - linux
+    goarch:
+      - amd64
+  - id: cbc-agent-windows-x64
+    ldflags: main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    binary: cbc-agent
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    main: ./cmd/agent/main.go
     goos:
       - windows
     goarch:
