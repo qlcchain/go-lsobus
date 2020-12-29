@@ -43,7 +43,9 @@ type NotificationQuoteAttributeValueChangeNotificationParams struct {
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationQuoteAttributeValueChangeNotificationParams() beforehand.
-func (o *NotificationQuoteAttributeValueChangeNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationQuoteAttributeValueChangeNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationQuoteAttributeValueChangeNotificationParams) BindRequest(r 
 		var body []*models.EventPlus
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("quoteAttributeValueChangeNotification", "body"))
+				res = append(res, errors.Required("quoteAttributeValueChangeNotification", "body", nil))
 			} else {
 				res = append(res, errors.NewParseError("quoteAttributeValueChangeNotification", "body", "", err))
 			}
@@ -73,7 +75,7 @@ func (o *NotificationQuoteAttributeValueChangeNotificationParams) BindRequest(r 
 			}
 		}
 	} else {
-		res = append(res, errors.Required("quoteAttributeValueChangeNotification", "body"))
+		res = append(res, errors.Required("quoteAttributeValueChangeNotification", "body", nil))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

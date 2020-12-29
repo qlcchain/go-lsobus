@@ -43,7 +43,9 @@ type NotificationProductOrderStateChangeNotificationParams struct {
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationProductOrderStateChangeNotificationParams() beforehand.
-func (o *NotificationProductOrderStateChangeNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationProductOrderStateChangeNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationProductOrderStateChangeNotificationParams) BindRequest(r *h
 		body, err := models.UnmarshalEvent(r.Body, route.Consumer)
 		if err != nil {
 			if err == io.EOF {
-				err = errors.Required("productOrderStateChange", "body")
+				err = errors.Required("productOrderStateChange", "body", "")
 			}
 			res = append(res, err)
 		} else {
@@ -67,7 +69,7 @@ func (o *NotificationProductOrderStateChangeNotificationParams) BindRequest(r *h
 			}
 		}
 	} else {
-		res = append(res, errors.Required("productOrderStateChange", "body"))
+		res = append(res, errors.Required("productOrderStateChange", "body", ""))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

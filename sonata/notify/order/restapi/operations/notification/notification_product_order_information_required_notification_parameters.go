@@ -53,7 +53,7 @@ func (o *NotificationProductOrderInformationRequiredNotificationParams) BindRequ
 		var body models.EventPlus
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("productOrderInformationRequired", "body"))
+				res = append(res, errors.Required("productOrderInformationRequired", "body", ""))
 			} else {
 				res = append(res, errors.NewParseError("productOrderInformationRequired", "body", "", err))
 			}
@@ -68,7 +68,7 @@ func (o *NotificationProductOrderInformationRequiredNotificationParams) BindRequ
 			}
 		}
 	} else {
-		res = append(res, errors.Required("productOrderInformationRequired", "body"))
+		res = append(res, errors.Required("productOrderInformationRequired", "body", ""))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

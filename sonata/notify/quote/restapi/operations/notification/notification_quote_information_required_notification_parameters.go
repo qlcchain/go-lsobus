@@ -43,7 +43,9 @@ type NotificationQuoteInformationRequiredNotificationParams struct {
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationQuoteInformationRequiredNotificationParams() beforehand.
-func (o *NotificationQuoteInformationRequiredNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationQuoteInformationRequiredNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationQuoteInformationRequiredNotificationParams) BindRequest(r *
 		var body []*models.EventPlus
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("quoteInformationRequiredNotification", "body"))
+				res = append(res, errors.Required("quoteInformationRequiredNotification", "body", nil))
 			} else {
 				res = append(res, errors.NewParseError("quoteInformationRequiredNotification", "body", "", err))
 			}
@@ -73,7 +75,7 @@ func (o *NotificationQuoteInformationRequiredNotificationParams) BindRequest(r *
 			}
 		}
 	} else {
-		res = append(res, errors.Required("quoteInformationRequiredNotification", "body"))
+		res = append(res, errors.Required("quoteInformationRequiredNotification", "body", nil))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
