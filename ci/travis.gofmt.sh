@@ -1,9 +1,3 @@
 #!/usr/bin/env bash
 
-set -e
-
-if [[ -n "$(gofmt -l . | grep -v ^vendor/)" ]]; then
-  echo "Go code is not formatted:"
-  gofmt -d .
-  exit 1
-fi
+goimports -w -local github.com/qlcchain/go-lsobus $(find . -type f -name '*.go' -not -path "*/mocks/*" -not -path "*/pb/*" -not -path "*/proto/*")

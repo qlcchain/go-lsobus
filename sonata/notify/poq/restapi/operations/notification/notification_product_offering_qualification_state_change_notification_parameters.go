@@ -43,7 +43,9 @@ type NotificationProductOfferingQualificationStateChangeNotificationParams struc
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationProductOfferingQualificationStateChangeNotificationParams() beforehand.
-func (o *NotificationProductOfferingQualificationStateChangeNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationProductOfferingQualificationStateChangeNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationProductOfferingQualificationStateChangeNotificationParams) 
 		var body models.Event
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
-				res = append(res, errors.Required("productOfferingQualificationStateChangeNotification", "body"))
+				res = append(res, errors.Required("productOfferingQualificationStateChangeNotification", "body", nil))
 			} else {
 				res = append(res, errors.NewParseError("productOfferingQualificationStateChangeNotification", "body", "", err))
 			}
@@ -68,7 +70,7 @@ func (o *NotificationProductOfferingQualificationStateChangeNotificationParams) 
 			}
 		}
 	} else {
-		res = append(res, errors.Required("productOfferingQualificationStateChangeNotification", "body"))
+		res = append(res, errors.Required("productOfferingQualificationStateChangeNotification", "body", nil))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

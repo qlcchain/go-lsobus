@@ -43,7 +43,9 @@ type NotificationQuoteStateChangeNotificationParams struct {
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationQuoteStateChangeNotificationParams() beforehand.
-func (o *NotificationQuoteStateChangeNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationQuoteStateChangeNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationQuoteStateChangeNotificationParams) BindRequest(r *http.Req
 		body, err := models.UnmarshalEvent(r.Body, route.Consumer)
 		if err != nil {
 			if err == io.EOF {
-				err = errors.Required("quoteStateChangeNotification", "body")
+				err = errors.Required("quoteStateChangeNotification", "body", nil)
 			}
 			res = append(res, err)
 		} else {
@@ -67,7 +69,7 @@ func (o *NotificationQuoteStateChangeNotificationParams) BindRequest(r *http.Req
 			}
 		}
 	} else {
-		res = append(res, errors.Required("quoteStateChangeNotification", "body"))
+		res = append(res, errors.Required("quoteStateChangeNotification", "body", nil))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

@@ -43,7 +43,9 @@ type NotificationQuoteCreationNotificationParams struct {
 // for simple values it will use straight method calls.
 //
 // To ensure default values, the struct must have been initialized with NewNotificationQuoteCreationNotificationParams() beforehand.
-func (o *NotificationQuoteCreationNotificationParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+func (o *NotificationQuoteCreationNotificationParams) BindRequest(
+	r *http.Request, route *middleware.MatchedRoute,
+) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -53,7 +55,7 @@ func (o *NotificationQuoteCreationNotificationParams) BindRequest(r *http.Reques
 		body, err := models.UnmarshalEvent(r.Body, route.Consumer)
 		if err != nil {
 			if err == io.EOF {
-				err = errors.Required("quoteCreationNotification", "body")
+				err = errors.Required("quoteCreationNotification", "body", nil)
 			}
 			res = append(res, err)
 		} else {
@@ -67,7 +69,7 @@ func (o *NotificationQuoteCreationNotificationParams) BindRequest(r *http.Reques
 			}
 		}
 	} else {
-		res = append(res, errors.Required("quoteCreationNotification", "body"))
+		res = append(res, errors.Required("quoteCreationNotification", "body", nil))
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

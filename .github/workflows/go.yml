@@ -8,16 +8,16 @@ jobs:
     if: contains(github.event.head_commit.message, '[skip ci]') == false && contains(github.event.head_commit.message, '[ci skip]') == false
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v1.1.2
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.14.x
+          go-version: 1.15.x
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 10
 
-      - uses: actions/cache@v1.1.1
+      - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -35,14 +35,6 @@ jobs:
           fi
           go vet `go list ./... | egrep -v "platform"`
           go vet -v `go list ./... | egrep -v "platform"`
-          echo "" > "coverage.txt"
-          for d in $(go list ./... | egrep -v "vendor"); do
-            go test -coverprofile=profile.out "$d"
-            if [[ -f profile.out ]]; then
-              cat profile.out >> "coverage.txt"
-              rm profile.out
-            fi
-          done
           make clean build
 
 #      - uses: codecov/codecov-action@v1.0.2
@@ -70,7 +62,7 @@ jobs:
           mkdir -p artifact && cp dist/*.{tar.gz,zip,txt,sig} artifact/
 
       - name: Upload snapshot artifacts
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v2.2.1
         with:
           name: go-lsobus-artifact
           path: artifact/
