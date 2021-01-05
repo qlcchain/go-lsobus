@@ -1,8 +1,9 @@
-package orchestra
+package pccwg
 
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 
 	poqcli "github.com/qlcchain/go-lsobus/sonata/poq/client"
@@ -14,7 +15,7 @@ type sonataPOQImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataPOQImpl(p *PartnerImpl) *sonataPOQImpl {
+func newSonataPOQImpl(p api.DoDSeller) *sonataPOQImpl {
 	s := &sonataPOQImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionPOQ
@@ -31,7 +32,7 @@ func (s *sonataPOQImpl) NewHTTPClient() *poqcli.APIProductOfferingQualificationM
 	return httpCli
 }
 
-func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
+func (s *sonataPOQImpl) SendCreateRequest(orderParams *api.OrderParams) error {
 	reqParams := s.BuildCreateParams(orderParams)
 
 	httpCli := s.NewHTTPClient()
@@ -52,7 +53,7 @@ func (s *sonataPOQImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
-func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataPOQImpl) SendFindRequest(params *api.FindParams) error {
 	reqParams := poqapi.NewProductOfferingQualificationFindParams()
 	if params.ProjectID != "" {
 		reqParams.ProjectID = &params.ProjectID
@@ -85,7 +86,7 @@ func (s *sonataPOQImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataPOQImpl) SendGetRequest(params *api.GetParams) error {
 	reqParams := poqapi.NewProductOfferingQualificationGetParams()
 	reqParams.ProductOfferingQualificationID = params.ID
 
@@ -104,7 +105,7 @@ func (s *sonataPOQImpl) SendGetRequest(params *GetParams) error {
 	return nil
 }
 
-func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.ProductOfferingQualificationCreateParams {
+func (s *sonataPOQImpl) BuildCreateParams(orderParams *api.OrderParams) *poqapi.ProductOfferingQualificationCreateParams {
 	reqParams := poqapi.NewProductOfferingQualificationCreateParams()
 
 	reqParams.ProductOfferingQualification = new(poqmod.ProductOfferingQualificationCreate)
@@ -168,7 +169,7 @@ func (s *sonataPOQImpl) BuildCreateParams(orderParams *OrderParams) *poqapi.Prod
 	return reqParams
 }
 
-func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOfferingQualificationItemCreate {
+func (s *sonataPOQImpl) BuildUNIItem(params *api.UNIItemParams) *poqmod.ProductOfferingQualificationItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
 	}
@@ -209,7 +210,7 @@ func (s *sonataPOQImpl) BuildUNIItem(params *UNIItemParams) *poqmod.ProductOffer
 	return uniItem
 }
 
-func (s *sonataPOQImpl) BuildELineItem(params *ELineItemParams) *poqmod.ProductOfferingQualificationItemCreate {
+func (s *sonataPOQImpl) BuildELineItem(params *api.ELineItemParams) *poqmod.ProductOfferingQualificationItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}

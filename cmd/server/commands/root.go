@@ -46,7 +46,6 @@ func Execute() {
 	flag.StringVar(&cfgPathP, "config", "", "config file")
 	flag.StringVar(&accountP, "account", "", "sign with account for cdr data")
 	flag.StringVarP(&chainEndPointP, "chainEndpoint", "", "ws://127.0.0.1:19736", "chain endpoint")
-	flag.BoolVarP(&fakeModeP, "fakeMode", "", false, "partner sonata fake mode")
 	if err := rootCmd.Execute(); err != nil {
 		log.Root.Info(err)
 		os.Exit(1)
@@ -66,10 +65,6 @@ func start() error {
 	}
 	if chainEndPointP != "" {
 		cfg.ChainUrl = chainEndPointP
-	}
-
-	if fakeModeP {
-		cfg.FakeMode = fakeModeP
 	}
 
 	s := util.ToIndentString(cfg)

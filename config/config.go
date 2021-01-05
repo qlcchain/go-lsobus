@@ -5,7 +5,6 @@ type Config struct {
 	DataDir  string        `json:"dataDir"`
 	LogLevel string        `json:"logLevel"` //info,warn,debug.
 	ChainUrl string        `json:"chainUrl"` //chain url.
-	FakeMode bool          `json:"fakeMode"` //fake mode for sonata
 	RPC      RPCConfig     `json:"rpc"`
 	Partners []*PartnerCfg `json:"partners"`
 	Privacy  PrivacyCfg    `json:"privacy"`
@@ -23,11 +22,13 @@ type RPCConfig struct {
 }
 
 type PartnerCfg struct {
-	Name      string `json:"name"`
-	ID        string `json:"id"`
-	SonataUrl string `json:"sonataUrl"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
+	Name           string `json:"name"`
+	ID             string `json:"id"`
+	SonataUrl      string `json:"sonataUrl"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	Implementation string `json:"implementation"`
+	IsFake         bool   `json:"isFake"`
 }
 
 type PrivacyCfg struct {

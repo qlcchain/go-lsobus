@@ -1,4 +1,4 @@
-package orchestra
+package api
 
 import (
 	invmod "github.com/qlcchain/go-lsobus/sonata/inventory/models"
@@ -132,4 +132,15 @@ type GetParams struct {
 	RspOrder *ordmod.ProductOrder                 `json:"-"`
 	RspInv   *invmod.Product                      `json:"-"`
 	RspOffer *offer.ProductOffering               `json:"-"`
+}
+
+type LoginParams struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+
+	RspLogin *LoginResponse
+}
+
+type LoginResponse struct {
+	Data string `json:"data"`
 }

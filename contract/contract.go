@@ -63,7 +63,7 @@ type ContractService struct {
 	quit                 chan bool
 	orderIdOnChainSeller *sync.Map
 	orderIdOnChainBuyer  *sync.Map
-	orchestra            *orchestra.Orchestra
+	sellers              *orchestra.Sellers
 	fakeMode             bool
 	mutex                *sync.Mutex
 }
@@ -80,8 +80,7 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 		return nil, err
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	or := orchestra.NewOrchestra(cfgFile)
-	or.SetFakeMode(cfg.FakeMode)
+	or := orchestra.NewSellers(cfgFile)
 	cs := &ContractService{
 		cfg:                  cfg,
 		account:              cc.Account(),
@@ -93,7 +92,7 @@ func NewContractService(cfgFile string) (*ContractService, error) {
 		quit:                 make(chan bool, 1),
 		orderIdOnChainSeller: new(sync.Map),
 		orderIdOnChainBuyer:  new(sync.Map),
-		orchestra:            or,
+		sellers:              or,
 		mutex:                new(sync.Mutex),
 	}
 	return cs, nil
@@ -115,12 +114,12 @@ func (cs *ContractService) SetAccount(account *types.Account) {
 	cs.account = account
 }
 
-func (cs *ContractService) GetOrchestra() *orchestra.Orchestra {
-	return cs.orchestra
+func (cs *ContractService) GetOrchestra() *orchestra.Sellers {
+	return cs.sellers
 }
 
 func (cs *ContractService) Init() error {
-	err := cs.orchestra.Init()
+	err := cs.sellers.Init()
 	if err != nil {
 		return err
 	}
@@ -245,7 +244,9 @@ func (cs *ContractService) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettl
 	}
 }
 
-func (cs *ContractService) GetOrderInfoBySellerAndOrderId(seller types.Address, orderId string) (*qlcSdk.DoDSettleOrderInfo, error) {
+func (cs *ContractService) GetOrderInfoBySellerAndOrderId(
+	seller types.Address, orderId string,
+) (*qlcSdk.DoDSettleOrderInfo, error) {
 	if cs.GetFakeMode() {
 		return mock.GetOrderInfoByInternalId("")
 	}

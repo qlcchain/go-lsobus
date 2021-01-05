@@ -1,4 +1,4 @@
-package orchestra
+package pccwg
 
 import (
 	"fmt"
@@ -9,8 +9,9 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 
 	"github.com/qlcchain/go-lsobus/common/util"
+	"github.com/qlcchain/go-lsobus/sonata/common/models"
 
-	cmnmod "github.com/qlcchain/go-lsobus/sonata/common/models"
+	"github.com/qlcchain/go-lsobus/api"
 
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
@@ -36,7 +37,7 @@ const (
 )
 
 type sonataBaseImpl struct {
-	Partner *PartnerImpl
+	Partner api.DoDSeller
 
 	URL     string
 	Scheme  string
@@ -48,7 +49,7 @@ type sonataBaseImpl struct {
 }
 
 func (s *sonataBaseImpl) Init() error {
-	s.URL = s.Partner.GetSonataUrl()
+	s.URL = s.Partner.GetConfig().SonataUrl
 	if s.URL != "" {
 		retUrl, err := url.Parse(s.URL)
 		if err != nil {
@@ -72,7 +73,7 @@ func (s *sonataBaseImpl) Init() error {
 }
 
 func (s *sonataBaseImpl) GetFakeMode() bool {
-	return s.Partner.GetFakeMode()
+	return s.Partner.GetConfig().IsFake
 }
 
 func (s *sonataBaseImpl) GetHost() string {
@@ -84,15 +85,15 @@ func (s *sonataBaseImpl) GetScheme() string {
 }
 
 func (s *sonataBaseImpl) GetApiToken() string {
-	return s.Partner.GetApiToken()
+	return s.Partner.GetAPIToken()
 }
 
 func (s *sonataBaseImpl) RenewApiToken() string {
-	return s.Partner.RenewApiToken()
+	return s.Partner.RenewAPIToken()
 }
 
 func (s *sonataBaseImpl) ClearApiToken() {
-	s.Partner.ClearApiToken()
+	s.Partner.ClearAPIToken()
 }
 
 func (s *sonataBaseImpl) NewHttpTransport(basePath string) *httptransport.Runtime {
@@ -105,17 +106,17 @@ func (s *sonataBaseImpl) NewItemID() string {
 	return strconv.Itoa(int(s.itemID.Inc()))
 }
 
-func (s *sonataBaseImpl) BuildUNIProductSpec(params *UNIItemParams) *cmnmod.UNISpec {
-	uniSpec := &cmnmod.UNISpec{}
+func (s *sonataBaseImpl) BuildUNIProductSpec(params *api.UNIItemParams) *models.UNISpec {
+	uniSpec := &models.UNISpec{}
 	uniSpec.SetAtSchemaLocation(MEFSchemaLocationSpecUNI)
 	uniSpec.SetAtType("UNISpec")
 
 	if params.PortSpeed == 1000 {
-		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr1000BASET}
+		uniSpec.PhysicalLayer = []models.PhysicalLayer{models.PhysicalLayerNr1000BASET}
 	} else if params.PortSpeed == 10000 {
-		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr10GBASESR}
+		uniSpec.PhysicalLayer = []models.PhysicalLayer{models.PhysicalLayerNr10GBASESR}
 	} else {
-		uniSpec.PhysicalLayer = []cmnmod.PhysicalLayer{cmnmod.PhysicalLayerNr100BASETX}
+		uniSpec.PhysicalLayer = []models.PhysicalLayer{models.PhysicalLayerNr100BASETX}
 	}
 	uniSpec.MaxServiceFrameSize = 1522
 	uniSpec.NumberOfLinks = 1
@@ -123,8 +124,8 @@ func (s *sonataBaseImpl) BuildUNIProductSpec(params *UNIItemParams) *cmnmod.UNIS
 	return uniSpec
 }
 
-func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.ELineSpec {
-	lineSpec := &cmnmod.ELineSpec{}
+func (s *sonataBaseImpl) BuildELineProductSpec(params *api.ELineItemParams) *models.ELineSpec {
+	lineSpec := &models.ELineSpec{}
 	//lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineSpec.SetAtType("ELineSpec")
 
@@ -132,17 +133,17 @@ func (s *sonataBaseImpl) BuildELineProductSpec(params *ELineItemParams) *cmnmod.
 	lineSpec.MaximumFrameSize = 1526
 	lineSpec.SVlanID = int32(params.SVlanID)
 	bwMbps := int32(params.Bandwidth)
-	bwProfile := &cmnmod.BandwidthProfile{
-		Cir: &cmnmod.InformationRate{Unit: cmnmod.InformationRateUnit(params.BwUnit), Amount: &bwMbps},
+	bwProfile := &models.BandwidthProfile{
+		Cir: &models.InformationRate{Unit: models.InformationRateUnit(params.BwUnit), Amount: &bwMbps},
 	}
-	lineSpec.ENNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
-	lineSpec.UNIIngressBWProfile = []*cmnmod.BandwidthProfile{bwProfile}
+	lineSpec.ENNIIngressBWProfile = []*models.BandwidthProfile{bwProfile}
+	lineSpec.UNIIngressBWProfile = []*models.BandwidthProfile{bwProfile}
 
 	return lineSpec
 }
 
-func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *ELineItemParams) *cmnmod.PCCWConnSpec {
-	lineSpec := &cmnmod.PCCWConnSpec{}
+func (s *sonataBaseImpl) BuildPCCWConnProductSpec(params *api.ELineItemParams) *models.PCCWConnSpec {
+	lineSpec := &models.PCCWConnSpec{}
 	//lineSpec.SetAtSchemaLocation(MEFSchemaLocationSpecELine)
 	lineSpec.SetAtType("PCCWConnSpec")
 

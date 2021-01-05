@@ -1,7 +1,9 @@
-package orchestra
+package pccwg
 
 import (
 	"github.com/go-openapi/swag"
+
+	"github.com/qlcchain/go-lsobus/api"
 
 	"github.com/qlcchain/go-lsobus/mock"
 	"github.com/qlcchain/go-lsobus/sonata/offer"
@@ -11,7 +13,7 @@ type sonataOfferImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOfferImpl(p *PartnerImpl) *sonataOfferImpl {
+func newSonataOfferImpl(p api.DoDSeller) *sonataOfferImpl {
 	s := &sonataOfferImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionOffer
@@ -22,7 +24,7 @@ func (s *sonataOfferImpl) Init() error {
 	return s.sonataBaseImpl.Init()
 }
 
-func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataOfferImpl) SendFindRequest(params *api.FindParams) error {
 	offUrl := s.URL + "/api/mef/productOfferingManagement/v1/productOffering"
 	offapi := offer.NewAPIProductOfferingManagement(offUrl)
 
@@ -45,7 +47,7 @@ func (s *sonataOfferImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataOfferImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataOfferImpl) SendGetRequest(params *api.GetParams) error {
 	offUrl := s.URL + "/api/mef/productOfferingManagement/v1/productOffering"
 	offapi := offer.NewAPIProductOfferingManagement(offUrl)
 

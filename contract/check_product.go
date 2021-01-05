@@ -3,11 +3,10 @@ package contract
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
-
-	"github.com/qlcchain/go-lsobus/orchestra"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 )
@@ -87,7 +86,9 @@ func (cs *ContractService) getProductId() {
 	}
 }
 
-func (cs *ContractService) updateProductInfoToChain(idOnChain string, productIds []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
+func (cs *ContractService) updateProductInfoToChain(
+	idOnChain string, productIds []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo,
+) error {
 	var id pkg.Hash
 	_ = id.Of(idOnChain)
 	productInfos := make([]*qlcSdk.DoDSettleProductInfo, 0)
@@ -140,11 +141,11 @@ func (cs *ContractService) updateProductInfoToChain(idOnChain string, productIds
 }
 
 func (cs *ContractService) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
-	fp := &orchestra.FindParams{
-		Seller:         &orchestra.PartnerParams{Name: sellName},
+	fp := &api.FindParams{
+		Seller:         &api.PartnerParams{Name: sellName},
 		ProductOrderID: orderInfo.OrderId,
 	}
-	err := cs.orchestra.ExecInventoryFind(fp)
+	err := cs.sellers.ExecInventoryFind(fp)
 	if err != nil {
 		return nil, err
 	}

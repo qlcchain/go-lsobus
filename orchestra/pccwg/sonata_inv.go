@@ -1,6 +1,7 @@
-package orchestra
+package pccwg
 
 import (
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 	invcli "github.com/qlcchain/go-lsobus/sonata/inventory/client"
 	invapi "github.com/qlcchain/go-lsobus/sonata/inventory/client/product"
@@ -10,7 +11,7 @@ type sonataInvImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataInvImpl(p *PartnerImpl) *sonataInvImpl {
+func newSonataInvImpl(p api.DoDSeller) *sonataInvImpl {
 	s := &sonataInvImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionInv
@@ -27,7 +28,7 @@ func (s *sonataInvImpl) NewHTTPClient() *invcli.APIProductInventoryManagement {
 	return httpCli
 }
 
-func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataInvImpl) SendFindRequest(params *api.FindParams) error {
 	reqParams := invapi.NewProductFindParams()
 	if params.BuyerID != "" {
 		reqParams.BuyerID = &params.BuyerID
@@ -71,7 +72,7 @@ func (s *sonataInvImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataInvImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataInvImpl) SendGetRequest(params *api.GetParams) error {
 	reqParams := invapi.NewProductGetParams()
 	reqParams.ProductID = params.ID
 

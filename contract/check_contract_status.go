@@ -8,11 +8,11 @@ import (
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
+	"github.com/qlcchain/go-lsobus/api"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
-
-	"github.com/qlcchain/go-lsobus/orchestra"
 )
 
 func (cs *ContractService) checkContractStatus() {
@@ -72,10 +72,10 @@ func (cs *ContractService) getContractStatus() {
 }
 
 func (cs *ContractService) checkOrderAlreadyExitOnSonataServer(externalID string) (string, bool) {
-	fp := &orchestra.FindParams{
+	fp := &api.FindParams{
 		ExternalID: externalID,
 	}
-	err := cs.orchestra.ExecOrderFind(fp)
+	err := cs.sellers.ExecOrderFind(fp)
 	if err != nil {
 		return "", false
 	}
@@ -91,7 +91,9 @@ func (cs *ContractService) checkOrderAlreadyExitOnSonataServer(externalID string
 	return *fp.RspOrderList[0].ID, true
 }
 
-func (cs *ContractService) createOrderToSonataServer(internalId string, orderInfo *qlcSdk.DoDSettleOrderInfo) (string, error) {
+func (cs *ContractService) createOrderToSonataServer(
+	internalId string, orderInfo *qlcSdk.DoDSettleOrderInfo,
+) (string, error) {
 	orderActivity := ""
 	itemAction := ""
 	if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
@@ -105,9 +107,9 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		itemAction = "DISCONNECT"
 	}
 
-	eLines := make([]*orchestra.ELineItemParams, 0)
+	eLines := make([]*api.ELineItemParams, 0)
 	for _, v := range orderInfo.Connections {
-		eLine := &orchestra.ELineItemParams{
+		eLine := &api.ELineItemParams{
 			SrcPortID:     v.SrcPort,
 			DstPortID:     v.DstPort,
 			DstCompanyID:  v.DstCompanyName,
@@ -115,13 +117,13 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 			SrcLocationID: v.SrcDataCenter,
 			DstLocationID: v.DstDataCenter,
 			CosName:       strings.ToUpper(v.ServiceClass.String()),
-			BaseItemParams: orchestra.BaseItemParams{
+			BaseItemParams: api.BaseItemParams{
 				BuyerProductID: v.BuyerProductId,
 			},
 		}
 
 		eLine.ItemID = v.ItemId
-		billingParams := &orchestra.BillingParams{}
+		billingParams := &api.BillingParams{}
 		if len(v.Bandwidth) != 0 {
 			bws := strings.Split(v.Bandwidth, " ")
 			if len(bws) != 2 {
@@ -161,13 +163,13 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		eLine.ProductID = v.ProductId
 		eLines = append(eLines, eLine)
 	}
-	op := &orchestra.OrderParams{
+	op := &api.OrderParams{
 		OrderActivity: orderActivity,
-		Buyer: &orchestra.PartnerParams{
+		Buyer: &api.PartnerParams{
 			ID:   orderInfo.Buyer.Address.String(),
 			Name: orderInfo.Buyer.Name,
 		},
-		Seller: &orchestra.PartnerParams{
+		Seller: &api.PartnerParams{
 			ID:   orderInfo.Seller.Address.String(),
 			Name: orderInfo.Seller.Name,
 		},
@@ -176,7 +178,7 @@ func (cs *ContractService) createOrderToSonataServer(internalId string, orderInf
 		PaymentType: eLines[0].BillingParams.PaymentType,
 		BillingType: eLines[0].BillingParams.BillingType,
 	}
-	err := cs.orchestra.ExecOrderCreate(op)
+	err := cs.sellers.ExecOrderCreate(op)
 	if err != nil {
 		return "", err
 	}
