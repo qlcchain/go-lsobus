@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
 	"os"
@@ -23,14 +24,13 @@ func setupTestCaseOrchestraAPI(t *testing.T) (func(t *testing.T), *OrchestraApi)
 	cfg, err := cc.Config()
 	setupOrchestraAPIConfig(cfg)
 
-	orch := orchestra.NewOrchestra(cfgFile)
-	orch.SetFakeMode(true)
+	orch := orchestra.NewSellers(cfgFile)
 
 	if err = orch.Init(); err != nil {
 		t.Fatal(err)
 	}
 
-	orchApi := NewOrchestraApi(orch)
+	orchApi := NewOrchestraAPI(orch)
 	return func(t *testing.T) {
 		err = os.RemoveAll(filepath.Join(config.TestDataDir(), uuid.New().String()))
 		if err != nil {
@@ -55,8 +55,8 @@ func TestOrchestraApi_Create(t *testing.T) {
 	teardownTestCase, oa := setupTestCaseOrchestraAPI(t)
 	defer teardownTestCase(t)
 
-	orchParams := orchestra.OrderParams{}
-	orchParams.Seller = &orchestra.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
+	orchParams := api.OrderParams{}
+	orchParams.Seller = &api.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
 	orchJson, _ := json.Marshal(orchParams)
 
 	req := &proto.OrchestraCommonRequest{}
@@ -82,8 +82,8 @@ func TestOrchestraApi_Find(t *testing.T) {
 	teardownTestCase, oa := setupTestCaseOrchestraAPI(t)
 	defer teardownTestCase(t)
 
-	orchParams := orchestra.FindParams{}
-	orchParams.Seller = &orchestra.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
+	orchParams := api.FindParams{}
+	orchParams.Seller = &api.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
 	orchJson, _ := json.Marshal(orchParams)
 
 	req := &proto.OrchestraCommonRequest{}
@@ -117,8 +117,8 @@ func TestOrchestraApi_Get(t *testing.T) {
 	teardownTestCase, oa := setupTestCaseOrchestraAPI(t)
 	defer teardownTestCase(t)
 
-	orchParams := orchestra.GetParams{}
-	orchParams.Seller = &orchestra.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
+	orchParams := api.GetParams{}
+	orchParams.Seller = &api.PartnerParams{Name: "PCCWG", ID: "PCCWG"}
 	orchJson, _ := json.Marshal(orchParams)
 
 	req := &proto.OrchestraCommonRequest{}

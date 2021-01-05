@@ -51,7 +51,7 @@ func (g *GRPCServer) Start(cfg *config.Config) error {
 	orderApi := NewOrderApi(g.cs)
 	pb.RegisterChainAPIServer(g.rpc, &chainApi{})
 	pb.RegisterOrderAPIServer(g.rpc, orderApi)
-	orchApi := NewOrchestraApi(g.cs.GetOrchestra())
+	orchApi := NewOrchestraAPI(g.cs.GetOrchestra())
 	pb.RegisterOrchestraAPIServer(g.rpc, orchApi)
 	reflection.Register(g.rpc)
 	go func() {

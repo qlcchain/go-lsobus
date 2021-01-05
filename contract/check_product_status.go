@@ -4,12 +4,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
-	"github.com/qlcchain/go-lsobus/orchestra"
 	"github.com/qlcchain/go-lsobus/sonata/inventory/models"
 )
 
@@ -49,11 +49,11 @@ func (cs *ContractService) getProductStatus() {
 		}
 		for _, value := range v.Products {
 			if !value.Active {
-				gp := &orchestra.GetParams{
-					Seller: &orchestra.PartnerParams{},
+				gp := &api.GetParams{
+					Seller: &api.PartnerParams{},
 					ID:     value.ProductId,
 				}
-				err := cs.orchestra.ExecInventoryGet(gp)
+				err := cs.sellers.ExecInventoryGet(gp)
 				if err != nil {
 					cs.logger.Error(err)
 					continue
@@ -112,7 +112,9 @@ func (cs *ContractService) getProductStatus() {
 	}
 }
 
-func (cs *ContractService) updateProductStatusToChain(addr pkg.Address, orderId string, products []*qlcSdk.DoDSettleProductInfo) error {
+func (cs *ContractService) updateProductStatusToChain(
+	addr pkg.Address, orderId string, products []*qlcSdk.DoDSettleProductInfo,
+) error {
 	param := &qlcSdk.DoDSettleUpdateProductInfoParam{
 		Address:     addr,
 		OrderId:     orderId,

@@ -1,4 +1,4 @@
-package orchestra
+package pccwg
 
 import (
 	"bytes"
@@ -8,26 +8,17 @@ import (
 	"github.com/go-openapi/runtime"
 
 	"github.com/qlcchain/go-lsobus/common/rest"
+
+	"github.com/qlcchain/go-lsobus/api"
 )
 
-type LoginParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-
-	RspLogin *LoginResponse
-}
-
-type LoginResponse struct {
-	Data string `json:"data"`
-}
-
-func (p *PartnerImpl) TryUpdateApiToken() {
+func (p *PCCWGImpl) TryUpdateApiToken() {
 	if p.cfg.Username == "" || p.cfg.Password == "" {
 		p.logger.Infof("partner %s username is empty", p.cfg.Name)
 		return
 	}
 
-	reqParams := &LoginParams{}
+	reqParams := &api.LoginParams{}
 	reqParams.Username = p.cfg.Username
 	reqParams.Password = p.cfg.Password
 
@@ -40,11 +31,11 @@ func (p *PartnerImpl) TryUpdateApiToken() {
 	}
 }
 
-func (p *PartnerImpl) SetApiToken(token string) {
+func (p *PCCWGImpl) SetApiToken(token string) {
 	p.apiToken = token
 }
 
-func (p *PartnerImpl) GetApiToken() string {
+func (p *PCCWGImpl) GetAPIToken() string {
 	if p.apiToken == "" {
 		p.TryUpdateApiToken()
 	}
@@ -52,21 +43,21 @@ func (p *PartnerImpl) GetApiToken() string {
 	return p.apiToken
 }
 
-func (p *PartnerImpl) RenewApiToken() string {
+func (p *PCCWGImpl) RenewAPIToken() string {
 	p.apiToken = ""
 	p.TryUpdateApiToken()
 	return p.apiToken
 }
 
-func (p *PartnerImpl) ClearApiToken() {
+func (p *PCCWGImpl) ClearAPIToken() {
 	p.apiToken = ""
 }
 
-func (p *PartnerImpl) ExecAuthLogin(params *LoginParams) error {
+func (p *PCCWGImpl) ExecAuthLogin(params *api.LoginParams) error {
 	var err error
 
 	req := rest.Request{Method: rest.Post}
-	req.BaseURL = p.GetSonataUrl() + "/api/login"
+	req.BaseURL = p.GetConfig().SonataUrl + "/api/login"
 	req.Body, err = json.Marshal(params)
 	if err != nil {
 		return err
@@ -75,7 +66,7 @@ func (p *PartnerImpl) ExecAuthLogin(params *LoginParams) error {
 	p.logger.Debugf("send login, url %s, username %s", req.BaseURL, params.Username)
 
 	rsp, err := rest.Send(req)
-	if p.GetFakeMode() {
+	if p.GetConfig().IsFake {
 		rsp = &rest.Response{}
 		rsp.StatusCode = 200
 		rsp.Body = "{\"data\": \"12345678\"}"
@@ -86,7 +77,7 @@ func (p *PartnerImpl) ExecAuthLogin(params *LoginParams) error {
 		return fmt.Errorf("receive response, StatusCode(%d) is not OK", rsp.StatusCode)
 	}
 
-	resp := &LoginResponse{}
+	resp := &api.LoginResponse{}
 	bdIO := bytes.NewBuffer([]byte(rsp.Body))
 	cs := runtime.JSONConsumer()
 	err = cs.Consume(bdIO, resp)

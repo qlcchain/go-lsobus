@@ -1,8 +1,9 @@
-package orchestra
+package pccwg
 
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -16,7 +17,7 @@ type sonataQuoteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataQuoteImpl(p *PartnerImpl) *sonataQuoteImpl {
+func newSonataQuoteImpl(p api.DoDSeller) *sonataQuoteImpl {
 	s := &sonataQuoteImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionQuote
@@ -33,7 +34,7 @@ func (s *sonataQuoteImpl) NewHTTPClient() *quocli.APIQuoteManagement {
 	return httpCli
 }
 
-func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
+func (s *sonataQuoteImpl) SendCreateRequest(orderParams *api.OrderParams) error {
 	s.logger.Debugf("params: %s", s.DumpValue(orderParams))
 
 	reqParams := s.BuildCreateParams(orderParams)
@@ -58,7 +59,7 @@ func (s *sonataQuoteImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
-func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataQuoteImpl) SendFindRequest(params *api.FindParams) error {
 	reqParams := quoapi.NewQuoteFindParams()
 	if params.ProjectID != "" {
 		reqParams.ProjectID = &params.ProjectID
@@ -95,7 +96,7 @@ func (s *sonataQuoteImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataQuoteImpl) SendGetRequest(params *api.GetParams) error {
 	reqParams := quoapi.NewQuoteGetParams()
 	reqParams.ID = params.ID
 
@@ -116,7 +117,7 @@ func (s *sonataQuoteImpl) SendGetRequest(params *GetParams) error {
 	return nil
 }
 
-func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.QuoteCreateParams {
+func (s *sonataQuoteImpl) BuildCreateParams(orderParams *api.OrderParams) *quoapi.QuoteCreateParams {
 	reqParams := quoapi.NewQuoteCreateParams()
 
 	reqParams.Quote = &quomod.QuoteCreate{}
@@ -188,7 +189,7 @@ func (s *sonataQuoteImpl) BuildCreateParams(orderParams *OrderParams) *quoapi.Qu
 	return reqParams
 }
 
-func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemCreate {
+func (s *sonataQuoteImpl) BuildUNIItem(params *api.UNIItemParams) *quomod.QuoteItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
 	}
@@ -247,7 +248,7 @@ func (s *sonataQuoteImpl) BuildUNIItem(params *UNIItemParams) *quomod.QuoteItemC
 	return uniItem
 }
 
-func (s *sonataQuoteImpl) BuildELineItem(params *ELineItemParams) *quomod.QuoteItemCreate {
+func (s *sonataQuoteImpl) BuildELineItem(params *api.ELineItemParams) *quomod.QuoteItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}

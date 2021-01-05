@@ -47,7 +47,6 @@ func setupOrchestraConfig(cfg *config.Config) {
 		Password:  "test",
 	}
 	cfg.Partners = append(cfg.Partners, p1)
-	cfg.FakeMode = true
 }
 
 func TestContractService_GetOrderInfoByInternalId(t *testing.T) {

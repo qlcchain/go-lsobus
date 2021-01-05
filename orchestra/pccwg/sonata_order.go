@@ -1,8 +1,9 @@
-package orchestra
+package pccwg
 
 import (
 	"time"
 
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/go-openapi/strfmt"
@@ -16,7 +17,7 @@ type sonataOrderImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataOrderImpl(p *PartnerImpl) *sonataOrderImpl {
+func newSonataOrderImpl(p api.DoDSeller) *sonataOrderImpl {
 	s := &sonataOrderImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionOrder
@@ -33,7 +34,7 @@ func (s *sonataOrderImpl) NewHTTPClient() *ordcli.APIProductOrderManagement {
 	return httpCli
 }
 
-func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
+func (s *sonataOrderImpl) SendCreateRequest(orderParams *api.OrderParams) error {
 	s.logger.Debugf("params: %s", s.DumpValue(orderParams))
 
 	reqParams := s.BuildCreateParams(orderParams)
@@ -56,7 +57,7 @@ func (s *sonataOrderImpl) SendCreateRequest(orderParams *OrderParams) error {
 	return nil
 }
 
-func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataOrderImpl) SendFindRequest(params *api.FindParams) error {
 	reqParams := ordapi.NewProductOrderFindParams()
 	if params.ProjectID != "" {
 		reqParams.ProjectID = &params.ProjectID
@@ -95,7 +96,7 @@ func (s *sonataOrderImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataOrderImpl) SendGetRequest(params *api.GetParams) error {
 	reqParams := ordapi.NewProductOrderGetParams()
 	reqParams.ProductOrderID = params.ID
 
@@ -115,7 +116,7 @@ func (s *sonataOrderImpl) SendGetRequest(params *GetParams) error {
 	return nil
 }
 
-func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.ProductOrderCreateParams {
+func (s *sonataOrderImpl) BuildCreateParams(orderParams *api.OrderParams) *ordapi.ProductOrderCreateParams {
 	reqParams := ordapi.NewProductOrderCreateParams()
 
 	reqParams.ProductOrder = &ordmod.ProductOrderCreate{}
@@ -201,7 +202,7 @@ func (s *sonataOrderImpl) BuildCreateParams(orderParams *OrderParams) *ordapi.Pr
 	return reqParams
 }
 
-func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrderItemCreate {
+func (s *sonataOrderImpl) BuildUNIItem(params *api.UNIItemParams) *ordmod.ProductOrderItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "UNISpec" {
 		return nil
 	}
@@ -251,7 +252,7 @@ func (s *sonataOrderImpl) BuildUNIItem(params *UNIItemParams) *ordmod.ProductOrd
 	return uniItem
 }
 
-func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.ProductOrderItemCreate {
+func (s *sonataOrderImpl) BuildELineItem(params *api.ELineItemParams) *ordmod.ProductOrderItemCreate {
 	if params.ProdSpecID != "" && params.ProdSpecID != "ELineSpec" {
 		return nil
 	}
@@ -300,7 +301,7 @@ func (s *sonataOrderImpl) BuildELineItem(params *ELineItemParams) *ordmod.Produc
 	return lineItem
 }
 
-func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *BillingParams) {
+func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, params *api.BillingParams) {
 	if params == nil {
 		return
 	}
@@ -310,13 +311,13 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	//item.PricingReference = params.ContractID
 
 	itemPrice := &ordmod.OrderItemPrice{}
-	if params.BillingType == BillingTypeDOD {
+	if params.BillingType == api.BillingTypeDOD {
 		itemPrice.PriceType = ordmod.PriceTypeNonRecurring
-	} else if params.BillingType == BillingTypePAYG {
+	} else if params.BillingType == api.BillingTypePAYG {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
 		itemPrice.Price.UnitOfMesure = params.MeasureUnit
-	} else if params.BillingType == BillingTypeUsage {
+	} else if params.BillingType == api.BillingTypeUsage {
 		itemPrice.PriceType = ordmod.PriceTypeRecurring
 		itemPrice.RecurringChargePeriod = ordmod.ChargePeriod(params.BillingUnit)
 		itemPrice.Price.UnitOfMesure = params.MeasureUnit
@@ -332,7 +333,7 @@ func (s *sonataOrderImpl) BuildItemPrice(item *ordmod.ProductOrderItemCreate, pa
 	item.OrderItemPrice = append(item.OrderItemPrice, itemPrice)
 }
 
-func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreate, params *OrderParams) {
+func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreate, params *api.OrderParams) {
 	if params.Buyer != nil {
 		partBuy := &ordmod.RelatedParty{}
 		partBuy.Role = []string{"Buyer"}
@@ -350,7 +351,7 @@ func (s *sonataOrderImpl) BuildOrderRelatedParty(order *ordmod.ProductOrderCreat
 	}
 }
 
-func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *OrderParams) {
+func (s *sonataOrderImpl) BuildOrderBilling(order *ordmod.ProductOrderCreate, params *api.OrderParams) {
 	order.PaymentType = params.PaymentType
 	order.BillingType = params.BillingType
 	if order.BillingType == "DOD" {

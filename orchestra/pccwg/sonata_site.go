@@ -1,6 +1,7 @@
-package orchestra
+package pccwg
 
 import (
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
 	sitcli "github.com/qlcchain/go-lsobus/sonata/site/client"
 	sitapi "github.com/qlcchain/go-lsobus/sonata/site/client/geographic_site"
@@ -10,10 +11,11 @@ type sonataSiteImpl struct {
 	sonataBaseImpl
 }
 
-func newSonataSiteImpl(p *PartnerImpl) *sonataSiteImpl {
+func newSonataSiteImpl(p api.DoDSeller) *sonataSiteImpl {
 	s := &sonataSiteImpl{}
 	s.Partner = p
 	s.Version = MEFAPIVersionSite
+	s.Init()
 	return s
 }
 
@@ -27,7 +29,7 @@ func (s *sonataSiteImpl) NewHTTPClient() *sitcli.APIGeographicSiteManagement {
 	return httpCli
 }
 
-func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
+func (s *sonataSiteImpl) SendFindRequest(params *api.FindParams) error {
 	reqParams := sitapi.NewGeographicSiteFindParams()
 	//reqParams.GeographicAddressCountry = ""
 	//reqParams.GeographicAddressCity = ""
@@ -48,7 +50,7 @@ func (s *sonataSiteImpl) SendFindRequest(params *FindParams) error {
 	return nil
 }
 
-func (s *sonataSiteImpl) SendGetRequest(params *GetParams) error {
+func (s *sonataSiteImpl) SendGetRequest(params *api.GetParams) error {
 	reqParams := sitapi.NewGeographicSiteGetParams()
 	reqParams.SiteID = params.ID
 

@@ -9,7 +9,7 @@ import (
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
-	"github.com/qlcchain/go-lsobus/orchestra"
+	"github.com/qlcchain/go-lsobus/api"
 	qm "github.com/qlcchain/go-lsobus/sonata/quote/models"
 )
 
@@ -144,15 +144,15 @@ func (cs *ContractService) verifyOrderInfoFromSonata(order *qlcSdk.DoDSettleOrde
 	for idx := 0; idx < len(order.Connections); idx++ {
 		var quote *qm.QuoteItem
 		conn := order.Connections[idx]
-		op := &orchestra.GetParams{
-			Seller: &orchestra.PartnerParams{
+		op := &api.GetParams{
+			Seller: &api.PartnerParams{
 				ID:   order.Seller.Address.String(),
 				Name: order.Seller.Name,
 			},
 			ID: conn.QuoteId,
 		}
 
-		err := cs.orchestra.ExecQuoteGet(op)
+		err := cs.sellers.ExecQuoteGet(op)
 		if err != nil {
 			cs.logger.Error(err)
 			return false

@@ -46,7 +46,7 @@ func Execute(osArgs []string) {
 		}
 		rootCmd.PersistentFlags().StringVarP(&endpointP, "endpoint", "e", endpointP, "endpoint for client")
 		addcommands()
-		addSonataCmd(rootCmd)
+		//addSonataCmd(rootCmd)
 		if err := rootCmd.Execute(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -70,5 +70,5 @@ func isInteractive(osArgs []string) bool {
 
 func addcommands() {
 	version()
-	addOrderCmd()
+	//addOrderCmd()
 }

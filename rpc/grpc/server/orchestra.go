@@ -9,16 +9,18 @@ import (
 
 	"github.com/qlcchain/go-lsobus/orchestra"
 
+	"github.com/qlcchain/go-lsobus/api"
+
 	"github.com/qlcchain/go-lsobus/log"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 type OrchestraApi struct {
 	logger *zap.SugaredLogger
-	orch   *orchestra.Orchestra
+	orch   *orchestra.Sellers
 }
 
-func NewOrchestraApi(orch *orchestra.Orchestra) *OrchestraApi {
+func NewOrchestraAPI(orch *orchestra.Sellers) *OrchestraApi {
 	oa := &OrchestraApi{
 		orch:   orch,
 		logger: log.NewLogger("OrchestraApi"),
@@ -27,7 +29,9 @@ func NewOrchestraApi(orch *orchestra.Orchestra) *OrchestraApi {
 	return oa
 }
 
-func (oa *OrchestraApi) ExecCreate(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+func (oa *OrchestraApi) ExecCreate(
+	ctx context.Context, param *proto.OrchestraCommonRequest,
+) (*proto.OrchestraCommonResponse, error) {
 	oa.logger.Debugf("ExecCreate request %+v", param)
 
 	orchParams := oa.Request2OrchCreateParams(param)
@@ -65,7 +69,9 @@ func (oa *OrchestraApi) ExecCreate(ctx context.Context, param *proto.OrchestraCo
 	return rsp, nil
 }
 
-func (oa *OrchestraApi) ExecFind(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+func (oa *OrchestraApi) ExecFind(
+	ctx context.Context, param *proto.OrchestraCommonRequest,
+) (*proto.OrchestraCommonResponse, error) {
 	oa.logger.Debugf("ExecFind request %+v", param)
 
 	orchParams := oa.Request2OrchFindParams(param)
@@ -106,7 +112,9 @@ func (oa *OrchestraApi) ExecFind(ctx context.Context, param *proto.OrchestraComm
 	return rsp, nil
 }
 
-func (oa *OrchestraApi) ExecGet(ctx context.Context, param *proto.OrchestraCommonRequest) (*proto.OrchestraCommonResponse, error) {
+func (oa *OrchestraApi) ExecGet(
+	ctx context.Context, param *proto.OrchestraCommonRequest,
+) (*proto.OrchestraCommonResponse, error) {
 	oa.logger.Debugf("ExecGet request %+v", param)
 
 	orchParams := oa.Request2OrchGetParams(param)
@@ -147,8 +155,8 @@ func (oa *OrchestraApi) ExecGet(ctx context.Context, param *proto.OrchestraCommo
 	return rsp, nil
 }
 
-func (oa *OrchestraApi) Request2OrchCreateParams(param *proto.OrchestraCommonRequest) *orchestra.OrderParams {
-	orchParams := &orchestra.OrderParams{}
+func (oa *OrchestraApi) Request2OrchCreateParams(param *proto.OrchestraCommonRequest) *api.OrderParams {
+	orchParams := &api.OrderParams{}
 
 	err := json.Unmarshal([]byte(param.Data), orchParams)
 	if err != nil {
@@ -158,8 +166,8 @@ func (oa *OrchestraApi) Request2OrchCreateParams(param *proto.OrchestraCommonReq
 	return orchParams
 }
 
-func (oa *OrchestraApi) Request2OrchFindParams(param *proto.OrchestraCommonRequest) *orchestra.FindParams {
-	orchParams := &orchestra.FindParams{}
+func (oa *OrchestraApi) Request2OrchFindParams(param *proto.OrchestraCommonRequest) *api.FindParams {
+	orchParams := &api.FindParams{}
 
 	err := json.Unmarshal([]byte(param.Data), orchParams)
 	if err != nil {
@@ -169,8 +177,8 @@ func (oa *OrchestraApi) Request2OrchFindParams(param *proto.OrchestraCommonReque
 	return orchParams
 }
 
-func (oa *OrchestraApi) Request2OrchGetParams(param *proto.OrchestraCommonRequest) *orchestra.GetParams {
-	orchParams := &orchestra.GetParams{}
+func (oa *OrchestraApi) Request2OrchGetParams(param *proto.OrchestraCommonRequest) *api.GetParams {
+	orchParams := &api.GetParams{}
 
 	err := json.Unmarshal([]byte(param.Data), orchParams)
 	if err != nil {
