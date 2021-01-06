@@ -39,17 +39,17 @@ func setupTestCase(t *testing.T) (*mockOrchestraData, func(t *testing.T)) {
 	}
 }
 
-func setupOrchestraConfig(o *Sellers) {
-	o.cfg.Partners = nil
-	p1 := &config.PartnerCfg{
-		Name:      "PCCW",
-		ID:        "PCCW",
-		SonataUrl: "http://127.0.0.1:7777",
-		Username:  "test",
-		Password:  "test",
-	}
-	o.cfg.Partners = append(o.cfg.Partners, p1)
-}
+//func setupOrchestraConfig(o *Seller) {
+//	o.cfg.Partners = nil
+//	p1 := &config.PartnerCfg{
+//		Name:      "PCCW",
+//		ID:        "PCCW",
+//		SonataUrl: "http://127.0.0.1:7777",
+//		Username:  "test",
+//		Password:  "test",
+//	}
+//	o.cfg.Partners = append(o.cfg.Partners, p1)
+//}
 
 func setupOrderParams() *api.OrderParams {
 	createParams := &api.OrderParams{
@@ -99,7 +99,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -133,7 +133,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -168,7 +168,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -210,7 +210,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -252,7 +252,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -294,7 +294,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //
@@ -329,7 +329,7 @@ func setupOrderParams() *api.OrderParams {
 //	md, tearDown := setupTestCase(t)
 //	defer tearDown(t)
 //
-//	o := NewSellers(md.cm.ConfigFile)
+//	o := NewSeller(md.cm.ConfigFile)
 //
 //	setupOrchestraConfig(o)
 //

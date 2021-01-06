@@ -23,15 +23,15 @@ import (
 
 type GRPCServer struct {
 	rpc    *grpc.Server
-	cs     *contract.ContractService
+	caller *contract.ContractCaller
 	logger *zap.SugaredLogger
 }
 
-func NewGRPCServer(cs *contract.ContractService) *GRPCServer {
+func NewGRPCServer(caller *contract.ContractCaller) *GRPCServer {
 	gRpcServer := grpc.NewServer()
 	r := &GRPCServer{
 		rpc:    gRpcServer,
-		cs:     cs,
+		caller: caller,
 		logger: log.NewLogger("rpc"),
 	}
 	return r
@@ -48,10 +48,10 @@ func (g *GRPCServer) Start(cfg *config.Config) error {
 	if err != nil {
 		return fmt.Errorf("failed to listen: %s", err)
 	}
-	orderApi := NewOrderApi(g.cs)
+	orderApi := NewOrderApi(g.caller)
 	pb.RegisterChainAPIServer(g.rpc, &chainApi{})
 	pb.RegisterOrderAPIServer(g.rpc, orderApi)
-	orchApi := NewOrchestraAPI(g.cs.GetOrchestra())
+	orchApi := NewOrchestraAPI(g.caller.GetOrchestra())
 	pb.RegisterOrchestraAPIServer(g.rpc, orchApi)
 	reflection.Register(g.rpc)
 	go func() {

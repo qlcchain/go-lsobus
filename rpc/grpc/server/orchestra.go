@@ -7,8 +7,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-lsobus/orchestra"
-
 	"github.com/qlcchain/go-lsobus/api"
 
 	"github.com/qlcchain/go-lsobus/log"
@@ -17,12 +15,12 @@ import (
 
 type OrchestraApi struct {
 	logger *zap.SugaredLogger
-	orch   *orchestra.Sellers
+	seller api.DoDSeller
 }
 
-func NewOrchestraAPI(orch *orchestra.Sellers) *OrchestraApi {
+func NewOrchestraAPI(seller api.DoDSeller) *OrchestraApi {
 	oa := &OrchestraApi{
-		orch:   orch,
+		seller: seller,
 		logger: log.NewLogger("OrchestraApi"),
 	}
 
@@ -38,13 +36,12 @@ func (oa *OrchestraApi) ExecCreate(
 
 	var execErr error
 	var execRspData interface{}
-
 	switch param.GetAction() {
 	case "ExecQuoteCreate":
-		execErr = oa.orch.ExecQuoteCreate(orchParams)
+		execErr = oa.seller.ExecQuoteCreate(orchParams)
 		execRspData = orchParams.RspQuote
 	case "ExecOrderCreate":
-		execErr = oa.orch.ExecOrderCreate(orchParams)
+		execErr = oa.seller.ExecOrderCreate(orchParams)
 		execRspData = orchParams.RspOrder
 	default:
 		return nil, errors.New("invalid ExecAction")
@@ -78,16 +75,15 @@ func (oa *OrchestraApi) ExecFind(
 
 	var execErr error
 	var execRspData interface{}
-
 	switch param.GetAction() {
 	case "ExecQuoteFind":
-		execErr = oa.orch.ExecQuoteFind(orchParams)
+		execErr = oa.seller.ExecQuoteFind(orchParams)
 		execRspData = orchParams.RspQuoteList
 	case "ExecOrderFind":
-		execErr = oa.orch.ExecOrderFind(orchParams)
+		execErr = oa.seller.ExecOrderFind(orchParams)
 		execRspData = orchParams.RspOrderList
 	case "ExecInventoryFind":
-		execErr = oa.orch.ExecInventoryFind(orchParams)
+		execErr = oa.seller.ExecInventoryFind(orchParams)
 		execRspData = orchParams.RspInvList
 	default:
 		return nil, errors.New("invalid ExecAction")
@@ -121,16 +117,15 @@ func (oa *OrchestraApi) ExecGet(
 
 	var execErr error
 	var execRspData interface{}
-
 	switch param.GetAction() {
 	case "ExecQuoteGet":
-		execErr = oa.orch.ExecQuoteGet(orchParams)
+		execErr = oa.seller.ExecQuoteGet(orchParams)
 		execRspData = orchParams.RspQuote
 	case "ExecOrderGet":
-		execErr = oa.orch.ExecOrderGet(orchParams)
+		execErr = oa.seller.ExecOrderGet(orchParams)
 		execRspData = orchParams.RspOrder
 	case "ExecInventoryGet":
-		execErr = oa.orch.ExecInventoryGet(orchParams)
+		execErr = oa.seller.ExecInventoryGet(orchParams)
 		execRspData = orchParams.RspInv
 	default:
 		return nil, errors.New("invalid ExecAction")

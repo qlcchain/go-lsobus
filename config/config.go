@@ -1,13 +1,13 @@
 package config
 
 type Config struct {
-	Version  int           `json:"version"`
-	DataDir  string        `json:"dataDir"`
-	LogLevel string        `json:"logLevel"` //info,warn,debug.
-	ChainUrl string        `json:"chainUrl"` //chain url.
-	RPC      RPCConfig     `json:"rpc"`
-	Partners []*PartnerCfg `json:"partners"`
-	Privacy  PrivacyCfg    `json:"privacy"`
+	Version  int    `json:"version"`
+	DataDir  string `json:"dataDir"`
+	LogLevel string `json:"logLevel"` //info,warn,debug.
+
+	RPC     RPCConfig   `json:"rpc"`
+	Partner *PartnerCfg `json:"partner"`
+	Privacy PrivacyCfg  `json:"privacy"`
 }
 
 type RPCConfig struct {
@@ -23,11 +23,12 @@ type RPCConfig struct {
 
 type PartnerCfg struct {
 	Name           string `json:"name"`
-	ID             string `json:"id"`
 	SonataUrl      string `json:"sonataUrl"`
 	Username       string `json:"username"`
-	Password       string `json:"password"`
+	Password       string `json:"password,omitempty"`
 	Implementation string `json:"implementation"`
+	ChainUrl       string `json:"chainUrl,omitempty"`
+	Account        string `json:"account"`
 	IsFake         bool   `json:"isFake"`
 }
 

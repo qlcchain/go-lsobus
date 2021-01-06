@@ -1,16 +1,14 @@
 package contract
 
 import (
-	"github.com/qlcchain/go-lsobus/mock"
-
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
-func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (string, error) {
-	addr := cs.account.Address().String()
+func (cs *ContractCaller) GetCreateOrderBlock(param *proto.CreateOrderParam) (string, error) {
+	addr := cs.seller.Account().Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToCreateOrderParam(param)
 		if err != nil {
@@ -21,33 +19,17 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 			op.PrivateFor = cs.cfg.Privacy.For
 			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 		}
-		blk := new(pkg.StateBlock)
-		if cs.GetFakeMode() {
-			if blk, err = mock.GetCreateOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if cs.chainReady {
-			if blk, err = cs.client.DoDSettlement.GetCreateOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if !cs.chainReady {
-			return "", chainNotReady
+		blk, err := cs.seller.GetCreateOrderBlock(op)
+		if err != nil {
+			return "", err
 		}
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-		if !cs.GetFakeMode() {
-			hash, err := cs.client.Ledger.Process(blk)
-			if err != nil {
-				cs.logger.Errorf("process block error: %s", err)
-				return "", err
-			}
-			cs.logger.Infof("process hash %s success", hash.String())
+		hash, err := cs.seller.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return "", err
 		}
+		cs.logger.Infof("process hash %s success", hash.String())
+
 		internalId := blk.Previous.String()
 		err = cs.readAndWriteProcessingOrder("add", "buyer", internalId)
 		if err != nil {
@@ -61,7 +43,7 @@ func (cs *ContractService) GetCreateOrderBlock(param *proto.CreateOrderParam) (s
 	}
 }
 
-func (cs *ContractService) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*qlcSdk.DoDSettleCreateOrderParam, error) {
+func (cs *ContractCaller) convertProtoToCreateOrderParam(param *proto.CreateOrderParam) (*qlcSdk.DoDSettleCreateOrderParam, error) {
 	sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
 	buyAddr, _ := pkg.HexToAddress(param.Buyer.Address)
 	op := new(qlcSdk.DoDSettleCreateOrderParam)

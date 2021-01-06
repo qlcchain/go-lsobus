@@ -6,30 +6,31 @@ import (
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
+	"github.com/qlcchain/go-lsobus/contract"
+
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-lsobus/contract"
 	"github.com/qlcchain/go-lsobus/log"
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 type OrderApi struct {
 	logger *zap.SugaredLogger
-	cs     *contract.ContractService
+	caller *contract.ContractCaller
 }
 
-func NewOrderApi(cs *contract.ContractService) *OrderApi {
+func NewOrderApi(caller *contract.ContractCaller) *OrderApi {
 	return &OrderApi{
-		cs:     cs,
+		caller: caller,
 		logger: log.NewLogger("OrderApi"),
 	}
 }
 
 func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderParam) (*proto.OrderId, error) {
 	oa.logger.Debugf("CreateOrder param %s", param.String())
-	id, err := oa.cs.GetCreateOrderBlock(param)
+	id, err := oa.caller.GetCreateOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetCreateOrderBlock err %s", err)
 		return nil, err
@@ -41,7 +42,7 @@ func (oa *OrderApi) CreateOrder(ctx context.Context, param *proto.CreateOrderPar
 
 func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderParam) (*proto.OrderId, error) {
 	oa.logger.Debugf("ChangeOrder param %s", param.String())
-	id, err := oa.cs.GetChangeOrderBlock(param)
+	id, err := oa.caller.GetChangeOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetChangeOrderBlock err %s", err)
 		return nil, err
@@ -50,10 +51,9 @@ func (oa *OrderApi) ChangeOrder(ctx context.Context, param *proto.ChangeOrderPar
 		InternalId: id,
 	}, nil
 }
-
 func (oa *OrderApi) TerminateOrder(ctx context.Context, param *proto.TerminateOrderParam) (*proto.OrderId, error) {
 	oa.logger.Debugf("TerminateOrder param %s", param.String())
-	id, err := oa.cs.GetTerminateOrderBlock(param)
+	id, err := oa.caller.GetTerminateOrderBlock(param)
 	if err != nil {
 		oa.logger.Debugf("GetTerminateOrderBlock err %s", err)
 		return nil, err
@@ -68,15 +68,16 @@ func (oa *OrderApi) GetOrderInfo(ctx context.Context, param *proto.GetOrderInfoP
 
 	var orderInfo *qlcSdk.DoDSettleOrderInfo
 	var err error
+	seller := oa.caller.GetOrchestra()
 	if param.InternalId != "" {
-		orderInfo, err = oa.cs.GetOrderInfoByInternalId(param.InternalId)
+		orderInfo, err = seller.GetOrderInfoByInternalId(param.InternalId)
 		if err != nil {
 			oa.logger.Debugf("GetOrderInfoByInternalId err %s", err)
 			return nil, err
 		}
 	} else if param.OrderId != "" {
 		sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
-		orderInfo, err = oa.cs.GetOrderInfoBySellerAndOrderId(sellerAddr, param.OrderId)
+		orderInfo, err = seller.GetOrderInfoBySellerAndOrderId(sellerAddr, param.OrderId)
 		if err != nil {
 			oa.logger.Debugf("GetOrderInfoBySellerAndOrderId err %s", err)
 			return nil, err

@@ -23,13 +23,10 @@ func setupTestCaseOrchestraAPI(t *testing.T) (func(t *testing.T), *OrchestraApi)
 	cc := ct.NewServiceContext(cfgFile)
 	cfg, err := cc.Config()
 	setupOrchestraAPIConfig(cfg)
-
-	orch := orchestra.NewSellers(cfgFile)
-
-	if err = orch.Init(); err != nil {
+	orch, err := orchestra.NewSeller(context.Background(), cfgFile)
+	if err != nil {
 		t.Fatal(err)
 	}
-
 	orchApi := NewOrchestraAPI(orch)
 	return func(t *testing.T) {
 		err = os.RemoveAll(filepath.Join(config.TestDataDir(), uuid.New().String()))
@@ -40,15 +37,12 @@ func setupTestCaseOrchestraAPI(t *testing.T) (func(t *testing.T), *OrchestraApi)
 }
 
 func setupOrchestraAPIConfig(cfg *config.Config) {
-	cfg.Partners = nil
-	p1 := &config.PartnerCfg{
+	cfg.Partner = &config.PartnerCfg{
 		Name:      "PCCWG",
-		ID:        "PCCWG",
 		SonataUrl: "http://127.0.0.1:7777",
 		Username:  "test",
 		Password:  "test",
 	}
-	cfg.Partners = append(cfg.Partners, p1)
 }
 
 func TestOrchestraApi_Create(t *testing.T) {

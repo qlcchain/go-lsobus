@@ -3,8 +3,6 @@ package contract
 import (
 	"errors"
 
-	"github.com/qlcchain/go-lsobus/mock"
-
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
@@ -12,8 +10,8 @@ import (
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
-func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
-	addr := cs.account.Address().String()
+func (cs *ContractCaller) GetChangeOrderBlock(param *proto.ChangeOrderParam) (string, error) {
+	addr := cs.seller.Account().Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToChangeOrderParam(param)
 		if err != nil {
@@ -24,34 +22,18 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 			op.PrivateFor = cs.cfg.Privacy.For
 			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 		}
-		blk := new(pkg.StateBlock)
-		if cs.GetFakeMode() {
-			if blk, err = mock.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if cs.chainReady {
-			if blk, err = cs.client.DoDSettlement.GetChangeOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if !cs.chainReady {
-			return "", chainNotReady
+		blk, err := cs.seller.GetChangeOrderBlock(op)
+		if err != nil {
+			return "", err
 		}
 
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-		if !cs.GetFakeMode() {
-			hash, err := cs.client.Ledger.Process(blk)
-			if err != nil {
-				cs.logger.Errorf("process block error: %s", err)
-				return "", err
-			}
-			cs.logger.Infof("process hash %s success", hash.String())
+		hash, err := cs.seller.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return "", err
 		}
+		cs.logger.Infof("process hash %s success", hash.String())
+
 		internalId := blk.Previous.String()
 		err = cs.readAndWriteProcessingOrder("add", "buyer", internalId)
 		if err != nil {
@@ -65,7 +47,7 @@ func (cs *ContractService) GetChangeOrderBlock(param *proto.ChangeOrderParam) (s
 	}
 }
 
-func (cs *ContractService) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*qlcSdk.DoDSettleChangeOrderParam, error) {
+func (cs *ContractCaller) convertProtoToChangeOrderParam(param *proto.ChangeOrderParam) (*qlcSdk.DoDSettleChangeOrderParam, error) {
 	sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
 	buyAddr, _ := pkg.HexToAddress(param.Buyer.Address)
 	op := new(qlcSdk.DoDSettleChangeOrderParam)

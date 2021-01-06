@@ -10,29 +10,27 @@ import (
 
 	"github.com/qlcchain/go-lsobus/api"
 
-	"github.com/qlcchain/go-lsobus/mock"
-
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 )
 
-func (cs *ContractService) checkContractStatus() {
+func (cs *ContractCaller) checkContractStatus() {
 	ticker := time.NewTicker(checkContractStatusInterval)
 	for {
 		select {
 		case <-cs.ctx.Done():
 			return
 		case <-ticker.C:
-			if cs.chainReady {
+			if cs.seller.IsChainReady() {
 				cs.getContractStatus()
 			}
 		}
 	}
 }
 
-func (cs *ContractService) getContractStatus() {
+func (cs *ContractCaller) getContractStatus() {
 	cs.orderIdOnChainBuyer.Range(func(key, value interface{}) bool {
 		internalId := key.(string)
-		orderInfo, err := cs.GetOrderInfoByInternalId(internalId)
+		orderInfo, err := cs.seller.GetOrderInfoByInternalId(internalId)
 		if err != nil {
 			cs.logger.Error(err)
 			return true
@@ -71,11 +69,11 @@ func (cs *ContractService) getContractStatus() {
 	})
 }
 
-func (cs *ContractService) checkOrderAlreadyExitOnSonataServer(externalID string) (string, bool) {
+func (cs *ContractCaller) checkOrderAlreadyExitOnSonataServer(externalID string) (string, bool) {
 	fp := &api.FindParams{
 		ExternalID: externalID,
 	}
-	err := cs.sellers.ExecOrderFind(fp)
+	err := cs.seller.ExecOrderFind(fp)
 	if err != nil {
 		return "", false
 	}
@@ -91,7 +89,7 @@ func (cs *ContractService) checkOrderAlreadyExitOnSonataServer(externalID string
 	return *fp.RspOrderList[0].ID, true
 }
 
-func (cs *ContractService) createOrderToSonataServer(
+func (cs *ContractCaller) createOrderToSonataServer(
 	internalId string, orderInfo *qlcSdk.DoDSettleOrderInfo,
 ) (string, error) {
 	orderActivity := ""
@@ -178,7 +176,7 @@ func (cs *ContractService) createOrderToSonataServer(
 		PaymentType: eLines[0].BillingParams.PaymentType,
 		BillingType: eLines[0].BillingParams.BillingType,
 	}
-	err := cs.sellers.ExecOrderCreate(op)
+	err := cs.seller.ExecOrderCreate(op)
 	if err != nil {
 		return "", err
 	}
@@ -194,7 +192,7 @@ func (cs *ContractService) createOrderToSonataServer(
 	return *orderId, nil
 }
 
-func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
+func (cs *ContractCaller) updateOrderInfoToChain(idOnChain string, orderInfo *qlcSdk.DoDSettleOrderInfo) error {
 	var id pkg.Hash
 	_ = id.Of(idOnChain)
 	orderItemIds := make([]*qlcSdk.DoDSettleOrderItem, 0)
@@ -208,7 +206,7 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *q
 	}
 
 	param := &qlcSdk.DoDSettleUpdateOrderInfoParam{
-		Buyer:       cs.account.Address(),
+		Buyer:       cs.seller.Account().Address(),
 		InternalId:  id,
 		OrderId:     orderInfo.OrderId,
 		OrderItemId: orderItemIds,
@@ -222,29 +220,14 @@ func (cs *ContractService) updateOrderInfoToChain(idOnChain string, orderInfo *q
 	}
 	blk := new(pkg.StateBlock)
 	var err error
-	if cs.GetFakeMode() {
-		if blk, err = mock.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-			return cs.account.Sign(hash), nil
-		}); err != nil {
-			return err
-		}
-	} else {
-		if blk, err = cs.client.DoDSettlement.GetUpdateOrderInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-			return cs.account.Sign(hash), nil
-		}); err != nil {
-			return err
-		}
+	if blk, err = cs.seller.GetUpdateOrderInfoBlock(param); err != nil {
+		return err
 	}
-	var w pkg.Work
-	worker, _ := pkg.NewWorker(w, blk.Root())
-	blk.Work = worker.NewWork()
-	if !cs.GetFakeMode() {
-		hash, err := cs.client.Ledger.Process(blk)
-		if err != nil {
-			cs.logger.Errorf("process block error: %s", err)
-			return err
-		}
-		cs.logger.Infof("process hash %s success", hash.String())
+	hash, err := cs.seller.Process(blk)
+	if err != nil {
+		cs.logger.Errorf("process block error: %s", err)
+		return err
 	}
+	cs.logger.Infof("process hash %s success", hash.String())
 	return nil
 }

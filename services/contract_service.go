@@ -13,7 +13,7 @@ import (
 
 type ContractService struct {
 	common.ServiceLifecycle
-	cs     *contract.ContractService
+	cs     *contract.ContractCaller
 	logger *zap.SugaredLogger
 }
 

@@ -3,8 +3,8 @@ package pccwg
 import (
 	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
-	invcli "github.com/qlcchain/go-lsobus/sonata/inventory/client"
-	invapi "github.com/qlcchain/go-lsobus/sonata/inventory/client/product"
+	invcli "github.com/qlcchain/go-lsobus/orchestra/sonata/inventory/client"
+	invapi "github.com/qlcchain/go-lsobus/orchestra/sonata/inventory/client/product"
 )
 
 type sonataInvImpl struct {

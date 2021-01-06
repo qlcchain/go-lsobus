@@ -4,23 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/qlcchain/go-lsobus/mock"
-
+	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/orchestra"
 
-	qlcSdk "github.com/qlcchain/qlc-go-sdk"
-	"github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/zap"
 
-	"github.com/qlcchain/go-lsobus/common"
-	"github.com/qlcchain/go-lsobus/common/event"
 	"github.com/qlcchain/go-lsobus/config"
 	"github.com/qlcchain/go-lsobus/log"
 	ct "github.com/qlcchain/go-lsobus/services/context"
@@ -50,21 +44,14 @@ type ProcessingOrderList struct {
 	Processing []*OrderList `json:"processing"`
 }
 
-type ContractService struct {
+type ContractCaller struct {
 	cfg                  *config.Config
-	account              *types.Account
 	logger               *zap.SugaredLogger
-	client               *qlcSdk.QLCClient
 	ctx                  context.Context
 	cancel               context.CancelFunc
-	handlerIds           map[common.TopicType]string
-	eb                   event.EventBus
-	chainReady           bool
-	quit                 chan bool
 	orderIdOnChainSeller *sync.Map
 	orderIdOnChainBuyer  *sync.Map
-	sellers              *orchestra.Sellers
-	fakeMode             bool
+	seller               api.DoDSeller
 	mutex                *sync.Mutex
 }
 
@@ -73,64 +60,44 @@ type Product struct {
 	productID   string
 }
 
-func NewContractService(cfgFile string) (*ContractService, error) {
+func NewContractService(cfgFile string) (*ContractCaller, error) {
 	cc := ct.NewServiceContext(cfgFile)
 	cfg, err := cc.Config()
 	if err != nil {
 		return nil, err
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	or := orchestra.NewSellers(cfgFile)
-	cs := &ContractService{
+	seller, err := orchestra.NewSeller(ctx, cfgFile)
+	if err != nil {
+		defer cancel()
+		return nil, err
+	}
+	cs := &ContractCaller{
 		cfg:                  cfg,
-		account:              cc.Account(),
 		logger:               log.NewLogger("contract"),
 		ctx:                  ctx,
 		cancel:               cancel,
-		handlerIds:           make(map[common.TopicType]string),
-		eb:                   cc.EventBus(),
-		quit:                 make(chan bool, 1),
 		orderIdOnChainSeller: new(sync.Map),
 		orderIdOnChainBuyer:  new(sync.Map),
-		sellers:              or,
+		seller:               seller,
 		mutex:                new(sync.Mutex),
 	}
 	return cs, nil
 }
 
-func (cs *ContractService) SetFakeMode(mode bool) {
-	cs.fakeMode = mode
+func (cs *ContractCaller) GetOrchestra() api.DoDSeller {
+	return cs.seller
 }
 
-func (cs *ContractService) GetFakeMode() bool {
-	return cs.fakeMode
-}
-
-func (cs *ContractService) GetAccount() *types.Account {
-	return cs.account
-}
-
-func (cs *ContractService) SetAccount(account *types.Account) {
-	cs.account = account
-}
-
-func (cs *ContractService) GetOrchestra() *orchestra.Sellers {
-	return cs.sellers
-}
-
-func (cs *ContractService) Init() error {
-	err := cs.sellers.Init()
-	if err != nil {
-		return err
-	}
-	err = cs.readProcessingOrder()
+func (cs *ContractCaller) Init() error {
+	err := cs.readProcessingOrder()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (cs *ContractService) readProcessingOrder() error {
+func (cs *ContractCaller) readProcessingOrder() error {
 	file := filepath.Join(cs.cfg.DataDir, processingOrderList)
 	_, err := os.Stat(file)
 	if err != nil {
@@ -161,7 +128,7 @@ func (cs *ContractService) readProcessingOrder() error {
 	return nil
 }
 
-func (cs *ContractService) readAndWriteProcessingOrder(action, role, chainOrderID string) error {
+func (cs *ContractCaller) readAndWriteProcessingOrder(action, role, chainOrderID string) error {
 	cs.mutex.Lock()
 	defer cs.mutex.Unlock()
 	f, err := ioutil.ReadFile(filepath.Join(cs.cfg.DataDir, processingOrderList))
@@ -219,96 +186,16 @@ func (cs *ContractService) readAndWriteProcessingOrder(action, role, chainOrderI
 	return nil
 }
 
-func (cs *ContractService) Start() error {
+func (cs *ContractCaller) Start() error {
 	go cs.checkDoDContract()
-	go cs.connectRpcServer()
 	go cs.checkContractStatus()
 	go cs.checkProductStatus()
 	go cs.checkProduct()
 	return nil
 }
 
-func (cs *ContractService) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderInfo, error) {
-	if cs.GetFakeMode() {
-		return mock.GetOrderInfoByInternalId(id)
-	}
-	if cs.chainReady {
-		orderInfo, err := cs.client.DoDSettlement.GetOrderInfoByInternalId(id)
-		if err != nil {
-			cs.logger.Error(err)
-			return nil, err
-		}
-		return orderInfo, nil
-	} else {
-		return nil, chainNotReady
-	}
-}
-
-func (cs *ContractService) GetOrderInfoBySellerAndOrderId(
-	seller types.Address, orderId string,
-) (*qlcSdk.DoDSettleOrderInfo, error) {
-	if cs.GetFakeMode() {
-		return mock.GetOrderInfoByInternalId("")
-	}
-	if cs.chainReady {
-		orderInfo, err := cs.client.DoDSettlement.GetOrderInfoBySellerAndOrderId(seller, orderId)
-		if err != nil {
-			cs.logger.Error(err)
-			return nil, err
-		}
-		return orderInfo, nil
-	} else {
-		return nil, chainNotReady
-	}
-}
-
-func (cs *ContractService) Stop() error {
+func (cs *ContractCaller) Stop() error {
 	//this must be the first step
 	cs.cancel()
-	err := cs.unsubscribeEvent()
-	if err != nil {
-		return err
-	}
-	if cs.client != nil {
-		_ = cs.client.Close
-	}
 	return nil
-}
-
-func (cs *ContractService) unsubscribeEvent() error {
-	for k, v := range cs.handlerIds {
-		if err := cs.eb.Unsubscribe(k, v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (cs *ContractService) processBlockAndWaitConfirmed(block *types.StateBlock) error {
-	_, err := cs.client.Ledger.Process(block)
-	if err != nil {
-		return fmt.Errorf("process block error: %s", err)
-	}
-	return cs.waitBlockConfirmed(block.GetHash())
-}
-
-func (cs *ContractService) waitBlockConfirmed(hash types.Hash) error {
-	t := time.NewTimer(time.Second * 180)
-	defer t.Stop()
-	for {
-		select {
-		case <-t.C:
-			return errors.New("consensus confirmed timeout")
-		default:
-			confirmed, err := cs.client.Ledger.BlockConfirmedStatus(hash)
-			if err != nil {
-				return err
-			}
-			if confirmed {
-				return nil
-			} else {
-				time.Sleep(1 * time.Second)
-			}
-		}
-	}
 }

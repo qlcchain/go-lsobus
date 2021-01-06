@@ -5,8 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/qlcchain/go-lsobus/common/util"
-
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

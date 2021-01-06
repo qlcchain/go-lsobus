@@ -21,23 +21,20 @@ func DefaultConfig(dir string) (*Config, error) {
 		Version:  configVersion,
 		DataDir:  dir,
 		LogLevel: "error",
-		ChainUrl: "ws://127.0.0.1:19736",
 		RPC: RPCConfig{
 			Enable:             true,
 			ListenAddress:      "tcp://0.0.0.0:9998",
 			GRPCListenAddress:  "tcp://0.0.0.0:9999",
 			CORSAllowedOrigins: []string{"*"},
 		},
-		Partners: []*PartnerCfg{
-			{
-				Name:           "PCCWG",
-				ID:             "PCCWG",
-				SonataUrl:      "http://127.0.0.1:7777",
-				Username:       "",
-				Password:       "",
-				IsFake:         false,
-				Implementation: "pccwg",
-			},
+		Partner: &PartnerCfg{
+			Name:           "PCCWG",
+			SonataUrl:      "http://127.0.0.1:7777",
+			Username:       "",
+			Password:       "",
+			IsFake:         false,
+			ChainUrl:       "ws://127.0.0.1:19736",
+			Implementation: "pccwg",
 		},
 		Privacy: PrivacyCfg{
 			Enable:         false,

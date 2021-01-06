@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/qlcchain/go-lsobus/contract"
-
 	grpcServer "github.com/qlcchain/go-lsobus/rpc/grpc/server"
 
 	"go.uber.org/zap"
@@ -26,7 +25,7 @@ type RPC struct {
 	grpc    *grpcServer.GRPCServer
 }
 
-func NewRPC(cfgFile string, cs *contract.ContractService) (*RPC, error) {
+func NewRPC(cfgFile string, caller *contract.ContractCaller) (*RPC, error) {
 	cc := chainctx.NewServiceContext(cfgFile)
 	cfg, _ := cc.Config()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -40,7 +39,7 @@ func NewRPC(cfgFile string, cs *contract.ContractService) (*RPC, error) {
 		cc:      cc,
 	}
 	if cfg.RPC.Enable {
-		r.grpc = grpcServer.NewGRPCServer(cs)
+		r.grpc = grpcServer.NewGRPCServer(caller)
 	}
 	return &r, nil
 }
