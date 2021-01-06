@@ -6,7 +6,7 @@ import (
 	"github.com/qlcchain/go-lsobus/api"
 
 	"github.com/qlcchain/go-lsobus/mock"
-	"github.com/qlcchain/go-lsobus/sonata/offer"
+	"github.com/qlcchain/go-lsobus/orchestra/sonata/offer"
 )
 
 type sonataOfferImpl struct {

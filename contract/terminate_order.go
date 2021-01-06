@@ -3,16 +3,14 @@ package contract
 import (
 	"errors"
 
-	"github.com/qlcchain/go-lsobus/mock"
-
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
-func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderParam) (string, error) {
-	addr := cs.account.Address().String()
+func (cs *ContractCaller) GetTerminateOrderBlock(param *proto.TerminateOrderParam) (string, error) {
+	addr := cs.seller.Account().Address().String()
 	if addr == param.Buyer.Address {
 		op, err := cs.convertProtoToTerminateOrderParam(param)
 		if err != nil {
@@ -23,33 +21,17 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 			op.PrivateFor = cs.cfg.Privacy.For
 			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 		}
-		blk := new(pkg.StateBlock)
-		if cs.GetFakeMode() {
-			if blk, err = mock.GetTerminateOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if cs.chainReady {
-			if blk, err = cs.client.DoDSettlement.GetTerminateOrderBlock(op, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return "", err
-			}
-		} else if !cs.chainReady {
-			return "", chainNotReady
+		blk, err := cs.seller.GetTerminateOrderBlock(op)
+		if err != nil {
+			return "", err
 		}
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-		if !cs.GetFakeMode() {
-			hash, err := cs.client.Ledger.Process(blk)
-			if err != nil {
-				cs.logger.Errorf("process block error: %s", err)
-				return "", err
-			}
-			cs.logger.Infof("process hash %s success", hash.String())
+		hash, err := cs.seller.Process(blk)
+		if err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return "", err
 		}
+		cs.logger.Infof("process hash %s success", hash.String())
+
 		internalId := blk.Previous.String()
 		err = cs.readAndWriteProcessingOrder("add", "buyer", internalId)
 		if err != nil {
@@ -63,7 +45,7 @@ func (cs *ContractService) GetTerminateOrderBlock(param *proto.TerminateOrderPar
 	}
 }
 
-func (cs *ContractService) convertProtoToTerminateOrderParam(param *proto.TerminateOrderParam) (*qlcSdk.DoDSettleTerminateOrderParam, error) {
+func (cs *ContractCaller) convertProtoToTerminateOrderParam(param *proto.TerminateOrderParam) (*qlcSdk.DoDSettleTerminateOrderParam, error) {
 	sellerAddr, _ := pkg.HexToAddress(param.Seller.Address)
 	buyAddr, _ := pkg.HexToAddress(param.Buyer.Address)
 	op := new(qlcSdk.DoDSettleTerminateOrderParam)

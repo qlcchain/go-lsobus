@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/qlcchain/go-lsobus/common/util"
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 )
 
 var configDir = filepath.Join(TestDataDir(), "config")

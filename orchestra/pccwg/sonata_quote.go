@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-openapi/strfmt"
 
-	quocli "github.com/qlcchain/go-lsobus/sonata/quote/client"
-	quoapi "github.com/qlcchain/go-lsobus/sonata/quote/client/quote"
-	quomod "github.com/qlcchain/go-lsobus/sonata/quote/models"
+	quocli "github.com/qlcchain/go-lsobus/orchestra/sonata/quote/client"
+	quoapi "github.com/qlcchain/go-lsobus/orchestra/sonata/quote/client/quote"
+	quomod "github.com/qlcchain/go-lsobus/orchestra/sonata/quote/models"
 )
 
 type sonataQuoteImpl struct {

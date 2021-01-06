@@ -7,9 +7,9 @@ import (
 	"time"
 
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 
-	"github.com/qlcchain/go-lsobus/common/util"
-	"github.com/qlcchain/go-lsobus/sonata/common/models"
+	"github.com/qlcchain/go-lsobus/orchestra/sonata/common/models"
 
 	"github.com/qlcchain/go-lsobus/api"
 
@@ -49,7 +49,7 @@ type sonataBaseImpl struct {
 }
 
 func (s *sonataBaseImpl) Init() error {
-	s.URL = s.Partner.GetConfig().SonataUrl
+	s.URL = s.Partner.GetSellerConfig().SonataUrl
 	if s.URL != "" {
 		retUrl, err := url.Parse(s.URL)
 		if err != nil {
@@ -73,7 +73,7 @@ func (s *sonataBaseImpl) Init() error {
 }
 
 func (s *sonataBaseImpl) GetFakeMode() bool {
-	return s.Partner.GetConfig().IsFake
+	return s.Partner.GetSellerConfig().IsFake
 }
 
 func (s *sonataBaseImpl) GetHost() string {

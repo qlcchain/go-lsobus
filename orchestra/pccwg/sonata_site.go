@@ -3,8 +3,8 @@ package pccwg
 import (
 	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/mock"
-	sitcli "github.com/qlcchain/go-lsobus/sonata/site/client"
-	sitapi "github.com/qlcchain/go-lsobus/sonata/site/client/geographic_site"
+	sitcli "github.com/qlcchain/go-lsobus/orchestra/sonata/site/client"
+	sitapi "github.com/qlcchain/go-lsobus/orchestra/sonata/site/client/geographic_site"
 )
 
 type sonataSiteImpl struct {

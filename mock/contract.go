@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"math"
 	"math/big"
 	"time"
@@ -9,12 +11,11 @@ import (
 
 	"github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 
-	"github.com/qlcchain/go-lsobus/common/util"
-
 	"github.com/google/uuid"
-	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	pb "github.com/qlcchain/go-lsobus/rpc/grpc/proto"
 )
 
 func GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderInfo, error) {
@@ -348,7 +349,9 @@ func DoDSettleUser() (*qlcSdk.DoDSettleUser, *qlcSdk.DoDSettleUser) {
 }
 
 func RandomHash() pkg.Hash {
-	s := util.RandomHexString(32)
+	b := make([]byte, 32)
+	_, _ = rand.Read(b)
+	s := hex.EncodeToString(b)
 	hash, _ := pkg.NewHash(s)
 	return hash
 }
@@ -437,7 +440,9 @@ func GetUpdateOrderInfoBlock(op *qlcSdk.DoDSettleUpdateOrderInfoParam, sign qlcS
 	return blk, nil
 }
 
-func GetUpdateProductInfoBlock(op *qlcSdk.DoDSettleUpdateProductInfoParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {
+func GetUpdateProductInfoBlock(
+	op *qlcSdk.DoDSettleUpdateProductInfoParam, sign qlcSdk.Signature,
+) (*pkg.StateBlock, error) {
 	blk := StateBlockWithoutWork()
 	var err error
 	if sign != nil {
@@ -528,7 +533,9 @@ func GetPendingResourceCheckForProductId(addr pkg.Address) []*qlcSdk.DoDPendingR
 	return infos
 }
 
-func GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseParam, sign qlcSdk.Signature) (*pkg.StateBlock, error) {
+func GetUpdateOrderInfoRewardBlock(
+	param *qlcSdk.DoDSettleResponseParam, sign qlcSdk.Signature,
+) (*pkg.StateBlock, error) {
 	blk := StateBlockWithoutWork()
 	var err error
 	if sign != nil {

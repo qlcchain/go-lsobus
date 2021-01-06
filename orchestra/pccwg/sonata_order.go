@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-openapi/strfmt"
 
-	ordcli "github.com/qlcchain/go-lsobus/sonata/order/client"
-	ordapi "github.com/qlcchain/go-lsobus/sonata/order/client/product_order"
-	ordmod "github.com/qlcchain/go-lsobus/sonata/order/models"
+	ordcli "github.com/qlcchain/go-lsobus/orchestra/sonata/order/client"
+	ordapi "github.com/qlcchain/go-lsobus/orchestra/sonata/order/client/product_order"
+	ordmod "github.com/qlcchain/go-lsobus/orchestra/sonata/order/models"
 )
 
 type sonataOrderImpl struct {

@@ -10,8 +10,7 @@ import (
 	"time"
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
-
-	"github.com/qlcchain/go-lsobus/common/util"
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 
 	"github.com/qlcchain/go-lsobus/services"
 	ct "github.com/qlcchain/go-lsobus/services/context"
@@ -62,9 +61,6 @@ func start() error {
 	cfg, err := cm.Config()
 	if err != nil {
 		return err
-	}
-	if chainEndPointP != "" {
-		cfg.ChainUrl = chainEndPointP
 	}
 
 	s := util.ToIndentString(cfg)

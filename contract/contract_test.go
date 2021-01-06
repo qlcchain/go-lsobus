@@ -9,11 +9,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/qlcchain/go-lsobus/cmd/util"
 	"github.com/qlcchain/go-lsobus/config"
 )
 
-func setupTestCase(t *testing.T) (func(t *testing.T), *ContractService) {
+func setupTestCase(t *testing.T) (func(t *testing.T), *ContractCaller) {
 	cfgFile := filepath.Join(config.TestDataDir(), uuid.New().String(), config.CfgFileName)
 	cc := ct.NewServiceContext(cfgFile)
 	cfg, err := cc.Config()
@@ -38,28 +37,26 @@ func setupTestCase(t *testing.T) (func(t *testing.T), *ContractService) {
 }
 
 func setupOrchestraConfig(cfg *config.Config) {
-	cfg.Partners = nil
-	p1 := &config.PartnerCfg{
-		Name:      "PCCWG",
-		ID:        "PCCWG",
-		SonataUrl: "http://127.0.0.1:7777",
-		Username:  "test",
-		Password:  "test",
+	cfg.Partner = &config.PartnerCfg{
+		Name:           "PCCWG",
+		SonataUrl:      "http://127.0.0.1:7777",
+		Username:       "test",
+		Password:       "test",
+		Implementation: "pccwg",
+		IsFake:         true,
 	}
-	cfg.Partners = append(cfg.Partners, p1)
 }
 
-func TestContractService_GetOrderInfoByInternalId(t *testing.T) {
-	teardownTestCase, cs := setupTestCase(t)
-	defer teardownTestCase(t)
-	orderInfo, err := cs.GetOrderInfoByInternalId(uuid.New().String())
-	if err == nil || err != chainNotReady {
-		t.Fatal("chain is not ready")
-	}
-	cs.SetFakeMode(true)
-	orderInfo, err = cs.GetOrderInfoByInternalId(uuid.New().String())
-	if err != nil {
-		t.Fatal("fake mode should return orderInfo and no error")
-	}
-	t.Log(util.ToIndentString(orderInfo))
-}
+//func TestContractService_GetOrderInfoByInternalId(t *testing.T) {
+//	teardownTestCase, cs := setupTestCase(t)
+//	defer teardownTestCase(t)
+//	orderInfo, err := cs.seller.GetOrderInfoByInternalId(uuid.New().String())
+//	if err == nil || err != chainNotReady {
+//		t.Fatal("chain is not ready")
+//	}
+//	orderInfo, err = cs.seller.GetOrderInfoByInternalId(uuid.New().String())
+//	if err != nil {
+//		t.Fatal("fake mode should return orderInfo and no error")
+//	}
+//	t.Log(util.ToIndentString(orderInfo))
+//}

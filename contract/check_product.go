@@ -3,49 +3,41 @@ package contract
 import (
 	"time"
 
-	"github.com/qlcchain/go-lsobus/api"
-	"github.com/qlcchain/go-lsobus/mock"
-
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+
+	"github.com/qlcchain/go-lsobus/api"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 )
 
-func (cs *ContractService) checkProduct() {
+func (cs *ContractCaller) checkProduct() {
 	ticker := time.NewTicker(checkProductInterval)
 	for {
 		select {
 		case <-cs.ctx.Done():
 			return
 		case <-ticker.C:
-			if cs.chainReady {
+			if cs.seller.IsChainReady() {
 				cs.getProductId()
 			}
 		}
 	}
 }
 
-func (cs *ContractService) getProductId() {
-	addr := cs.account.Address()
-	var err error
-	var orderInfo *qlcSdk.DoDSettleOrderInfo
-	var id []*qlcSdk.DoDPendingResourceCheckInfo
-	if cs.GetFakeMode() {
-		id = mock.GetPendingResourceCheckForProductId(addr)
-	} else {
-		id, err = cs.client.DoDSettlement.GetPendingResourceCheck(addr)
-		if id == nil {
-			return
-		}
+func (cs *ContractCaller) getProductId() {
+	addr := cs.seller.Account().Address()
+	id, err := cs.seller.GetPendingResourceCheck(addr)
+	if id == nil || err != nil {
+		return
 	}
 	for _, order := range id {
 		if len(order.Products) == 0 {
-			orderInfo, err = cs.GetOrderInfoByInternalId(order.InternalId.String())
+			orderInfo, err := cs.seller.GetOrderInfoByInternalId(order.InternalId.String())
 			if err != nil {
 				cs.logger.Error(err)
 				continue
 			}
-			if !cs.GetFakeMode() {
+			if !cs.seller.IsFake() {
 				if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
 					cs.logger.Info("waiting for buyer place order")
 					continue
@@ -73,7 +65,7 @@ func (cs *ContractService) getProductId() {
 				cs.logger.Error(err)
 				continue
 			}
-			if cs.GetFakeMode() {
+			if cs.seller.IsFake() {
 				cs.orderIdOnChainSeller.Range(func(key, value interface{}) bool {
 					id := key.(string)
 					cs.orderIdOnChainSeller.Delete(id)
@@ -86,7 +78,7 @@ func (cs *ContractService) getProductId() {
 	}
 }
 
-func (cs *ContractService) updateProductInfoToChain(
+func (cs *ContractCaller) updateProductInfoToChain(
 	idOnChain string, productIds []*Product, orderInfo *qlcSdk.DoDSettleOrderInfo,
 ) error {
 	var id pkg.Hash
@@ -102,8 +94,9 @@ func (cs *ContractService) updateProductInfoToChain(
 			productInfos = append(productInfos, pi)
 		}
 
+		account := cs.seller.Account()
 		param := &qlcSdk.DoDSettleUpdateProductInfoParam{
-			Address:     cs.account.Address(),
+			Address:     account.Address(),
 			OrderId:     orderInfo.OrderId,
 			ProductInfo: productInfos,
 		}
@@ -114,38 +107,24 @@ func (cs *ContractService) updateProductInfoToChain(
 		}
 		blk := new(pkg.StateBlock)
 		var err error
-		if cs.GetFakeMode() {
-			if blk, err = mock.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return err
-			}
-		} else {
-			if blk, err = cs.client.DoDSettlement.GetUpdateProductInfoBlock(param, func(hash pkg.Hash) (signature pkg.Signature, err error) {
-				return cs.account.Sign(hash), nil
-			}); err != nil {
-				return err
-			}
+
+		if blk, err = cs.seller.GetUpdateProductInfoBlock(param); err != nil {
+			return err
 		}
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-		if !cs.GetFakeMode() {
-			if err = cs.processBlockAndWaitConfirmed(blk); err != nil {
-				cs.logger.Errorf("process block error: %s", err)
-				return err
-			}
+		if _, err = cs.seller.Process(blk); err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			return err
 		}
 	}
 	return nil
 }
 
-func (cs *ContractService) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
+func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
 	fp := &api.FindParams{
 		Seller:         &api.PartnerParams{Name: sellName},
 		ProductOrderID: orderInfo.OrderId,
 	}
-	err := cs.sellers.ExecInventoryFind(fp)
+	err := cs.seller.ExecInventoryFind(fp)
 	if err != nil {
 		return nil, err
 	}

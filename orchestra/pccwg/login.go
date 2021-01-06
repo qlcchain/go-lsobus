@@ -13,21 +13,22 @@ import (
 )
 
 func (p *PCCWGImpl) TryUpdateApiToken() {
-	if p.cfg.Username == "" || p.cfg.Password == "" {
-		p.logger.Infof("partner %s username is empty", p.cfg.Name)
+	cfg := p.GetSellerConfig()
+	if cfg.Username == "" || cfg.Password == "" {
+		p.logger.Infof("partner %s username is empty", cfg.Name)
 		return
 	}
 
 	reqParams := &api.LoginParams{}
-	reqParams.Username = p.cfg.Username
-	reqParams.Password = p.cfg.Password
+	reqParams.Username = cfg.Username
+	reqParams.Password = cfg.Password
 
 	err := p.ExecAuthLogin(reqParams)
 	if err == nil {
-		p.logger.Infof("partner %s update api token, got new token %s", p.cfg.Name, reqParams.RspLogin.Data)
+		p.logger.Infof("partner %s update api token, got new token %s", cfg.Name, reqParams.RspLogin.Data)
 		p.apiToken = reqParams.RspLogin.Data
 	} else {
-		p.logger.Errorf("partner %s ExecAuthLogin err %s", p.cfg.Name, err)
+		p.logger.Errorf("partner %s ExecAuthLogin err %s", cfg.Name, err)
 	}
 }
 
@@ -57,7 +58,7 @@ func (p *PCCWGImpl) ExecAuthLogin(params *api.LoginParams) error {
 	var err error
 
 	req := rest.Request{Method: rest.Post}
-	req.BaseURL = p.GetConfig().SonataUrl + "/api/login"
+	req.BaseURL = p.GetSellerConfig().SonataUrl + "/api/login"
 	req.Body, err = json.Marshal(params)
 	if err != nil {
 		return err
@@ -66,7 +67,7 @@ func (p *PCCWGImpl) ExecAuthLogin(params *api.LoginParams) error {
 	p.logger.Debugf("send login, url %s, username %s", req.BaseURL, params.Username)
 
 	rsp, err := rest.Send(req)
-	if p.GetConfig().IsFake {
+	if p.GetSellerConfig().IsFake {
 		rsp = &rest.Response{}
 		rsp.StatusCode = 200
 		rsp.Body = "{\"data\": \"12345678\"}"
