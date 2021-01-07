@@ -7,6 +7,7 @@ require (
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/antihax/optional v1.0.0
 	github.com/bitly/go-simplejson v0.5.0
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cornelk/hashmap v1.0.1
 	github.com/fatih/color v1.10.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
@@ -19,7 +20,8 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/qlcchain/qlc-go-sdk v1.4.0
+	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/qlcchain/qlc-go-sdk v1.4.2
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.1.1
 	go.uber.org/atomic v1.7.0
