@@ -23,7 +23,7 @@ BUILDTIME = $(shell date +'%FT%TZ%z')
 LDFLAGS=-ldflags "-X github.com/qlcchain/go-lsobus/services/version.Version=${VERSION} \
 				  -X github.com/qlcchain/go-lsobus/services/version.GitRev=${GITREV} \
 				  -X github.com/qlcchain/go-lsobus/services/version.BuildTime=${BUILDTIME}"
-GO_BUILDER_VERSION=v1.14.2
+GO_BUILDER_VERSION=v1.15.6
 
 default: build
 

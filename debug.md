@@ -19,7 +19,7 @@ Warnings:
 docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i /local/docs/openapi.yaml -g go -o /local/out/go --skip-validate-spec
 ```
 
-## Missing QLCChain API
+## ~~Missing QLCChain API~~
 
 - https://docs.qlcchain.online/api/rpc/ledger.html#ledger-process
 - https://docs.qlcchain.online/api/rpc/ledger.html#ledger-blockconfirmedstatus
@@ -44,3 +44,18 @@ response:
   }
 }
 ```
+
+## Wrong return value
+
+- request payload missing `privateFrom/privateFor/privateGroupID`
+- response should be state block
+  
+- `v1/dlt/order/buyer/update-order-info-block`
+- `/v1/dlt/order/seller/update-product-info-block`
+- `/v1/dlt/order/seller/update-order-info-reward-block`
+- `/v1/dlt/order/buyer/change-order-block`
+- `/v1/dlt/order/buyer/change-order-block`
+- `/v1/dlt/order/buyer/terminate-order-block`
+- `/v1/dlt/order/seller/create-order-reward-block`
+- `/v1/dlt/order/seller/change-order-reward-block`
+- `/v1/dlt/order/seller/terminate-order-reward-block`
