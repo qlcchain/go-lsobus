@@ -46,11 +46,15 @@ type APIClient struct {
 
 	DLTInvoicesApi *DLTInvoicesApiService
 
+	DLTLedgerApi *DLTLedgerApiService
+
 	DLTOrdersBuyerApi *DLTOrdersBuyerApiService
 
 	DLTOrdersInfoApi *DLTOrdersInfoApiService
 
 	DLTOrdersSellerApi *DLTOrdersSellerApiService
+
+	DLTPovApi *DLTPovApiService
 
 	OrdersApi *OrdersApiService
 
@@ -78,9 +82,11 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 
 	// API Services
 	c.DLTInvoicesApi = (*DLTInvoicesApiService)(&c.common)
+	c.DLTLedgerApi = (*DLTLedgerApiService)(&c.common)
 	c.DLTOrdersBuyerApi = (*DLTOrdersBuyerApiService)(&c.common)
 	c.DLTOrdersInfoApi = (*DLTOrdersInfoApiService)(&c.common)
 	c.DLTOrdersSellerApi = (*DLTOrdersSellerApiService)(&c.common)
+	c.DLTPovApi = (*DLTPovApiService)(&c.common)
 	c.OrdersApi = (*OrdersApiService)(&c.common)
 	c.QualificationsApi = (*QualificationsApiService)(&c.common)
 	c.QuotesApi = (*QuotesApiService)(&c.common)

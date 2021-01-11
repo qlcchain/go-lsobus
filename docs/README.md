@@ -24,6 +24,8 @@ Class | Method | HTTP request | Description
 *DLTInvoicesApi* | [**V1DltInvoiceGenerateByBuyerPost**](DLTInvoicesApi.md#v1dltinvoicegeneratebybuyerpost) | **Post** /v1/dlt/invoice/generate-by-buyer | 
 *DLTInvoicesApi* | [**V1DltInvoiceGenerateByOrderIdPost**](DLTInvoicesApi.md#v1dltinvoicegeneratebyorderidpost) | **Post** /v1/dlt/invoice/generate-by-order-id | 
 *DLTInvoicesApi* | [**V1DltInvoiceGenerateByProductIdPost**](DLTInvoicesApi.md#v1dltinvoicegeneratebyproductidpost) | **Post** /v1/dlt/invoice/generate-by-product-id | 
+*DLTLedgerApi* | [**V1DltLedgerBlockConfirmedStatusHashGet**](DLTLedgerApi.md#v1dltledgerblockconfirmedstatushashget) | **Get** /v1/dlt/ledger/block-confirmed-status/{hash} | 
+*DLTLedgerApi* | [**V1DltLedgerProcessPost**](DLTLedgerApi.md#v1dltledgerprocesspost) | **Post** /v1/dlt/ledger/process | 
 *DLTOrdersBuyerApi* | [**V1DltOrderBuyerChangeOrderBlockPost**](DLTOrdersBuyerApi.md#v1dltorderbuyerchangeorderblockpost) | **Post** /v1/dlt/order/buyer/change-order-block | 
 *DLTOrdersBuyerApi* | [**V1DltOrderBuyerCreateOrderBlockPost**](DLTOrdersBuyerApi.md#v1dltorderbuyercreateorderblockpost) | **Post** /v1/dlt/order/buyer/create-order-block | 
 *DLTOrdersBuyerApi* | [**V1DltOrderBuyerTerminateOrderBlockPost**](DLTOrdersBuyerApi.md#v1dltorderbuyerterminateorderblockpost) | **Post** /v1/dlt/order/buyer/terminate-order-block | 
@@ -52,6 +54,7 @@ Class | Method | HTTP request | Description
 *DLTOrdersSellerApi* | [**V1DltOrderSellerTerminateOrderRewardBlockPost**](DLTOrdersSellerApi.md#v1dltordersellerterminateorderrewardblockpost) | **Post** /v1/dlt/order/seller/terminate-order-reward-block | 
 *DLTOrdersSellerApi* | [**V1DltOrderSellerUpdateOrderInfoRewardBlockPost**](DLTOrdersSellerApi.md#v1dltordersellerupdateorderinforewardblockpost) | **Post** /v1/dlt/order/seller/update-order-info-reward-block | 
 *DLTOrdersSellerApi* | [**V1DltOrderSellerUpdateProductInfoBlockPost**](DLTOrdersSellerApi.md#v1dltordersellerupdateproductinfoblockpost) | **Post** /v1/dlt/order/seller/update-product-info-block | 
+*DLTPovApi* | [**V1DltPovStatusGet**](DLTPovApi.md#v1dltpovstatusget) | **Get** /v1/dlt/pov/status | 
 *OrdersApi* | [**V1OrdersIdGet**](OrdersApi.md#v1ordersidget) | **Get** /v1/orders/{id} | 
 *OrdersApi* | [**V1OrdersOrderPost**](OrdersApi.md#v1ordersorderpost) | **Post** /v1/orders/order | 
 *OrdersApi* | [**V1OrdersPost**](OrdersApi.md#v1orderspost) | **Post** /v1/orders | 
@@ -79,6 +82,9 @@ Class | Method | HTTP request | Description
  - [DltInvoiceGenerateInvoiceConnectionModel](DltInvoiceGenerateInvoiceConnectionModel.md)
  - [DltInvoiceGenerateInvoiceOrderModel](DltInvoiceGenerateInvoiceOrderModel.md)
  - [DltInvoiceGenerateInvoiceUsageModel](DltInvoiceGenerateInvoiceUsageModel.md)
+ - [DltLedgerBlockConfirmedStatusRes](DltLedgerBlockConfirmedStatusRes.md)
+ - [DltLedgerProcessReq](DltLedgerProcessReq.md)
+ - [DltLedgerProcessRes](DltLedgerProcessRes.md)
  - [DltOrderBuyerChangeOrderBlockModel](DltOrderBuyerChangeOrderBlockModel.md)
  - [DltOrderBuyerChangeOrderBlockReq](DltOrderBuyerChangeOrderBlockReq.md)
  - [DltOrderBuyerChangeOrderBlockRes](DltOrderBuyerChangeOrderBlockRes.md)
@@ -141,6 +147,7 @@ Class | Method | HTTP request | Description
  - [DltOrderSellerUpdateProductInfoBlockModel](DltOrderSellerUpdateProductInfoBlockModel.md)
  - [DltOrderSellerUpdateProductInfoBlockReq](DltOrderSellerUpdateProductInfoBlockReq.md)
  - [DltOrderSellerUpdateProductInfoBlockRes](DltOrderSellerUpdateProductInfoBlockRes.md)
+ - [DltPovStatusRes](DltPovStatusRes.md)
  - [Model200SuccessResponse](Model200SuccessResponse.md)
  - [Model400ErrorResponse](Model400ErrorResponse.md)
  - [Model400ErrorResponseError](Model400ErrorResponseError.md)

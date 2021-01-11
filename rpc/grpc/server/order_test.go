@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+
 	"github.com/qlcchain/go-lsobus/config"
 	"github.com/qlcchain/go-lsobus/contract"
 	ct "github.com/qlcchain/go-lsobus/services/context"

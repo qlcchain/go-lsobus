@@ -10,6 +10,7 @@ package swagger
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -21,33 +22,34 @@ var (
 	_ context.Context
 )
 
-type QualificationsApiService service
+type DLTLedgerApiService service
 
 /*
-QualificationsApiService
-Product metronet
+DLTLedgerApiService
+Return block confirmed status
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
-@return QualificationProductMetronetRes
+ * @param hash Blocks hash
+@return DltLedgerBlockConfirmedStatusRes
 */
-func (a *QualificationsApiService) V1QualificationProductMetronetPost(ctx context.Context, body QualificationProductMetronetReq) (QualificationProductMetronetRes, *http.Response, error) {
+func (a *DLTLedgerApiService) V1DltLedgerBlockConfirmedStatusHashGet(ctx context.Context, hash string) (DltLedgerBlockConfirmedStatusRes, *http.Response, error) {
 	var (
-		localVarHttpMethod  = strings.ToUpper("Post")
+		localVarHttpMethod  = strings.ToUpper("Get")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue QualificationProductMetronetRes
+		localVarReturnValue DltLedgerBlockConfirmedStatusRes
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/v1/qualification/product-metronet"
+	localVarPath := a.client.cfg.BasePath + "/v1/dlt/ledger/block-confirmed-status/{hash}"
+	localVarPath = strings.Replace(localVarPath, "{"+"hash"+"}", fmt.Sprintf("%v", hash), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
+	localVarHttpContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
@@ -63,8 +65,6 @@ func (a *QualificationsApiService) V1QualificationProductMetronetPost(ctx contex
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	// body params
-	localVarPostBody = &body
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -95,7 +95,7 @@ func (a *QualificationsApiService) V1QualificationProductMetronetPost(ctx contex
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v QualificationProductMetronetRes
+			var v DltLedgerBlockConfirmedStatusRes
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -131,23 +131,23 @@ func (a *QualificationsApiService) V1QualificationProductMetronetPost(ctx contex
 }
 
 /*
-QualificationsApiService
-Validate geo address
+DLTLedgerApiService
+Check block base info, update chain info for the block, and broadcast block
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return QualificationValidateAddressRes
+@return DltLedgerProcessRes
 */
-func (a *QualificationsApiService) V1QualificationValidateAddressPost(ctx context.Context, body QualificationValidateAddressReq) (QualificationValidateAddressRes, *http.Response, error) {
+func (a *DLTLedgerApiService) V1DltLedgerProcessPost(ctx context.Context, body DltLedgerProcessReq) (DltLedgerProcessRes, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue QualificationValidateAddressRes
+		localVarReturnValue DltLedgerProcessRes
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/v1/qualification/validate-address"
+	localVarPath := a.client.cfg.BasePath + "/v1/dlt/ledger/process"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -202,7 +202,7 @@ func (a *QualificationsApiService) V1QualificationValidateAddressPost(ctx contex
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v QualificationValidateAddressRes
+			var v DltLedgerProcessRes
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
