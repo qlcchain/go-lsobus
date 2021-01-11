@@ -6,6 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/qlcchain/go-lsobus/orchestra/dod"
+
 	"github.com/qlcchain/go-lsobus/api"
 
 	"github.com/qlcchain/go-lsobus/orchestra/pccwg"
@@ -36,6 +38,10 @@ func NewSeller(ctx context.Context, cfgFile string) (seller api.DoDSeller, err e
 			return nil, err
 		}
 	case "qlc":
+		seller, err = dod.NewDoD(ctx, cfg)
+		if err != nil {
+			return nil, err
+		}
 	default:
 		return nil, fmt.Errorf("invalid partner %s implementation, %s", partner.Name, partner.Implementation)
 	}
