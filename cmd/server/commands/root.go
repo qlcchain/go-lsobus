@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"encoding/hex"
-	"errors"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -11,6 +9,7 @@ import (
 
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"github.com/qlcchain/qlc-go-sdk/pkg/util"
+	"gopkg.in/validator.v2"
 
 	"github.com/qlcchain/go-lsobus/services"
 	ct "github.com/qlcchain/go-lsobus/services/context"
@@ -21,10 +20,7 @@ import (
 )
 
 var (
-	accountP       string
-	cfgPathP       string
-	chainEndPointP string
-	fakeModeP      bool
+	cfgPathP string
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -43,8 +39,6 @@ func Execute() {
 	}
 	flag := rootCmd.PersistentFlags()
 	flag.StringVar(&cfgPathP, "config", "", "config file")
-	flag.StringVar(&accountP, "account", "", "sign with account for cdr data")
-	flag.StringVarP(&chainEndPointP, "chainEndpoint", "", "ws://127.0.0.1:19736", "chain endpoint")
 	if err := rootCmd.Execute(); err != nil {
 		log.Root.Info(err)
 		os.Exit(1)
@@ -63,19 +57,13 @@ func start() error {
 		return err
 	}
 
+	if err = validator.Validate(cfg); err != nil {
+		return err
+	}
+
 	s := util.ToIndentString(cfg)
 	_ = ioutil.WriteFile(cm.ConfigFile, []byte(s), 0600)
 	log.Root.Info("Run service id: ", serviceContext.Id())
-
-	if len(accountP) > 0 {
-		bytes, err := hex.DecodeString(accountP)
-		if err != nil {
-			return err
-		}
-		account = pkg.NewAccount(bytes)
-	} else {
-		return errors.New("must run with qlc account")
-	}
 
 	// save accounts to context
 	serviceContext.SetAccount(account)

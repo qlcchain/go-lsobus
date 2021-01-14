@@ -13,6 +13,8 @@ const (
 	configVersion = 1
 	cfgDir        = "glsobus"
 	nixCfgDir     = ".glsobus"
+	PCCWGBackend  = "pccwg"
+	QLCDoDBackend = "qlc"
 )
 
 func DefaultConfig(dir string) (*Config, error) {
@@ -21,22 +23,23 @@ func DefaultConfig(dir string) (*Config, error) {
 		Version:  configVersion,
 		DataDir:  dir,
 		LogLevel: "error",
-		RPC: RPCConfig{
+		RPC: &RPCConfig{
 			Enable:             true,
 			ListenAddress:      "tcp://0.0.0.0:9998",
 			GRPCListenAddress:  "tcp://0.0.0.0:9999",
 			CORSAllowedOrigins: []string{"*"},
 		},
 		Partner: &PartnerCfg{
-			Name:           "PCCWG",
+			Name:           "QLC",
 			SonataUrl:      "http://127.0.0.1:7777",
 			Username:       "",
 			Password:       "",
+			APIToken:       "",
 			IsFake:         false,
-			ChainUrl:       "ws://127.0.0.1:19736",
-			Implementation: "pccwg",
+			ChainUrl:       "",
+			Implementation: QLCDoDBackend,
 		},
-		Privacy: PrivacyCfg{
+		Privacy: &PrivacyCfg{
 			Enable:         false,
 			From:           "",
 			For:            []string{},

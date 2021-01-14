@@ -1,7 +1,7 @@
 
-## API spec erro
+## API spec error
 ```
-➜ docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli validate -i /local/docs/openapi.yaml
+➜ docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli validate -i /local/docs/openapi.json
 Validating spec (/local/docs/openapi.yaml)
 Errors:
 	- attribute components.schemas.200SuccessResponse.items is missing
@@ -16,46 +16,33 @@ Warnings:
 
 ## generate code 
 ```
-docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i /local/docs/openapi.yaml -g go -o /local/out/go --skip-validate-spec
+docker run --rm -v "${PWD}:/local" swaggerapi/swagger-codegen-cli-v3:latest generate -i /local/docs/openapi.json -l go -o /local/generated/dod
+```
+## DEBUG
+
+### swagger doc
+
+- missing
+
+```js
+router.post('/v1/rpc/qlc/dod-settlement/update-order-info-block', dodSettlement.updateOrderInfoBlock);
+router.post('/v1/rpc/qlc/dod-settlement/update-product-info-block', dodSettlement.updateProductInfoBlock);
+router.post('/v1/rpc/qlc/dod-settlement/update-order-info-reward-block', dodSettlement.updateOrderInfoRewardBlock);
+router.post('/v1/rpc/qlc/dod-settlement/change-order-block', dodSettlement.changeOrderBlock);
+router.post('/v1/rpc/qlc/dod-settlement/terminate-order-block', dodSettlement.terminateOrderBlock);
+router.post('/v1/rpc/qlc/dod-settlement/create-order-reward-block', dodSettlement.createOrderRewardBlock);
+router.post('/v1/rpc/qlc/dod-settlement/change-order-reward-block', dodSettlement.changeOrderRewardBlock);
+router.post('/v1/rpc/qlc/dod-settlement/terminate-order-reward-block', dodSettlement.terminateOrderRewardBlock);
 ```
 
-## ~~Missing QLCChain API~~
+- miss match
 
-- https://docs.qlcchain.online/api/rpc/ledger.html#ledger-process
-- https://docs.qlcchain.online/api/rpc/ledger.html#ledger-blockconfirmedstatus
-- pov_getPovStatus
-request:
-```json
-{
-  "jsonrpc": "2.0",
-  "id":3,
-  "method":"pov_getPovStatus"
-}
-```
-response:
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 3,
-  "result": {
-    "povEnabled": true,
-    "syncState": 2,
-    "syncStateStr": "SyncDone"
-  }
-}
-```
+  `v1/dlt/order/seller/pending-request` etc.
 
-## Wrong return value
+### QLC Node
 
-- request payload missing `privateFrom/privateFor/privateGroupID`
-- response should be state block
-  
-- `v1/dlt/order/buyer/update-order-info-block`
-- `/v1/dlt/order/seller/update-product-info-block`
-- `/v1/dlt/order/seller/update-order-info-reward-block`
-- `/v1/dlt/order/buyer/change-order-block`
-- `/v1/dlt/order/buyer/change-order-block`
-- `/v1/dlt/order/buyer/terminate-order-block`
-- `/v1/dlt/order/seller/create-order-reward-block`
-- `/v1/dlt/order/seller/change-order-reward-block`
-- `/v1/dlt/order/seller/terminate-order-reward-block`
+chain node have to enable PoV, otherwise the DoD contract won't work
+
+### just for test
+
+- add an endpoint to quickly create an order from buyer side
