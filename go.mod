@@ -30,4 +30,5 @@ require (
 	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/validator.v2 v2.0.0-20200605151824-2b28d334fa05
 )

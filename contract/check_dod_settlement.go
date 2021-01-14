@@ -28,13 +28,18 @@ func (cs *ContractCaller) checkDoDContract() {
 
 func (cs *ContractCaller) processDoDContract() {
 	addr := cs.seller.Account().Address()
-	dod, err := cs.seller.GetPendingRequest(addr)
-	if err != nil || len(dod) == 0 {
+	rsps, err := cs.seller.GetPendingRequest(addr)
+	if err != nil || len(rsps) == 0 {
 		return
 	}
-	for _, v := range dod {
+
+	for _, v := range rsps {
 		cs.logger.Infof("find a dod settlement need sign,request hash is %s", v.Hash.String())
 		//		if v.Order.OrderType == abi.DoDSettleOrderTypeCreate || v.Order.OrderType == abi.DoDSettleOrderTypeChange {
+		if v.Order == nil {
+			cs.logger.Error("invalid order info")
+			continue
+		}
 		b := cs.verifyOrderInfoFromSonata(v.Order)
 		if !b {
 			continue
@@ -79,22 +84,18 @@ func (cs *ContractCaller) processDoDContract() {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())
 			continue
 		}
-		var w pkg.Work
-		worker, _ := pkg.NewWorker(w, blk.Root())
-		blk.Work = worker.NewWork()
-		if !cs.seller.IsFake() {
-			if _, err = cs.seller.Process(blk); err != nil {
-				cs.logger.Errorf("process block error: %s", err)
+
+		if h, err := cs.seller.Process(blk); err != nil {
+			cs.logger.Errorf("process block error: %s", err)
+			continue
+		} else if h != pkg.ZeroHash {
+			cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
+			err = cs.readAndWriteProcessingOrder("add", "seller", v.Order.InternalId)
+			if err != nil {
+				cs.logger.Error(err)
 				continue
-			} else {
-				cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
-				err = cs.readAndWriteProcessingOrder("add", "seller", v.Order.InternalId)
-				if err != nil {
-					cs.logger.Error(err)
-					continue
-				}
-				cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 			}
+			cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
 		}
 	}
 }

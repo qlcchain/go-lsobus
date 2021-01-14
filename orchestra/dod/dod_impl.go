@@ -5,11 +5,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/atomic"
+	"go.uber.org/zap"
+
+	"github.com/qlcchain/go-lsobus/log"
 
 	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/config"
@@ -22,11 +24,16 @@ type DoDImpl struct {
 	cfg     *config.Config
 	account *pkg.Account
 	status  atomic.Int32
+	logger  *zap.SugaredLogger
 }
 
 func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	swCfg := sw.NewConfiguration()
-	swCfg.Host = cfg.Partner.SonataUrl
+	swCfg.BasePath = cfg.Partner.SonataUrl
+	token := cfg.Partner.APIToken
+	if token != "" {
+		swCfg.AddDefaultHeader("API-KEY", token)
+	}
 	client := sw.NewAPIClient(swCfg)
 
 	bytes, err := hex.DecodeString(cfg.Partner.Account)
@@ -38,27 +45,31 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 		client:  client,
 		cfg:     cfg,
 		account: account,
+		logger:  log.NewLogger("qlc_dod"),
 	}
 
-	go func(ctx context.Context, client *sw.APIClient) {
-		ticker := time.NewTicker(5 * time.Second)
-		defer ticker.Stop()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background())
-				if err != nil {
-					p.status.Store(0)
-				} else if resp.SyncState == 2 {
-					p.status.Store(1)
-				} else {
-					time.Sleep(time.Second)
-				}
-			}
-		}
-	}(ctx, client)
+	//FIXME: verify PoV status
+	p.status.Store(1)
+
+	//go func(ctx context.Context, client *sw.APIClient) {
+	//	ticker := time.NewTicker(5 * time.Second)
+	//	defer ticker.Stop()
+	//	for {
+	//		select {
+	//		case <-ctx.Done():
+	//			return
+	//		case <-ticker.C:
+	//			resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background())
+	//			if err != nil {
+	//				p.status.Store(0)
+	//			} else if resp.SyncState == 2 {
+	//				p.status.Store(1)
+	//			} else {
+	//				time.Sleep(time.Second)
+	//			}
+	//		}
+	//	}
+	//}(ctx, client)
 
 	return p, nil
 }
@@ -184,7 +195,7 @@ func (d *DoDImpl) IsChainReady() bool {
 }
 
 func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingRequestRsp, error) {
-	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerPendingRequestPost(
+	if resp, h, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerPendingRequestPost(
 		context.Background(),
 		sw.DltOrderSellerPendingRequestReq{
 			QlcAddressSeller: addr.String(),
@@ -192,6 +203,7 @@ func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingReque
 	); err != nil {
 		return nil, err
 	} else {
+		d.logger.Debug(h)
 		var pending qlcSdk.DoDPendingRequestRsp
 		_ = convert(resp, &pending)
 		return []*qlcSdk.DoDPendingRequestRsp{&pending}, nil
