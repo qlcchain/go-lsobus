@@ -9,7 +9,7 @@
 package swagger
 
 type DltOrderBuyerChangeOrderBlockReq struct {
-	Buyer       *DltInvoiceGenerateInvoiceByOrderIdResBuyer `json:"buyer"`
-	Seller      *DltInvoiceGenerateInvoiceByOrderIdResBuyer `json:"seller"`
-	Connections []DltOrderBuyerChangeOrderBlockModel        `json:"connections"`
+	Buyer       *DltInvoiceGenerateInvoiceByOrderIdResDataBuyer `json:"buyer"`
+	Seller      *DltInvoiceGenerateInvoiceByOrderIdResDataBuyer `json:"seller"`
+	Connections []DltOrderBuyerChangeOrderBlockModel            `json:"connections"`
 }

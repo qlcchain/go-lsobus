@@ -8,7 +8,7 @@
  */
 package swagger
 
-type QuoteResValidFor struct {
+type QuoteResDataValidFor struct {
 	StartDate string `json:"startDate,omitempty"`
 	EndDate   string `json:"endDate,omitempty"`
 }

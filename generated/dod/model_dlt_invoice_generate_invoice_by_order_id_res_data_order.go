@@ -8,7 +8,7 @@
  */
 package swagger
 
-type DltInvoiceGenerateInvoiceByOrderIdResOrder struct {
+type DltInvoiceGenerateInvoiceByOrderIdResDataOrder struct {
 	OrderId         string                                     `json:"orderId,omitempty"`
 	InternalId      string                                     `json:"internalId,omitempty"`
 	ConnectionCount float64                                    `json:"connectionCount,omitempty"`

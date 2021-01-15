@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
@@ -50,6 +50,9 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 
 	//FIXME: verify PoV status
 	p.status.Store(1)
+	if resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background()); err == nil {
+		p.logger.Debugf("pov status %f", resp.Data.SyncState)
+	}
 
 	//go func(ctx context.Context, client *sw.APIClient) {
 	//	ticker := time.NewTicker(5 * time.Second)
@@ -62,7 +65,7 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	//			resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background())
 	//			if err != nil {
 	//				p.status.Store(0)
-	//			} else if resp.SyncState == 2 {
+	//			} else if resp.Data.SyncState == 2 {
 	//				p.status.Store(1)
 	//			} else {
 	//				time.Sleep(time.Second)
@@ -116,7 +119,7 @@ func (d *DoDImpl) ExecQuoteCreate(params *api.OrderParams) error {
 	}); err != nil {
 		return err
 	} else {
-		params.RspQuote = quoteItem2Quote(resp.QuoteItem)
+		params.RspQuote = quoteItem2Quote(resp.Data.QuoteItem)
 		return nil
 	}
 }
@@ -129,7 +132,9 @@ func (d *DoDImpl) ExecQuoteGet(params *api.GetParams) error {
 	if resp, _, err := d.client.QuotesApi.V1QuotesIdGet(context.Background(), params.ID); err != nil {
 		return err
 	} else {
-		params.RspQuote = quoteItem2Quote(resp.QuoteItem)
+		d.logger.Debug(util.ToString(resp.Data))
+		params.RspQuote = quoteItem2Quote(resp.Data.QuoteItem)
+		d.logger.Debug(util.ToString(&quomod.Quote{}))
 		return nil
 	}
 }
@@ -195,7 +200,7 @@ func (d *DoDImpl) IsChainReady() bool {
 }
 
 func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingRequestRsp, error) {
-	if resp, h, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerPendingRequestPost(
+	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerPendingRequestPost(
 		context.Background(),
 		sw.DltOrderSellerPendingRequestReq{
 			QlcAddressSeller: addr.String(),
@@ -203,9 +208,8 @@ func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingReque
 	); err != nil {
 		return nil, err
 	} else {
-		d.logger.Debug(h)
 		var pending qlcSdk.DoDPendingRequestRsp
-		_ = convert(resp, &pending)
+		_ = convert(resp.Data, &pending)
 		return []*qlcSdk.DoDPendingRequestRsp{&pending}, nil
 	}
 }
@@ -260,7 +264,7 @@ func (d *DoDImpl) GetUpdateOrderInfoBlock(param *qlcSdk.DoDSettleUpdateOrderInfo
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetUpdateOrderInfoBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -274,7 +278,7 @@ func (d *DoDImpl) GetUpdateProductInfoBlock(param *qlcSdk.DoDSettleUpdateProduct
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetUpdateProductInfoBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -288,7 +292,7 @@ func (d *DoDImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseP
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetUpdateOrderInfoRewardBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -302,7 +306,7 @@ func (d *DoDImpl) GetChangeOrderBlock(param *qlcSdk.DoDSettleChangeOrderParam) (
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetChangeOrderBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -316,7 +320,7 @@ func (d *DoDImpl) GetCreateOrderBlock(param *qlcSdk.DoDSettleCreateOrderParam) (
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetCreateOrderBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -330,7 +334,7 @@ func (d *DoDImpl) GetTerminateOrderBlock(param *qlcSdk.DoDSettleTerminateOrderPa
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetTerminateOrderBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -344,7 +348,7 @@ func (d *DoDImpl) GetCreateOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetCreateOrderRewardBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -358,7 +362,7 @@ func (d *DoDImpl) GetChangeOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetChangeOrderRewardBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
@@ -372,19 +376,21 @@ func (d *DoDImpl) GetTerminateOrderRewardBlock(param *qlcSdk.DoDSettleResponsePa
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		fmt.Println(resp)
+		d.logger.Debugf("GetTerminateOrderRewardBlock: %s", resp.Data.TxId)
 		return nil, nil
 	}
 }
 
-func (d *DoDImpl) Process(block *pkg.StateBlock) (pkg.Hash, error) {
-	var req sw.DltLedgerProcessReq
-	_ = convert(block, &req)
-	if resp, _, err := d.client.DLTLedgerApi.V1DltLedgerProcessPost(context.Background(), req); err == nil {
-		return pkg.ZeroHash, err
-	} else {
-		return pkg.NewHash(resp.Hash)
-	}
+//FIXME: A new interface is required to calculate the PoW locally
+func (d *DoDImpl) Process(blk *pkg.StateBlock) (pkg.Hash, error) {
+	//var req sw.DltLedgerProcessReq
+	//_ = convert(blk, &req)
+	//if resp, _, err := d.client.DLTLedgerApi.V1DltLedgerProcessPost(context.Background(), req); err == nil {
+	//	return pkg.ZeroHash, err
+	//} else {
+	//	return pkg.NewHash(resp.Data.Hash)
+	//}
+	return pkg.ZeroHash, nil
 }
 
 func convert(from, to interface{}) error {

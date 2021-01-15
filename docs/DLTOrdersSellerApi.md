@@ -97,7 +97,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderSellerPendingResourceCheckPost**
-> []DltOrderSellerPendingResourceCheckModel V1DltOrderSellerPendingResourceCheckPost(ctx, body)
+> DltOrderSellerPendingResourceCheckRes V1DltOrderSellerPendingResourceCheckPost(ctx, body)
 
 
 Get all pending orders for seller to check. Seller need to check every product's status in each order
@@ -111,7 +111,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]DltOrderSellerPendingResourceCheckModel**](array.md)
+[**DltOrderSellerPendingResourceCheckRes**](dltOrderSellerPendingResourceCheckRes.md)
 
 ### Authorization
 

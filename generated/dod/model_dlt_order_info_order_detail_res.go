@@ -9,12 +9,8 @@
 package swagger
 
 type DltOrderInfoOrderDetailRes struct {
-	Buyer         *DltInvoiceGenerateInvoiceByOrderIdResBuyer `json:"buyer,omitempty"`
-	Seller        *DltInvoiceGenerateInvoiceByOrderIdResBuyer `json:"seller,omitempty"`
-	OrderId       string                                      `json:"orderId,omitempty"`
-	OrderType     string                                      `json:"orderType,omitempty"`
-	OrderState    string                                      `json:"orderState,omitempty"`
-	ContractState string                                      `json:"contractState,omitempty"`
-	Connections   []DltOrderInfoOrderDetailConnectionModel    `json:"connections,omitempty"`
-	Track         []DltOrderInfoOrderDetailTrackModel         `json:"track,omitempty"`
+	Code   float64                         `json:"code,omitempty"`
+	Error_ *interface{}                    `json:"error,omitempty"`
+	Data   *DltOrderInfoOrderDetailResData `json:"data,omitempty"`
+	Meta   *interface{}                    `json:"meta,omitempty"`
 }

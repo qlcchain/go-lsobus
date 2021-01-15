@@ -12,6 +12,8 @@ import (
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
+	"github.com/qlcchain/go-lsobus/utils"
+
 	"github.com/qlcchain/go-lsobus/mock"
 
 	"github.com/qlcchain/go-lsobus/api"
@@ -200,7 +202,7 @@ func (p *PCCWGImpl) GetTerminateOrderRewardBlock(param *qlcSdk.DoDSettleResponse
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -223,7 +225,7 @@ func (p *PCCWGImpl) GetChangeOrderRewardBlock(
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -247,7 +249,7 @@ func (p *PCCWGImpl) GetCreateOrderRewardBlock(
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -271,7 +273,7 @@ func (p *PCCWGImpl) GetTerminateOrderBlock(
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -293,7 +295,7 @@ func (p *PCCWGImpl) GetChangeOrderBlock(param *qlcSdk.DoDSettleChangeOrderParam)
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -315,7 +317,7 @@ func (p *PCCWGImpl) GetCreateOrderBlock(param *qlcSdk.DoDSettleCreateOrderParam)
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -337,7 +339,7 @@ func (p *PCCWGImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleRespons
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -359,7 +361,7 @@ func (p *PCCWGImpl) GetUpdateProductInfoBlock(param *qlcSdk.DoDSettleUpdateProdu
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -385,7 +387,7 @@ func (p *PCCWGImpl) GetUpdateOrderInfoBlock(param *qlcSdk.DoDSettleUpdateOrderIn
 	}); err != nil {
 		return nil, err
 	} else {
-		blk.Work = generateWork(blk.Root())
+		blk.Work = utils.GenerateWork(blk.Root())
 		return blk, nil
 	}
 }
@@ -446,12 +448,6 @@ func (p *PCCWGImpl) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderI
 		return nil, err
 	}
 	return orderInfo, nil
-}
-
-func generateWork(hash pkg.Hash) pkg.Work {
-	var w pkg.Work
-	worker, _ := pkg.NewWorker(w, hash)
-	return worker.NewWork()
 }
 
 func (p *PCCWGImpl) waitBlockConfirmed(hash pkg.Hash) error {

@@ -349,15 +349,15 @@ DLTOrdersSellerApiService
 Get all pending orders for seller to check. Seller need to check every product&#x27;s status in each order
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return []DltOrderSellerPendingResourceCheckModel
+@return DltOrderSellerPendingResourceCheckRes
 */
-func (a *DLTOrdersSellerApiService) V1DltOrderSellerPendingResourceCheckPost(ctx context.Context, body DltOrderSellerPendingResourceCheckReq) ([]DltOrderSellerPendingResourceCheckModel, *http.Response, error) {
+func (a *DLTOrdersSellerApiService) V1DltOrderSellerPendingResourceCheckPost(ctx context.Context, body DltOrderSellerPendingResourceCheckReq) (DltOrderSellerPendingResourceCheckRes, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue []DltOrderSellerPendingResourceCheckModel
+		localVarReturnValue DltOrderSellerPendingResourceCheckRes
 	)
 
 	// create path and map variables
@@ -416,7 +416,7 @@ func (a *DLTOrdersSellerApiService) V1DltOrderSellerPendingResourceCheckPost(ctx
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v []DltOrderSellerPendingResourceCheckModel
+			var v DltOrderSellerPendingResourceCheckRes
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
