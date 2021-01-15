@@ -9,12 +9,8 @@
 package swagger
 
 type DltInvoiceGenerateInvoiceByOrderIdRes struct {
-	InvoiceId            string                                      `json:"invoiceId,omitempty"`
-	TotalConnectionCount float64                                     `json:"totalConnectionCount,omitempty"`
-	TotalAmount          float64                                     `json:"totalAmount,omitempty"`
-	Currency             string                                      `json:"currency,omitempty"`
-	StartTime            float64                                     `json:"startTime,omitempty"`
-	EndTime              float64                                     `json:"endTime,omitempty"`
-	Buyer                *DltInvoiceGenerateInvoiceByOrderIdResBuyer `json:"buyer,omitempty"`
-	Order                *DltInvoiceGenerateInvoiceByOrderIdResOrder `json:"order,omitempty"`
+	Code   float64                                    `json:"code,omitempty"`
+	Error_ *interface{}                               `json:"error,omitempty"`
+	Data   *DltInvoiceGenerateInvoiceByOrderIdResData `json:"data,omitempty"`
+	Meta   *interface{}                               `json:"meta,omitempty"`
 }

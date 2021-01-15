@@ -1,4 +1,4 @@
-# DltInvoiceGenerateInvoiceByProductIdResConnection
+# DltInvoiceGenerateInvoiceByProductIdResDataConnection
 
 ## Properties
 Name | Type | Description | Notes

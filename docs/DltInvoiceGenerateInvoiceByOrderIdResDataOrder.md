@@ -1,4 +1,4 @@
-# DltInvoiceGenerateInvoiceByOrderIdResOrder
+# DltInvoiceGenerateInvoiceByOrderIdResDataOrder
 
 ## Properties
 Name | Type | Description | Notes

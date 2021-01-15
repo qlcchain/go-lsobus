@@ -9,5 +9,8 @@
 package swagger
 
 type DltOrderBuyerTerminateOrderBlockRes struct {
-	TxId string `json:"txId,omitempty"`
+	Code   float64                               `json:"code,omitempty"`
+	Error_ *interface{}                          `json:"error,omitempty"`
+	Data   *DltOrderBuyerCreateOrderBlockResData `json:"data,omitempty"`
+	Meta   *interface{}                          `json:"meta,omitempty"`
 }

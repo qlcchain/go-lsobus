@@ -9,5 +9,8 @@
 package swagger
 
 type DltLedgerBlockConfirmedStatusRes struct {
-	Hash string `json:"hash,omitempty"`
+	Code   float64                               `json:"code,omitempty"`
+	Error_ *interface{}                          `json:"error,omitempty"`
+	Data   *DltLedgerBlockConfirmedStatusResData `json:"data,omitempty"`
+	Meta   *interface{}                          `json:"meta,omitempty"`
 }

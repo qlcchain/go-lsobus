@@ -3,8 +3,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Buyer** | [***DltInvoiceGenerateInvoiceByOrderIdResBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_buyer.md) |  | [default to null]
-**Seller** | [***DltInvoiceGenerateInvoiceByOrderIdResBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_buyer.md) |  | [default to null]
+**Buyer** | [***DltInvoiceGenerateInvoiceByOrderIdResDataBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_data_buyer.md) |  | [default to null]
+**Seller** | [***DltInvoiceGenerateInvoiceByOrderIdResDataBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_data_buyer.md) |  | [default to null]
 **Connections** | [**[]DltOrderBuyerCreateOrderBlockModel**](dltOrderBuyerCreateOrderBlockModel.md) |  | [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

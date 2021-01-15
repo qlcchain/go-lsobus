@@ -9,6 +9,8 @@
 package swagger
 
 type DltOrderSellerPendingRequestRes struct {
-	Hash  string                              `json:"hash,omitempty"`
-	Order []DltOrderSellerPendingRequestModel `json:"order,omitempty"`
+	Code   float64                              `json:"code,omitempty"`
+	Error_ *interface{}                         `json:"error,omitempty"`
+	Data   *DltOrderSellerPendingRequestResData `json:"data,omitempty"`
+	Meta   *interface{}                         `json:"meta,omitempty"`
 }

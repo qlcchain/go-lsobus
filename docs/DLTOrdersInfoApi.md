@@ -79,7 +79,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoInternalIdByOrderIdPost**
-> string V1DltOrderInfoInternalIdByOrderIdPost(ctx, body)
+> DltOrderInfoInternalIdByOrderIdRes V1DltOrderInfoInternalIdByOrderIdPost(ctx, body)
 
 
 Get internal id by seller address and order id
@@ -93,7 +93,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**string**
+[**DltOrderInfoInternalIdByOrderIdRes**](dltOrderInfoInternalIdByOrderIdRes.md)
 
 ### Authorization
 
@@ -107,7 +107,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoOrderCountByAddressAndSellerPost**
-> float64 V1DltOrderInfoOrderCountByAddressAndSellerPost(ctx, body)
+> DltOrderInfoOrderCountByAddressAndSellerRes V1DltOrderInfoOrderCountByAddressAndSellerPost(ctx, body)
 
 
 Get order count by buyer's address and seller's address
@@ -121,7 +121,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**float64**
+[**DltOrderInfoOrderCountByAddressAndSellerRes**](dltOrderInfoOrderCountByAddressAndSellerRes.md)
 
 ### Authorization
 
@@ -135,7 +135,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoOrderCountByAddressPost**
-> float64 V1DltOrderInfoOrderCountByAddressPost(ctx, body)
+> DltOrderInfoOrderCountByAddressRes V1DltOrderInfoOrderCountByAddressPost(ctx, body)
 
 
 Get order count by buyer's address
@@ -149,7 +149,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**float64**
+[**DltOrderInfoOrderCountByAddressRes**](dltOrderInfoOrderCountByAddressRes.md)
 
 ### Authorization
 
@@ -163,7 +163,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoOrderIdListByAddressAndSellerPost**
-> []DltOrderInfoOrderIdListByAddressModel V1DltOrderInfoOrderIdListByAddressAndSellerPost(ctx, body)
+> DltOrderInfoOrderIdListByAddressAndSellerRes V1DltOrderInfoOrderIdListByAddressAndSellerPost(ctx, body)
 
 
 Get buyer's all order ids with specified seller
@@ -177,7 +177,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]DltOrderInfoOrderIdListByAddressModel**](array.md)
+[**DltOrderInfoOrderIdListByAddressAndSellerRes**](dltOrderInfoOrderIdListByAddressAndSellerRes.md)
 
 ### Authorization
 
@@ -191,7 +191,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoOrderIdListByAddressPost**
-> []DltOrderInfoOrderIdListByAddressModel V1DltOrderInfoOrderIdListByAddressPost(ctx, body)
+> DltOrderInfoOrderIdListByAddressRes V1DltOrderInfoOrderIdListByAddressPost(ctx, body)
 
 
 Get buyer's all order ids
@@ -205,7 +205,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]DltOrderInfoOrderIdListByAddressModel**](array.md)
+[**DltOrderInfoOrderIdListByAddressRes**](dltOrderInfoOrderIdListByAddressRes.md)
 
 ### Authorization
 
@@ -303,7 +303,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoProductCountByAddressAndSellerPost**
-> float64 V1DltOrderInfoProductCountByAddressAndSellerPost(ctx, body)
+> DltOrderInfoProductCountByAddressAndSellerRes V1DltOrderInfoProductCountByAddressAndSellerPost(ctx, body)
 
 
 Get product count by buyer's address and seller's address
@@ -317,7 +317,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**float64**
+[**DltOrderInfoProductCountByAddressAndSellerRes**](dltOrderInfoProductCountByAddressAndSellerRes.md)
 
 ### Authorization
 
@@ -331,7 +331,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoProductCountByAddressPost**
-> float64 V1DltOrderInfoProductCountByAddressPost(ctx, body)
+> DltOrderInfoProductCountByAddressRes V1DltOrderInfoProductCountByAddressPost(ctx, body)
 
 
 Get product count by buyer's address
@@ -345,7 +345,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**float64**
+[**DltOrderInfoProductCountByAddressRes**](dltOrderInfoProductCountByAddressRes.md)
 
 ### Authorization
 
@@ -359,7 +359,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoProductIdListByAddressAndSellerPost**
-> []DltOrderInfoProductIdListByAddressModel V1DltOrderInfoProductIdListByAddressAndSellerPost(ctx, body)
+> DltOrderInfoProductIdListByAddressAndSellerRes V1DltOrderInfoProductIdListByAddressAndSellerPost(ctx, body)
 
 
 Get buyer's all product ids with specified seller
@@ -373,7 +373,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]DltOrderInfoProductIdListByAddressModel**](array.md)
+[**DltOrderInfoProductIdListByAddressAndSellerRes**](dltOrderInfoProductIdListByAddressAndSellerRes.md)
 
 ### Authorization
 
@@ -387,7 +387,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **V1DltOrderInfoProductIdListByAddressPost**
-> []DltOrderInfoProductIdListByAddressModel V1DltOrderInfoProductIdListByAddressPost(ctx, body)
+> DltOrderInfoProductIdListByAddressRes V1DltOrderInfoProductIdListByAddressPost(ctx, body)
 
 
 Get buyer's all product ids
@@ -401,7 +401,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]DltOrderInfoProductIdListByAddressModel**](array.md)
+[**DltOrderInfoProductIdListByAddressRes**](dltOrderInfoProductIdListByAddressRes.md)
 
 ### Authorization
 

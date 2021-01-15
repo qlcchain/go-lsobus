@@ -1,10 +1,10 @@
-# DltOrderSellerPendingRequestModel
+# DltOrderSellerPendingRequestResDataOrder
 
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Buyer** | [***DltInvoiceGenerateInvoiceByOrderIdResBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_buyer.md) |  | [optional] [default to null]
-**Seller** | [***DltInvoiceGenerateInvoiceByOrderIdResBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_buyer.md) |  | [optional] [default to null]
+**Buyer** | [***DltInvoiceGenerateInvoiceByOrderIdResDataBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_data_buyer.md) |  | [optional] [default to null]
+**Seller** | [***DltInvoiceGenerateInvoiceByOrderIdResDataBuyer**](dltInvoiceGenerateInvoiceByOrderIdRes_data_buyer.md) |  | [optional] [default to null]
 **OrderId** | **string** |  | [optional] [default to null]
 **OrderType** | **string** |  | [optional] [default to null]
 **OrderState** | **string** |  | [optional] [default to null]

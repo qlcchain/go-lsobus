@@ -9,6 +9,8 @@
 package swagger
 
 type DltOrderInfoProductInfoByAddressAndSellerRes struct {
-	TotalProducts float64                                          `json:"totalProducts,omitempty"`
-	ProductInfo   []DltOrderInfoProductInfoBySellerAndProductIdRes `json:"productInfo,omitempty"`
+	Code   float64                                  `json:"code,omitempty"`
+	Error_ *interface{}                             `json:"error,omitempty"`
+	Data   *DltOrderInfoProductInfoByAddressResData `json:"data,omitempty"`
+	Meta   *interface{}                             `json:"meta,omitempty"`
 }
