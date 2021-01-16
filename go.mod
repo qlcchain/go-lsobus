@@ -16,6 +16,7 @@ require (
 	github.com/go-openapi/strfmt v0.19.11
 	github.com/go-openapi/swag v0.19.12
 	github.com/go-openapi/validate v0.20.0
+	github.com/go-resty/resty/v2 v2.4.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.4
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0

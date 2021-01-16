@@ -7,8 +7,8 @@ import (
 func addOrderCmd() {
 	if interactive {
 		orderCmd := &ishell.Cmd{
-			Name: "dod_settlement",
-			Help: "dod_settlement commands",
+			Name: "dod",
+			Help: "dod settlement commands",
 			Func: func(c *ishell.Context) {
 				c.Println(c.Cmd.HelpText())
 			},
@@ -18,5 +18,19 @@ func addOrderCmd() {
 		addDSChangeOrderCmdByShell(orderCmd)
 		addGetOrderInfoByShell(orderCmd)
 		addDSTerminateOrderCmdByShell(orderCmd)
+	}
+}
+
+func addMockOrderCmd() {
+	if interactive {
+		orderCmd := &ishell.Cmd{
+			Name: "order",
+			Help: "mock DoD order commands",
+			Func: func(c *ishell.Context) {
+				c.Println(c.Cmd.HelpText())
+			},
+		}
+		shell.AddCmd(orderCmd)
+		addMockOrderCmdByShell(orderCmd)
 	}
 }
