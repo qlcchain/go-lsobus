@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+	"github.com/go-openapi/swag"
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
-	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
@@ -32,7 +32,7 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	swCfg.BasePath = cfg.Partner.SonataUrl
 	token := cfg.Partner.APIToken
 	if token != "" {
-		swCfg.AddDefaultHeader("API-KEY", token)
+		swCfg.AddDefaultHeader("CLIENT-KEY", token)
 	}
 	client := sw.NewAPIClient(swCfg)
 
@@ -106,22 +106,7 @@ func (d *DoDImpl) ExecPOQGet(params *api.GetParams) error {
 }
 
 func (d *DoDImpl) ExecQuoteCreate(params *api.OrderParams) error {
-	if resp, _, err := d.client.QuotesApi.V1QuotesPost(context.Background(), sw.QuoteCreateReq{
-		ProjectId:                    "",
-		QuoteLevel:                   "",
-		InstantSyncQuoting:           false,
-		Description:                  "",
-		RequestedQuoteCompletionDate: "",
-		ExpectedFulfillmentStartDate: "",
-		Agreement:                    nil,
-		RelatedParty:                 nil,
-		QuoteItem:                    nil,
-	}); err != nil {
-		return err
-	} else {
-		params.RspQuote = quoteItem2Quote(resp.Data.QuoteItem)
-		return nil
-	}
+	panic("implement me")
 }
 
 func (d *DoDImpl) ExecQuoteFind(params *api.FindParams) error {
@@ -132,15 +117,38 @@ func (d *DoDImpl) ExecQuoteGet(params *api.GetParams) error {
 	if resp, _, err := d.client.QuotesApi.V1QuotesIdGet(context.Background(), params.ID); err != nil {
 		return err
 	} else {
-		d.logger.Debug(util.ToString(resp.Data))
-		params.RspQuote = quoteItem2Quote(resp.Data.QuoteItem)
-		d.logger.Debug(util.ToString(&quomod.Quote{}))
+		params.RspQuote = quoteItem2Quote(resp.Data)
 		return nil
 	}
 }
 
-func quoteItem2Quote([]sw.QuoteQuoteItemSonataModel) *quomod.Quote {
-	return nil
+func quoteItem2Quote(in *sw.QuoteResponse) *quomod.Quote {
+	var out quomod.Quote
+
+	// mapping price
+	for _, item := range in.QuoteItem {
+		for _, price := range item.QuoteItemPrice {
+			if price.Price.PreTaxAmount.Value != float32(0) {
+				out.QuoteItem = append(out.QuoteItem, &quomod.QuoteItem{
+					PreCalculatedPrice: &quomod.QuotePrice{
+						Price: &quomod.Price{
+							PreTaxAmount: &quomod.Money{
+								Unit:  swag.String(price.Price.PreTaxAmount.Unit),
+								Value: swag.Float32(price.Price.PreTaxAmount.Value),
+							},
+							PriceRange: nil,
+						},
+						PriceType:             quomod.PriceType(price.PriceType),
+						RecurringChargePeriod: quomod.ChargePeriod(price.RecurringChargePeriod),
+					},
+					State: quomod.QuoteItemStateType(item.State),
+					ID:    swag.String(item.ID),
+				})
+			}
+		}
+	}
+
+	return &out
 }
 
 func (d *DoDImpl) ExecOrderCreate(params *api.OrderParams) error {
@@ -208,9 +216,7 @@ func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingReque
 	); err != nil {
 		return nil, err
 	} else {
-		var pending qlcSdk.DoDPendingRequestRsp
-		_ = convert(resp.Data, &pending)
-		return []*qlcSdk.DoDPendingRequestRsp{&pending}, nil
+		return resp.Data.Result, nil
 	}
 }
 

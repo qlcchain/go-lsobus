@@ -8,9 +8,131 @@
  */
 package swagger
 
+import (
+	"time"
+)
+
 type QuoteRes struct {
-	Code   float64       `json:"code,omitempty"`
-	Error_ *interface{}  `json:"error,omitempty"`
-	Data   *QuoteResData `json:"data,omitempty"`
-	Meta   *interface{}  `json:"meta,omitempty"`
+	Code   float64        `json:"code,omitempty"`
+	Error_ *interface{}   `json:"error,omitempty"`
+	Data   *QuoteResponse `json:"data,omitempty"`
+	Meta   *interface{}   `json:"meta,omitempty"`
+}
+
+type QuoteItem struct {
+	ID      string `json:"id"`
+	State   string `json:"state"`
+	Action  string `json:"action"`
+	Product struct {
+		ID                   string `json:"id"`
+		ProductSpecification struct {
+			ID         string `json:"id"`
+			Describing struct {
+				PhysicalLayer       []string `json:"physicalLayer"`
+				InterconnectionType string   `json:"interconnectionType"`
+			} `json:"describing"`
+		} `json:"productSpecification"`
+		ProductRelationship []struct {
+			Type    string `json:"type"`
+			Product struct {
+				ID string `json:"id"`
+			} `json:"product"`
+		} `json:"productRelationship"`
+		Place []struct {
+			ID   string `json:"id"`
+			Role string `json:"role"`
+			Type string `json:"@type"`
+		} `json:"place"`
+	} `json:"product,omitempty"`
+	QuoteItemPrice []struct {
+		PriceType             string `json:"priceType"`
+		RecurringChargePeriod string `json:"recurringChargePeriod,omitempty"`
+		Name                  string `json:"name,omitempty"`
+		Price                 struct {
+			PreTaxAmount struct {
+				Value float32 `json:"value"`
+				Unit  string  `json:"unit"`
+			} `json:"preTaxAmount"`
+		} `json:"price"`
+	} `json:"quoteItemPrice"`
+	RequestedQuoteItemTerm struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Duration    struct {
+			Value int    `json:"value"`
+			Unit  string `json:"unit"`
+		} `json:"duration"`
+	} `json:"requestedQuoteItemTerm"`
+	QuoteItemTerm struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Duration    struct {
+			Value int    `json:"value"`
+			Unit  string `json:"unit"`
+		} `json:"duration"`
+	} `json:"quoteItemTerm"`
+	QuoteItemRelationship []struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	} `json:"quoteItemRelationship"`
+	Note []struct {
+		Date   time.Time `json:"date"`
+		Author string    `json:"author"`
+		Text   string    `json:"text"`
+	} `json:"note,omitempty"`
+	Qualification []struct {
+		ID                string `json:"id"`
+		Href              string `json:"href"`
+		QualificationItem string `json:"qualificationItem"`
+	} `json:"qualification"`
+	RelatedParty []struct {
+		ID              string   `json:"id"`
+		Role            []string `json:"role"`
+		Name            string   `json:"name"`
+		EmailAddress    string   `json:"emailAddress"`
+		Number          string   `json:"number"`
+		NumberExtension string   `json:"numberExtension"`
+		ReferredType    string   `json:"@referredType"`
+	} `json:"relatedParty"`
+}
+
+type QuoteResponse struct {
+	ApimXUserID                  string    `json:"apimXUserId"`
+	HTTPStatus                   string    `json:"httpStatus"`
+	ID                           string    `json:"id"`
+	Href                         string    `json:"href"`
+	ProjectID                    string    `json:"projectId"`
+	Description                  string    `json:"description"`
+	State                        string    `json:"state"`
+	QuoteDate                    time.Time `json:"quoteDate"`
+	InstantSyncQuoting           bool      `json:"instantSyncQuoting"`
+	QuoteLevel                   string    `json:"quoteLevel"`
+	RequestedQuoteCompletionDate time.Time `json:"requestedQuoteCompletionDate"`
+	ExpectedQuoteCompletionDate  time.Time `json:"expectedQuoteCompletionDate"`
+	ExpectedFulfillmentStartDate string    `json:"expectedFulfillmentStartDate"`
+	EffectiveQuoteCompletionDate time.Time `json:"effectiveQuoteCompletionDate"`
+	ValidFor                     struct {
+		StartDate time.Time `json:"startDate"`
+		EndDate   time.Time `json:"endDate"`
+	} `json:"validFor"`
+	Note []struct {
+		Date   time.Time `json:"date"`
+		Author string    `json:"author"`
+		Text   string    `json:"text"`
+	} `json:"note"`
+	Agreement []struct {
+		ID   string `json:"id"`
+		Href string `json:"href"`
+		Name string `json:"name"`
+		Path string `json:"path"`
+	} `json:"agreement"`
+	RelatedParty []struct {
+		ID              string   `json:"id"`
+		Role            []string `json:"role"`
+		Name            string   `json:"name"`
+		EmailAddress    string   `json:"emailAddress"`
+		Number          string   `json:"number"`
+		NumberExtension string   `json:"numberExtension"`
+	} `json:"relatedParty"`
+	QuoteItem []*QuoteItem `json:"quoteItem"`
 }

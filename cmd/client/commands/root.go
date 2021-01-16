@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	endpointP = "http://127.0.0.1:9999"
+	endpointP = "http://127.0.0.1:7777"
 )
 
 func Execute(osArgs []string) {
@@ -33,7 +33,7 @@ func Execute(osArgs []string) {
 		})
 		shell.Println("LSOBUS Client")
 		//set common variable
-		addcommands()
+		addCommands()
 		// run shell
 		shell.Run()
 	} else {
@@ -44,8 +44,8 @@ func Execute(osArgs []string) {
 			Run: func(cmd *cobra.Command, args []string) {
 			},
 		}
-		rootCmd.PersistentFlags().StringVarP(&endpointP, "endpoint", "e", endpointP, "endpoint for client")
-		addcommands()
+		rootCmd.PersistentFlags().StringVarP(&endpointP, "endpoint", "e", endpointP, "DoD backend address for client")
+		addCommands()
 		//addSonataCmd(rootCmd)
 		if err := rootCmd.Execute(); err != nil {
 			fmt.Println(err)
@@ -68,7 +68,8 @@ func isInteractive(osArgs []string) bool {
 	return false
 }
 
-func addcommands() {
+func addCommands() {
 	version()
-	//addOrderCmd()
+	addOrderCmd()
+	addMockOrderCmd()
 }

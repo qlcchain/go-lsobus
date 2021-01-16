@@ -40,11 +40,13 @@ func (cs *ContractCaller) processDoDContract() {
 			cs.logger.Error("invalid order info")
 			continue
 		}
+
 		b := cs.verifyOrderInfoFromSonata(v.Order)
 		if !b {
 			continue
 		}
 		//		}
+		
 		action, err := qlcSdk.ParseDoDSettleResponseAction("confirm")
 		if err != nil {
 			cs.logger.Error(err)
@@ -84,19 +86,20 @@ func (cs *ContractCaller) processDoDContract() {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())
 			continue
 		}
+		cs.logger.Debug(blk)
 
-		if h, err := cs.seller.Process(blk); err != nil {
-			cs.logger.Errorf("process block error: %s", err)
-			continue
-		} else if h != pkg.ZeroHash {
-			cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
-			err = cs.readAndWriteProcessingOrder("add", "seller", v.Order.InternalId)
-			if err != nil {
-				cs.logger.Error(err)
-				continue
-			}
-			cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
-		}
+		//if h, err := cs.seller.Process(blk); err != nil {
+		//	cs.logger.Errorf("process block error: %s", err)
+		//	continue
+		//} else if h != pkg.ZeroHash {
+		//	cs.logger.Infof("dod settlement sign success,request hash is :%s", v.Hash.String())
+		//	err = cs.readAndWriteProcessingOrder("add", "seller", v.Order.InternalId)
+		//	if err != nil {
+		//		cs.logger.Error(err)
+		//		continue
+		//	}
+		//	cs.orderIdOnChainSeller.Store(v.Order.InternalId, "")
+		//}
 	}
 }
 
@@ -123,10 +126,11 @@ func (cs *ContractCaller) verifyOrderInfoFromSonata(order *qlcSdk.DoDSettleOrder
 			return false
 		}
 
-		if len(op.RspQuote.QuoteItem) != len(order.Connections) {
-			cs.logger.Errorf("order information verify fail, item count not equal")
-			return false
-		}
+		//FIXME: support ordering port
+		//if len(op.RspQuote.QuoteItem) != len(order.Connections) {
+		//	cs.logger.Errorf("order information verify fail, item count not equal")
+		//	return false
+		//}
 
 		for _, v := range op.RspQuote.QuoteItem {
 			if *v.ID == conn.QuoteItemId {
