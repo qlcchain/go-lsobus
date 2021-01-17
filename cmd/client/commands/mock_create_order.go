@@ -9,6 +9,7 @@ import (
 
 	"github.com/abiosoft/ishell"
 	"github.com/go-resty/resty/v2"
+	"github.com/qlcchain/qlc-go-sdk/pkg/random"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 
@@ -280,6 +281,175 @@ const (
 		}
 	]
 }`
+	OrderSample = `{
+  "externalId": "d2e019e027f19e250daa9a5d4d68d40cf160d40928028b6771053f7b54e6450d",
+  "buyerRequestDate": "2021-01-07T14:00:00.000Z",
+  "requestedCompletionDate": "2021-01-07T15:00:00.000Z",
+  "orderActivity": "INSTALL",
+  "desiredResponse": "CONFIRMATION_AND_ENGINEERING_DESIGN",
+  "orderVersion": "1",
+  "projectId": "MyProject-02",
+  "relatedParty": [
+    {
+      "id": "1",
+      "role": [
+        "Buyer"
+      ],
+      "name": "Buyer",
+      "emailAddress": "buyer@me.com",
+      "number": "12123",
+      "numberExtension": "1"
+    },
+    {
+      "id": "2",
+      "role": [
+        "Notification Contact"
+      ],
+      "name": "Buyer",
+      "emailAddress": "buyer@me.com",
+      "number": "12123",
+      "numberExtension": "1"
+    }
+  ],
+  "note": [],
+  "orderItem": [
+    {
+      "id": "1",
+      "action": "INSTALL",
+      "productOffering": {
+        "id": "294d59af1508440b8c2989856bd4eedd"
+      },
+      "relatedParty": [
+        {
+          "id": "1",
+          "role": [
+            "UNISpecContact"
+          ],
+          "name": "test contact",
+          "emailAddress": "who@me.com",
+          "number": "661763285401"
+        }
+      ],
+      "product": {
+        "productSpecification": {
+          "id": "UNISpec"
+        },
+        "place": [
+          {
+            "id": "32443101",
+            "role": "UNI_LOCATION"
+          }
+        ],
+        "productRelationship": []
+      },
+      "orderItemRelationship": [],
+      "qualification": {
+        "id": "294d59af1508440b8c2989856bd4eedd",
+        "qualificationItem": "1"
+      },
+      "quote": {
+        "id": "81e08d2909f94d0fb60582c362384bca",
+        "quoteItem": "1"
+      }
+    },
+    {
+      "id": "2",
+      "action": "INSTALL",
+      "productOffering": {
+        "id": "294d59af1508440b8c2989856bd4eedd"
+      },
+      "relatedParty": [
+        {
+          "id": "1",
+          "role": [
+            "ELineSpecContact"
+          ],
+          "name": "Buyer",
+          "emailAddress": "buyer@me.com",
+          "number": "12123",
+          "numberExtension": "1"
+        }
+      ],
+      "product": {
+        "productSpecification": {
+          "id": "ELineSpec"
+        },
+        "place": [],
+        "productRelationship": [
+          {
+            "type": "RELIES_ON",
+            "product": {
+              "id": "QLINK01",
+              "productSpecification": {
+                "id": "ENNI"
+              }
+            }
+          }
+        ]
+      },
+      "orderItemRelationship": [
+        {
+          "type": "RELIES_ON",
+          "id": "1"
+        }
+      ],
+      "qualification": {
+        "id": "294d59af1508440b8c2989856bd4eedd",
+        "qualificationItem": "2"
+      },
+      "quote": {
+        "id": "81e08d2909f94d0fb60582c362384bca",
+        "quoteItem": "2"
+      }
+    }
+  ],
+  "createDate": "2021-01-07T14:00:00.000Z"
+}`
+
+	SmartContractSample = `{
+	"buyer": {
+		"address": "qlc_17xd74qtbz5cu7teg9nx4m418qoc3pwq4a6kxixassed3af4ux3houii3ur7",
+		"seed": "b41c5db45a2b9d2bce0a19445f74b768af2a546d8d9f5b59d6680067a1ed00be",
+		"name": "Buyer"
+	}, 
+  "orderItem": [
+    {
+      "id": "PRODUCT-6eeddcba-e423-43e9-a0d4-71fb5ce427df",
+      "productOffering": {
+        "id": "294d59af1508440b8c2989856bd4eedd"
+      },
+      "quote": {
+        "id": "7a1407e8f50b4f7c86636fc354400f48",
+        "quoteItem": "1"
+      },
+			"detail": {
+				"buyerProductId": "PRD0017HCVF44ED"
+			}
+    },
+		{
+      "id": "PRODUCT-85fbb62d-f24c-42e7-8632-56b7fffaf2cd",
+      "productOffering": {
+        "id": "294d59af1508440b8c2989856bd4eedd"
+      },
+      "quote": {
+        "id": "7a1407e8f50b4f7c86636fc354400f48",
+        "quoteItem": "2"
+      },
+			"detail": {
+				"buyerProductId": "PRD00FXUZY1GCVE",
+				"connectionName" : "MyProject-03",
+				"paymentType" : "invoice",
+				"billingType" : "DOD",
+				"bandwidth" : "100",
+				"unit": "Mbps",
+				"billingUnit" : null,
+				"dateStartUnix": "1610467115",
+				"dateEndUnix": "1611467115",
+				"serviceClass" : "bronze" 
+			}
+    }
+  ]
+}`
 )
 
 func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
@@ -335,26 +505,26 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 }
 
 func mockOrderForBuyer(seed, vendor, token string) error {
-	var account *pkg.Account
-	if bytes, err := hex.DecodeString(seed); err != nil {
-		return err
-	} else {
-		if s, err := pkg.BytesToSeed(bytes); err != nil {
-			return err
-		} else {
-			var err error
-			if account, err = s.Account(0); err != nil {
-				return err
-			}
-		}
-	}
+	//var account *pkg.Account
+	//if bytes, err := hex.DecodeString(seed); err != nil {
+	//	return err
+	//} else {
+	//	if s, err := pkg.BytesToSeed(bytes); err != nil {
+	//		return err
+	//	} else {
+	//		var err error
+	//		if account, err = s.Account(0); err != nil {
+	//			return err
+	//		}
+	//	}
+	//}
 
 	client := resty.New().SetHeader("CLIENT-KEY", token).
 		SetHeader("Content-Type", "application/json").EnableTrace().SetDebug(true)
 
 	switch strings.ToUpper(vendor) {
 	case "HGC":
-		return mockHGCOrderForBuyer(client, account)
+		return mockHGCOrderForBuyer(client, seed)
 	default:
 		return fmt.Errorf("unsupport sonata vendor %s", vendor)
 	}
@@ -672,7 +842,167 @@ type QuoteResponse struct {
 	Meta  interface{} `json:"meta"`
 }
 
-func mockHGCOrderForBuyer(client *resty.Client, account *pkg.Account) error {
+type OrderRequest struct {
+	ExternalID              string    `json:"externalId"`
+	BuyerRequestDate        time.Time `json:"buyerRequestDate"`
+	RequestedCompletionDate time.Time `json:"requestedCompletionDate"`
+	OrderActivity           string    `json:"orderActivity"`
+	DesiredResponse         string    `json:"desiredResponse"`
+	OrderVersion            string    `json:"orderVersion"`
+	ProjectID               string    `json:"projectId"`
+	RelatedParty            []struct {
+		ID              string   `json:"id"`
+		Role            []string `json:"role"`
+		Name            string   `json:"name"`
+		EmailAddress    string   `json:"emailAddress"`
+		Number          string   `json:"number"`
+		NumberExtension string   `json:"numberExtension"`
+	} `json:"relatedParty"`
+	Note      []interface{} `json:"note"`
+	OrderItem []struct {
+		ID              string `json:"id"`
+		Action          string `json:"action"`
+		ProductOffering struct {
+			ID string `json:"id"`
+		} `json:"productOffering"`
+		RelatedParty []struct {
+			ID           string   `json:"id"`
+			Role         []string `json:"role"`
+			Name         string   `json:"name"`
+			EmailAddress string   `json:"emailAddress"`
+			Number       string   `json:"number"`
+		} `json:"relatedParty"`
+		Product struct {
+			ProductSpecification struct {
+				ID string `json:"id"`
+			} `json:"productSpecification"`
+			Place []struct {
+				ID   string `json:"id"`
+				Role string `json:"role"`
+			} `json:"place"`
+			ProductRelationship []interface{} `json:"productRelationship"`
+		} `json:"product"`
+		OrderItemRelationship []interface{} `json:"orderItemRelationship"`
+		Qualification         struct {
+			ID                string `json:"id"`
+			QualificationItem string `json:"qualificationItem"`
+		} `json:"qualification"`
+		Quote struct {
+			ID        string `json:"id"`
+			QuoteItem string `json:"quoteItem"`
+		} `json:"quote"`
+	} `json:"orderItem"`
+	CreateDate time.Time `json:"createDate"`
+}
+
+type Order struct {
+	ApimXUserID             string    `json:"apimXUserId"`
+	ID                      string    `json:"id"`
+	ExternalID              string    `json:"externalId"`
+	State                   string    `json:"state"`
+	BuyerRequestDate        time.Time `json:"buyerRequestDate"`
+	RequestedCompletionDate time.Time `json:"requestedCompletionDate"`
+	OrderActivity           string    `json:"orderActivity"`
+	DesiredResponse         string    `json:"desiredResponse"`
+	OrderVersion            string    `json:"orderVersion"`
+	ProjectID               string    `json:"projectId"`
+	RelatedParty            []struct {
+		ID              string   `json:"id"`
+		Role            []string `json:"role"`
+		Name            string   `json:"name"`
+		EmailAddress    string   `json:"emailAddress"`
+		Number          string   `json:"number"`
+		NumberExtension string   `json:"numberExtension"`
+	} `json:"relatedParty"`
+	Note      []interface{} `json:"note"`
+	OrderItem []struct {
+		ID              string `json:"id"`
+		Action          string `json:"action"`
+		ProductOffering struct {
+			ID string `json:"id"`
+		} `json:"productOffering"`
+		RelatedParty []struct {
+			ID           string   `json:"id"`
+			Role         []string `json:"role"`
+			Name         string   `json:"name"`
+			EmailAddress string   `json:"emailAddress"`
+			Number       string   `json:"number"`
+		} `json:"relatedParty"`
+		Product struct {
+			ProductSpecification struct {
+				ID string `json:"id"`
+			} `json:"productSpecification"`
+			Place []struct {
+				ID           string `json:"id"`
+				Role         string `json:"role"`
+				AddressLine1 string `json:"addressLine1"`
+			} `json:"place"`
+			ProductRelationship []interface{} `json:"productRelationship"`
+		} `json:"product"`
+		OrderItemRelationship []interface{} `json:"orderItemRelationship"`
+		Qualification         struct {
+			ID                string `json:"id"`
+			QualificationItem string `json:"qualificationItem"`
+		} `json:"qualification"`
+		Quote struct {
+			ID        string `json:"id"`
+			QuoteItem string `json:"quoteItem"`
+		} `json:"quote"`
+	} `json:"orderItem"`
+	CreateDate string `json:"createDate"`
+}
+
+type OrderResponse struct {
+	Error interface{} `json:"error"`
+	Data  *Order      `json:"data"`
+	Code  interface{} `json:"code"`
+	Meta  interface{} `json:"meta"`
+}
+
+type User struct {
+	Address string `json:"address"`
+	Seed    string `json:"seed"`
+	Name    string `json:"name"`
+}
+
+type SmartContractOrderItem struct {
+	ID              string `json:"id"`
+	ProductOffering struct {
+		ID string `json:"id"`
+	} `json:"productOffering"`
+	Quote struct {
+		ID        string `json:"id"`
+		QuoteItem string `json:"quoteItem"`
+	} `json:"quote"`
+	Detail struct {
+		BuyerProductID string      `json:"buyerProductId"`
+		ConnectionName string      `json:"connectionName"`
+		PaymentType    string      `json:"paymentType"`
+		BillingType    string      `json:"billingType"`
+		Bandwidth      string      `json:"bandwidth"`
+		Unit           string      `json:"unit"`
+		BillingUnit    interface{} `json:"billingUnit"`
+		DateStartUnix  string      `json:"dateStartUnix"`
+		DateEndUnix    string      `json:"dateEndUnix"`
+		ServiceClass   string      `json:"serviceClass"`
+	} `json:"detail,omitempty"`
+}
+
+type SmartContractRequest struct {
+	Buyer     User                      `json:"buyer"`
+	OrderItem []*SmartContractOrderItem `json:"orderItem"`
+}
+
+type SmartContractResponse struct {
+	Error interface{} `json:"error"`
+	Data  struct {
+		TxID string `json:"txId"`
+	} `json:"data"`
+	Code interface{} `json:"code"`
+	Meta interface{} `json:"meta"`
+}
+
+func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	u.Info("STEP1, query inventory")
 	resp, err := client.R().SetResult(&InventoryWrapper{}).Get(fmt.Sprintf("%s/v1/orders/product-inventory", endpointP))
 	if err != nil {
@@ -700,11 +1030,23 @@ func mockHGCOrderForBuyer(client *resty.Client, account *pkg.Account) error {
 		return err
 	}
 	quote := resp.Result().(*QuoteResponse).Data
-	u.Info(quote)
 
 	u.Info("STEP4, place an order")
+	orderReq := mockOrderRequest(quote)
+	resp, err = client.R().SetBody(orderReq).SetResult(&OrderResponse{}).Post(fmt.Sprintf("%s/v1/orders", endpointP))
+	if err != nil {
+		return err
+	}
+	order := resp.Result().(*OrderResponse).Data
 
 	u.Info("STEP5, create smart contract to save order info")
+	smReq := mockSmartContract(order, seed)
+	resp, err = client.R().SetBody(smReq).SetResult(&SmartContractResponse{}).Post(fmt.Sprintf("%s/v1/orders/smart-contract", endpointP))
+	if err != nil {
+		return err
+	}
+	tx := resp.Result().(*SmartContractResponse).Data
+	u.Info("smart contract tx: ", tx.TxID)
 
 	return nil
 }
@@ -716,9 +1058,50 @@ func mockPOQRequest(inventory []*Inventory) *POQRequest {
 	poqRequest.RequestedResponseDate = time.Now().AddDate(0, 0, 1)
 	poqRequest.ProductOfferingQualificationItem[0].Product.ProductSpecification.ID = generateID("UNI001-POQ", 3)
 	poqRequest.ProductOfferingQualificationItem[1].Product.ProductSpecification.ID = generateID("ELINE001-POQ", 3)
+
 	return &poqRequest
+}
+
+func mockOrderRequest(quote *Quote) *OrderRequest {
+	orderRequest := &OrderRequest{}
+	json.Unmarshal([]byte(OrderSample), &orderRequest)
+	orderRequest.ProjectID = quote.ProjectID
+	orderRequest.ExternalID = Hash().String()
+	for i := 0; i < len(orderRequest.OrderItem); i++ {
+		orderRequest.OrderItem[i].Quote.ID = quote.ID
+		orderRequest.OrderItem[i].Qualification.ID = quote.QuoteItem[i].Qualification[0].ID
+	}
+	now := time.Now()
+	orderRequest.CreateDate = now
+	orderRequest.BuyerRequestDate = now
+	orderRequest.RequestedCompletionDate = now.AddDate(0, 0, 2)
+
+	return orderRequest
+}
+
+func mockSmartContract(order *Order, seed string) *SmartContractRequest {
+	bytes, _ := hex.DecodeString(seed)
+	s, _ := pkg.BytesToSeed(bytes)
+	account, _ := s.Account(0)
+	smRequest := &SmartContractRequest{}
+	json.Unmarshal([]byte(SmartContractSample), &smRequest)
+	smRequest.Buyer = User{Address: account.Address().String(), Seed: seed, Name: "LSOBus Bot"}
+
+	for i := 0; i < len(order.OrderItem); i++ {
+		smRequest.OrderItem[i].ID = Hash().String()
+		smRequest.OrderItem[i].ProductOffering.ID = order.OrderItem[i].ProductOffering.ID
+		smRequest.OrderItem[i].Quote.ID = order.OrderItem[i].Quote.ID
+	}
+
+	return smRequest
 }
 
 func generateID(prefix string, length int) string {
 	return fmt.Sprintf("%s-%s", prefix, util.RandomFixedString(length))
+}
+
+func Hash() pkg.Hash {
+	h := pkg.Hash{}
+	_ = random.Bytes(h[:])
+	return h
 }
