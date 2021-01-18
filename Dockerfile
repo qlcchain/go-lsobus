@@ -7,7 +7,7 @@ COPY . /qlcchain/go-lsobus
 RUN cd /qlcchain/go-lsobus && make clean build
 
 # Pull lsobus into a second stage deploy alpine container
-FROM alpine:3.12.3
+FROM alpine:3.13.0
 
 ENV LSOBUSHOME /lsobus
 
