@@ -18,7 +18,7 @@ require (
 	github.com/go-openapi/validate v0.20.0
 	github.com/go-resty/resty/v2 v2.4.0
 	github.com/golang/protobuf v1.4.3
-	github.com/google/uuid v1.1.4
+	github.com/google/uuid v1.1.5
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/qlcchain/qlc-go-sdk v1.4.2
