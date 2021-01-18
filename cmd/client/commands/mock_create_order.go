@@ -1031,22 +1031,23 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	}
 	quote := resp.Result().(*QuoteResponse).Data
 
-	u.Info("STEP4, place an order")
-	orderReq := mockOrderRequest(quote)
-	resp, err = client.R().SetBody(orderReq).SetResult(&OrderResponse{}).Post(fmt.Sprintf("%s/v1/orders", endpointP))
-	if err != nil {
-		return err
-	}
-	order := resp.Result().(*OrderResponse).Data
-
-	u.Info("STEP5, create smart contract to save order info")
-	smReq := mockSmartContract(order, seed)
+	u.Info("STEP4, create smart contract to save order info")
+	smReq := mockSmartContract(quote, seed)
 	resp, err = client.R().SetBody(smReq).SetResult(&SmartContractResponse{}).Post(fmt.Sprintf("%s/v1/orders/smart-contract", endpointP))
 	if err != nil {
 		return err
 	}
 	tx := resp.Result().(*SmartContractResponse).Data
 	u.Info("smart contract tx: ", tx.TxID)
+
+	u.Info("STEP5, place an order")
+	orderReq := mockOrderRequest(quote, tx.TxID)
+	resp, err = client.R().SetBody(orderReq).SetResult(&OrderResponse{}).Post(fmt.Sprintf("%s/v1/orders", endpointP))
+	if err != nil {
+		return err
+	}
+	order := resp.Result().(*OrderResponse).Data
+	u.Info(order)
 
 	return nil
 }
@@ -1062,11 +1063,11 @@ func mockPOQRequest(inventory []*Inventory) *POQRequest {
 	return &poqRequest
 }
 
-func mockOrderRequest(quote *Quote) *OrderRequest {
+func mockOrderRequest(quote *Quote, id string) *OrderRequest {
 	orderRequest := &OrderRequest{}
 	json.Unmarshal([]byte(OrderSample), &orderRequest)
 	orderRequest.ProjectID = quote.ProjectID
-	orderRequest.ExternalID = Hash().String()
+	orderRequest.ExternalID = id
 	for i := 0; i < len(orderRequest.OrderItem); i++ {
 		orderRequest.OrderItem[i].Quote.ID = quote.ID
 		orderRequest.OrderItem[i].Qualification.ID = quote.QuoteItem[i].Qualification[0].ID
@@ -1079,7 +1080,7 @@ func mockOrderRequest(quote *Quote) *OrderRequest {
 	return orderRequest
 }
 
-func mockSmartContract(order *Order, seed string) *SmartContractRequest {
+func mockSmartContract(quote *Quote, seed string) *SmartContractRequest {
 	bytes, _ := hex.DecodeString(seed)
 	s, _ := pkg.BytesToSeed(bytes)
 	account, _ := s.Account(0)
@@ -1087,10 +1088,10 @@ func mockSmartContract(order *Order, seed string) *SmartContractRequest {
 	json.Unmarshal([]byte(SmartContractSample), &smRequest)
 	smRequest.Buyer = User{Address: account.Address().String(), Seed: seed, Name: "LSOBus Bot"}
 
-	for i := 0; i < len(order.OrderItem); i++ {
+	for i := 0; i < len(quote.QuoteItem); i++ {
 		smRequest.OrderItem[i].ID = Hash().String()
-		smRequest.OrderItem[i].ProductOffering.ID = order.OrderItem[i].ProductOffering.ID
-		smRequest.OrderItem[i].Quote.ID = order.OrderItem[i].Quote.ID
+		smRequest.OrderItem[i].ProductOffering.ID = quote.QuoteItem[i].Qualification[0].ID
+		smRequest.OrderItem[i].Quote.ID = quote.ID
 	}
 
 	return smRequest
