@@ -51,7 +51,7 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	//FIXME: verify PoV status
 	p.status.Store(1)
 	if resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background()); err == nil {
-		p.logger.Debugf("pov status %f", resp.Data.SyncState)
+		p.logger.Debugf("pov status %d, %s", resp.SyncState, resp.SyncStateStr)
 	}
 
 	//go func(ctx context.Context, client *sw.APIClient) {
@@ -117,12 +117,12 @@ func (d *DoDImpl) ExecQuoteGet(params *api.GetParams) error {
 	if resp, _, err := d.client.QuotesApi.V1QuotesIdGet(context.Background(), params.ID); err != nil {
 		return err
 	} else {
-		params.RspQuote = quoteItem2Quote(resp.Data)
+		params.RspQuote = quoteItem2Quote(&resp)
 		return nil
 	}
 }
 
-func quoteItem2Quote(in *sw.QuoteResponse) *quomod.Quote {
+func quoteItem2Quote(in *sw.QuoteRes) *quomod.Quote {
 	var out quomod.Quote
 
 	// mapping price
@@ -216,7 +216,7 @@ func (d *DoDImpl) GetPendingRequest(addr pkg.Address) ([]*qlcSdk.DoDPendingReque
 	); err != nil {
 		return nil, err
 	} else {
-		return resp.Data.Result, nil
+		return resp.Result, nil
 	}
 }
 
@@ -354,7 +354,7 @@ func (d *DoDImpl) GetCreateOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetCreateOrderRewardBlock: %s", resp.Data.TxId)
+		d.logger.Debugf("GetCreateOrderRewardBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }

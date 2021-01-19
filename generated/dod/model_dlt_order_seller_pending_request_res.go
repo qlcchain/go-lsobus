@@ -11,13 +11,6 @@ package swagger
 import qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
 type DltOrderSellerPendingRequestRes struct {
-	Code   float64                       `json:"code,omitempty"`
-	Error_ *interface{}                  `json:"error,omitempty"`
-	Data   *DltOrderSellerPendingResData `json:"data,omitempty"`
-	Meta   *interface{}                  `json:"meta,omitempty"`
-}
-
-type DltOrderSellerPendingResData struct {
 	Jsonrpc string                         `json:"jsonrpc"`
 	ID      string                         `json:"id"`
 	Result  []*qlcSdk.DoDPendingRequestRsp `json:"result"`

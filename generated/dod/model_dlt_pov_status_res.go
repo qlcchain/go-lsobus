@@ -9,8 +9,7 @@
 package swagger
 
 type DltPovStatusRes struct {
-	Code   float64              `json:"code,omitempty"`
-	Error_ *interface{}         `json:"error,omitempty"`
-	Data   *DltPovStatusResData `json:"data,omitempty"`
-	Meta   *interface{}         `json:"meta,omitempty"`
+	PovEnabled   bool   `json:"povEnabled,omitempty"`
+	SyncState    int    `json:"syncState,omitempty"`
+	SyncStateStr string `json:"syncStateStr,omitempty"`
 }
