@@ -9,8 +9,7 @@
 package swagger
 
 type DltOrderSellerPendingResourceCheckRes struct {
-	Code   float64                                   `json:"code,omitempty"`
-	Error_ *interface{}                              `json:"error,omitempty"`
-	Data   []DltOrderSellerPendingResourceCheckModel `json:"data,omitempty"`
-	Meta   *interface{}                              `json:"meta,omitempty"`
+	Jsonrpc string                                     `json:"jsonrpc"`
+	ID      string                                     `json:"id"`
+	Result  []*DltOrderSellerPendingResourceCheckModel `json:"result,omitempty"`
 }
