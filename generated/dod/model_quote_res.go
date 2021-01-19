@@ -12,13 +12,6 @@ import (
 	"time"
 )
 
-type QuoteRes struct {
-	Code   float64        `json:"code,omitempty"`
-	Error_ *interface{}   `json:"error,omitempty"`
-	Data   *QuoteResponse `json:"data,omitempty"`
-	Meta   *interface{}   `json:"meta,omitempty"`
-}
-
 type QuoteItem struct {
 	ID      string `json:"id"`
 	State   string `json:"state"`
@@ -96,7 +89,7 @@ type QuoteItem struct {
 	} `json:"relatedParty"`
 }
 
-type QuoteResponse struct {
+type QuoteRes struct {
 	ApimXUserID                  string    `json:"apimXUserId"`
 	HTTPStatus                   string    `json:"httpStatus"`
 	ID                           string    `json:"id"`

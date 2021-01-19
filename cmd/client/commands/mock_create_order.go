@@ -539,13 +539,6 @@ type Inventory struct {
 	} `json:"productSpecification"`
 }
 
-type InventoryWrapper struct {
-	Error string       `json:"error"`
-	Data  []*Inventory `json:"data"`
-	Code  string       `json:"code"`
-	Meta  string       `json:"meta"`
-}
-
 type POQRequest struct {
 	ProjectID                string    `json:"projectId"`
 	ProvideAlternative       bool      `json:"provideAlternative"`
@@ -589,7 +582,7 @@ type POQRequest struct {
 	} `json:"productOfferingQualificationItem"`
 }
 
-type POQ struct {
+type POQResponse struct {
 	ID                                   string    `json:"id"`
 	InstantSyncQualification             bool      `json:"instantSyncQualification"`
 	State                                string    `json:"state"`
@@ -632,13 +625,6 @@ type POQ struct {
 			} `json:"place"`
 		} `json:"product,omitempty"`
 	} `json:"productOfferingQualificationItem"`
-}
-
-type POQResponse struct {
-	Error interface{} `json:"error"`
-	Data  *POQ        `json:"data"`
-	Code  interface{} `json:"code"`
-	Meta  interface{} `json:"meta"`
 }
 
 type QuoteRequest struct {
@@ -720,7 +706,7 @@ type QuoteRequest struct {
 	} `json:"quoteItem"`
 }
 
-type Quote struct {
+type QuoteResponse struct {
 	HTTPStatus                   string    `json:"httpStatus"`
 	ID                           string    `json:"id"`
 	Href                         string    `json:"href"`
@@ -835,13 +821,6 @@ type Quote struct {
 	} `json:"quoteItem"`
 }
 
-type QuoteResponse struct {
-	Error interface{} `json:"error"`
-	Data  *Quote      `json:"data"`
-	Code  interface{} `json:"code"`
-	Meta  interface{} `json:"meta"`
-}
-
 type OrderRequest struct {
 	ExternalID              string    `json:"externalId"`
 	BuyerRequestDate        time.Time `json:"buyerRequestDate"`
@@ -895,7 +874,7 @@ type OrderRequest struct {
 	CreateDate time.Time `json:"createDate"`
 }
 
-type Order struct {
+type OrderResponse struct {
 	ApimXUserID             string    `json:"apimXUserId"`
 	ID                      string    `json:"id"`
 	ExternalID              string    `json:"externalId"`
@@ -952,13 +931,6 @@ type Order struct {
 	CreateDate string `json:"createDate"`
 }
 
-type OrderResponse struct {
-	Error interface{} `json:"error"`
-	Data  *Order      `json:"data"`
-	Code  interface{} `json:"code"`
-	Meta  interface{} `json:"meta"`
-}
-
 type User struct {
 	Address string `json:"address"`
 	Seed    string `json:"seed"`
@@ -994,21 +966,16 @@ type SmartContractRequest struct {
 }
 
 type SmartContractResponse struct {
-	Error interface{} `json:"error"`
-	Data  struct {
-		TxID string `json:"txId"`
-	} `json:"data"`
-	Code interface{} `json:"code"`
-	Meta interface{} `json:"meta"`
+	TxID string `json:"txId"`
 }
 
 func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	u.Info("STEP1, query inventory")
-	resp, err := client.R().SetResult(&InventoryWrapper{}).Get(fmt.Sprintf("%s/v1/orders/product-inventory", endpointP))
+	var inventory []*Inventory
+	resp, err := client.R().SetResult(&inventory).Get(fmt.Sprintf("%s/v1/orders/product-inventory", endpointP))
 	if err != nil {
 		return err
 	}
-	inventory := resp.Result().(*InventoryWrapper).Data
 	//u.Info(u.ToIndentString(inventory))
 
 	u.Info("STEP2, create POQ")
@@ -1018,7 +985,7 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	if err != nil {
 		return err
 	}
-	poq := resp.Result().(*POQResponse).Data
+	poq := resp.Result().(*POQResponse)
 	//u.Info(u.ToIndentString(poq))
 
 	u.Info("STEP3, create quote")
@@ -1029,7 +996,7 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	if err != nil {
 		return err
 	}
-	quote := resp.Result().(*QuoteResponse).Data
+	quote := resp.Result().(*QuoteResponse)
 
 	u.Info("STEP4, create smart contract to save order info")
 	smReq := mockSmartContract(quote, seed)
@@ -1037,7 +1004,7 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	if err != nil {
 		return err
 	}
-	tx := resp.Result().(*SmartContractResponse).Data
+	tx := resp.Result().(*SmartContractResponse)
 	u.Info("smart contract tx: ", tx.TxID)
 
 	u.Info("STEP5, place an order")
@@ -1046,8 +1013,8 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	if err != nil {
 		return err
 	}
-	order := resp.Result().(*OrderResponse).Data
-	u.Info(order)
+	order := resp.Result().(*OrderResponse)
+	u.Info(fmt.Sprintf("order id: %s, externalid: %s", order.ID, order.ExternalID))
 
 	return nil
 }
@@ -1063,7 +1030,7 @@ func mockPOQRequest(inventory []*Inventory) *POQRequest {
 	return &poqRequest
 }
 
-func mockOrderRequest(quote *Quote, id string) *OrderRequest {
+func mockOrderRequest(quote *QuoteResponse, id string) *OrderRequest {
 	orderRequest := &OrderRequest{}
 	json.Unmarshal([]byte(OrderSample), &orderRequest)
 	orderRequest.ProjectID = quote.ProjectID
@@ -1080,7 +1047,7 @@ func mockOrderRequest(quote *Quote, id string) *OrderRequest {
 	return orderRequest
 }
 
-func mockSmartContract(quote *Quote, seed string) *SmartContractRequest {
+func mockSmartContract(quote *QuoteResponse, seed string) *SmartContractRequest {
 	bytes, _ := hex.DecodeString(seed)
 	s, _ := pkg.BytesToSeed(bytes)
 	account, _ := s.Account(0)
