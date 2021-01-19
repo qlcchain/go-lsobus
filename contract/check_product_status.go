@@ -36,14 +36,14 @@ func (cs *ContractCaller) getProductStatus() {
 		return
 	}
 
-	for _, v := range resources {
+	for _, resource := range resources {
 		var productActive []*qlcSdk.DoDSettleProductInfo
-		orderInfo, err = cs.seller.GetOrderInfoByInternalId(v.InternalId.String())
+		orderInfo, err = cs.seller.GetOrderInfoByInternalId(resource.InternalId.String())
 		if err != nil {
 			cs.logger.Error(err)
 			continue
 		}
-		for _, value := range v.Products {
+		for _, value := range resource.Products {
 			if !value.Active {
 				gp := &api.GetParams{
 					Seller: &api.PartnerParams{},
@@ -80,30 +80,30 @@ func (cs *ContractCaller) getProductStatus() {
 			}
 		}
 		if len(productActive) != 0 {
-			err = cs.updateProductStatusToChain(addr, v.OrderId, productActive)
+			err = cs.updateProductStatusToChain(addr, resource.OrderId, productActive)
 			if err != nil {
 				cs.logger.Error(err)
 			}
 		}
 		var c int
 		orderReady := false
-		for _, value := range v.Products {
+		for _, value := range resource.Products {
 			if value.Active {
 				c++
 			}
 		}
-		if c == len(v.Products) {
+		if c == len(resource.Products) {
 			if c != 0 {
 				orderReady = true
 			}
 		}
 		if orderReady {
-			err = cs.updateOrderCompleteStatusToChain(v.SendHash)
+			err = cs.updateOrderCompleteStatusToChain(resource.SendHash)
 			if err != nil {
 				cs.logger.Error(err)
 				continue
 			}
-			cs.logger.Infof("update order %s complete status to chain success", v.OrderId)
+			cs.logger.Infof("update order %s complete status to chain success", resource.OrderId)
 		}
 	}
 }
@@ -128,9 +128,6 @@ func (cs *ContractCaller) updateProductStatusToChain(
 		return err
 	}
 
-	var w pkg.Work
-	worker, _ := pkg.NewWorker(w, blk.Root())
-	blk.Work = worker.NewWork()
 	if _, err := cs.seller.Process(blk); err != nil {
 		cs.logger.Errorf("process block error: %s", err)
 		return err
