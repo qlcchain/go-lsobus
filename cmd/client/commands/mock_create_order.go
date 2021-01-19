@@ -9,6 +9,7 @@ import (
 
 	"github.com/abiosoft/ishell"
 	"github.com/go-resty/resty/v2"
+	qlcchain "github.com/qlcchain/qlc-go-sdk"
 	"github.com/qlcchain/qlc-go-sdk/pkg/random"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"github.com/qlcchain/qlc-go-sdk/pkg/util"
@@ -178,7 +179,7 @@ const (
 				]
 			},
 			"qualification": {
-				"id": "{% response 'body', 'req_1d14aaa96cc64aa8b444b3e0ddb1046d', 'b64::JC5kYXRhLmlk::46b', 'never', 60 %}",
+				"id": "8e32872f156b4f25814720d17f2fc0c8",
 				"href": "",
 				"qualificationItem": "1"
 			},
@@ -969,6 +970,26 @@ type SmartContractResponse struct {
 	TxID string `json:"txId"`
 }
 
+type OrderInfo struct {
+	Jsonrpc string                       `json:"jsonrpc"`
+	ID      string                       `json:"id"`
+	Result  *qlcchain.DoDSettleOrderInfo `json:"result"`
+}
+
+type OrderInfoItem struct {
+	ItemID      string `json:"itemId"`
+	OrderItemID string `json:"orderItemId"`
+}
+
+type UpdateOrderRequest struct {
+	Buyer       string           `json:"buyer"`
+	InternalID  string           `json:"internalId"`
+	OrderID     string           `json:"orderId"`
+	OrderItemID []*OrderInfoItem `json:"orderItemId"`
+	Status      string           `json:"status"`
+	FailReason  string           `json:"failReason"`
+}
+
 func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	u.Info("STEP1, query inventory")
 	var inventory []*Inventory
@@ -990,7 +1011,7 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 
 	u.Info("STEP3, create quote")
 	quoteReq := strings.ReplaceAll(QuoteSample, "MyProject-03", poq.ProjectID)
-	//quoteReq = strings.ReplaceAll(quoteReq, "${QUALIFICATION_ID}", poq.ID)
+	quoteReq = strings.ReplaceAll(quoteReq, "8e32872f156b4f25814720d17f2fc0c8", poq.ID)
 	//u.Info(quoteReq)
 	resp, err = client.R().SetBody(quoteReq).SetResult(&QuoteResponse{}).Post(fmt.Sprintf("%s/v1/quotes", endpointP))
 	if err != nil {
@@ -999,7 +1020,11 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	quote := resp.Result().(*QuoteResponse)
 
 	u.Info("STEP4, create smart contract to save order info")
-	smReq := mockSmartContract(quote, seed)
+	bytes, _ := hex.DecodeString(seed)
+	s, _ := pkg.BytesToSeed(bytes)
+	account, _ := s.Account(0)
+	buyer := account.Address().String()
+	smReq := mockSmartContract(quote, buyer, seed)
 	resp, err = client.R().SetBody(smReq).SetResult(&SmartContractResponse{}).Post(fmt.Sprintf("%s/v1/orders/smart-contract", endpointP))
 	if err != nil {
 		return err
@@ -1016,6 +1041,45 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	order := resp.Result().(*OrderResponse)
 	u.Info(fmt.Sprintf("order id: %s, externalid: %s", order.ID, order.ExternalID))
 
+	u.Info("STEP6, waiting the seller to sign the contract")
+	oi := &OrderInfo{}
+	for {
+		resp, err = client.R().SetBody(fmt.Sprintf(`{"internalId": "%s"}`, order.ExternalID)).SetResult(&OrderInfo{}).
+			Post(fmt.Sprintf("%s/v1/dlt/order/info/by-internal-id", endpointP))
+
+		if err != nil {
+			return err
+		}
+		oi = resp.Result().(*OrderInfo)
+		if oi.Result.ContractState == qlcchain.DoDSettleContractStateConfirmed {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+
+	param := &UpdateOrderRequest{
+		Buyer:      buyer,
+		InternalID: order.ExternalID,
+		OrderID:    order.ID,
+		Status:     "success",
+		FailReason: "",
+	}
+	for _, connection := range oi.Result.Connections {
+		param.OrderItemID = append(param.OrderItemID, &OrderInfoItem{
+			ItemID: connection.ItemId,
+			//FIXME: remove the fake data
+			OrderItemID: order.OrderItem[1].ID,
+		})
+	}
+	u.Info("STEP7, update order info for buyer")
+	resp, err = client.R().SetBody(param).SetResult(&SmartContractResponse{}).
+		Post(fmt.Sprintf("%s/v1/dlt/order/buyer/update-order-info-block", endpointP))
+
+	if err != nil {
+		return err
+	}
+	tx = resp.Result().(*SmartContractResponse)
+	u.Info("update order info tx id: ", tx.TxID)
 	return nil
 }
 
@@ -1047,16 +1111,13 @@ func mockOrderRequest(quote *QuoteResponse, id string) *OrderRequest {
 	return orderRequest
 }
 
-func mockSmartContract(quote *QuoteResponse, seed string) *SmartContractRequest {
-	bytes, _ := hex.DecodeString(seed)
-	s, _ := pkg.BytesToSeed(bytes)
-	account, _ := s.Account(0)
+func mockSmartContract(quote *QuoteResponse, buyer, seed string) *SmartContractRequest {
 	smRequest := &SmartContractRequest{}
 	json.Unmarshal([]byte(SmartContractSample), &smRequest)
-	smRequest.Buyer = User{Address: account.Address().String(), Seed: seed, Name: "LSOBus Bot"}
+	smRequest.Buyer = User{Address: buyer, Seed: seed, Name: "LSOBus Bot"}
 
 	for i := 0; i < len(quote.QuoteItem); i++ {
-		smRequest.OrderItem[i].ID = Hash().String()
+		smRequest.OrderItem[i].ID = generateID("PRD", 32)
 		smRequest.OrderItem[i].ProductOffering.ID = quote.QuoteItem[i].Qualification[0].ID
 		smRequest.OrderItem[i].Quote.ID = quote.ID
 	}

@@ -8,8 +8,10 @@
  */
 package swagger
 
+import qlcchain "github.com/qlcchain/qlc-go-sdk"
+
 type DltOrderSellerPendingResourceCheckRes struct {
-	Jsonrpc string                                     `json:"jsonrpc"`
-	ID      string                                     `json:"id"`
-	Result  []*DltOrderSellerPendingResourceCheckModel `json:"result,omitempty"`
+	Jsonrpc string                                  `json:"jsonrpc"`
+	ID      string                                  `json:"id"`
+	Result  []*qlcchain.DoDPendingResourceCheckInfo `json:"result,omitempty"`
 }

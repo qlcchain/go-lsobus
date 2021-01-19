@@ -11,5 +11,5 @@ package swagger
 type DltOrderSellerUpdateProductInfoBlockModel struct {
 	OrderItemId string `json:"orderItemId,omitempty"`
 	ProductId   string `json:"productId,omitempty"`
-	Active      string `json:"active,omitempty"`
+	Active      bool   `json:"active,omitempty"`
 }

@@ -1,13 +1,12 @@
 package contract
 
 import (
+	"fmt"
 	"time"
 
-	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
-
-	"github.com/qlcchain/go-lsobus/api"
-
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
+	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
+	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 )
 
 func (cs *ContractCaller) checkProduct() {
@@ -39,7 +38,7 @@ func (cs *ContractCaller) getProductId() {
 			}
 			if !cs.seller.IsFake() {
 				if orderInfo.ContractState != qlcSdk.DoDSettleContractStateConfirmed || orderInfo.OrderState != qlcSdk.DoDSettleOrderStateSuccess {
-					cs.logger.Info("waiting for buyer place order")
+					cs.logger.Info("waiting for buyer update the order")
 					continue
 				}
 			}
@@ -120,36 +119,43 @@ func (cs *ContractCaller) updateProductInfoToChain(
 }
 
 func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
-	fp := &api.FindParams{
-		Seller:         &api.PartnerParams{Name: sellName},
-		ProductOrderID: orderInfo.OrderId,
-	}
-	err := cs.seller.ExecInventoryFind(fp)
-	if err != nil {
-		return nil, err
-	}
+	//FIXME: find order status
+	//fp := &api.FindParams{
+	//	Seller:         &api.PartnerParams{Name: sellName},
+	//	ProductOrderID: orderInfo.OrderId,
+	//}
+	//err := cs.seller.ExecInventoryFind(fp)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if len(fp.RspInvList) == 0 {
+	//	return nil, noInventoryList
+	//}
 	var productIds []*Product
-	if len(fp.RspInvList) == 0 {
-		return nil, noInventoryList
-	}
 	for _, conn := range orderInfo.Connections {
-		var b bool
-		for _, productSummary := range fp.RspInvList {
-			for _, productOrderRef := range productSummary.ProductOrder {
-				if conn.OrderItemId == *productOrderRef.OrderItemID {
-					pt := &Product{
-						orderItemID: *productOrderRef.OrderItemID,
-						productID:   *productSummary.ID,
-					}
-					productIds = append(productIds, pt)
-					b = true
-					break
-				}
-				if b {
-					break
-				}
-			}
+		pt := &Product{
+			orderItemID: conn.OrderItemId,
+			productID:   fmt.Sprintf("MOCKPRD-%s", util.RandomFixedString(20)),
 		}
+		productIds = append(productIds, pt)
+
+		//var b bool
+		//for _, productSummary := range fp.RspInvList {
+		//	for _, productOrderRef := range productSummary.ProductOrder {
+		//		if conn.OrderItemId == *productOrderRef.OrderItemID {
+		//			pt := &Product{
+		//				orderItemID: *productOrderRef.OrderItemID,
+		//				productID:   *productSummary.ID,
+		//			}
+		//			productIds = append(productIds, pt)
+		//			b = true
+		//			break
+		//		}
+		//		if b {
+		//			break
+		//		}
+		//	}
+		//}
 	}
 
 	return productIds, nil

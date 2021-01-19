@@ -8,9 +8,10 @@
  */
 package swagger
 
+import qlcchain "github.com/qlcchain/qlc-go-sdk"
+
 type DltOrderInfoOrderDetailRes struct {
-	Code   float64                         `json:"code,omitempty"`
-	Error_ *interface{}                    `json:"error,omitempty"`
-	Data   *DltOrderInfoOrderDetailResData `json:"data,omitempty"`
-	Meta   *interface{}                    `json:"meta,omitempty"`
+	Jsonrpc string                       `json:"jsonrpc"`
+	ID      string                       `json:"id"`
+	Result  *qlcchain.DoDSettleOrderInfo `json:"result,omitempty"`
 }

@@ -4,12 +4,16 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/go-openapi/swag"
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
+
+	"github.com/qlcchain/go-lsobus/cmd/util"
 
 	invmod "github.com/qlcchain/go-lsobus/orchestra/sonata/inventory/models"
 
@@ -166,15 +170,22 @@ func (d *DoDImpl) ExecOrderGet(params *api.GetParams) error {
 }
 
 func (d *DoDImpl) ExecInventoryFind(params *api.FindParams) error {
-	panic("implement me")
+	return fmt.Errorf("implement me")
 }
 
 //FIXME:
 func (d *DoDImpl) ExecInventoryGet(params *api.GetParams) error {
+	if strings.HasPrefix(params.ID, "MOCKPRD") {
+		params.RspInv = &invmod.Product{
+			ID:     swag.String(params.ID),
+			Status: invmod.ProductStatusActive,
+		}
+		return nil
+	}
+
 	if resp, _, err := d.client.OrdersApi.V1OrdersProductInventoryIdGet(context.Background(), params.ID); err != nil {
 		return err
 	} else {
-		d.logger.Debug(resp)
 		params.RspInv = &invmod.Product{
 			ID:     swag.String(resp.Id),
 			Status: invmod.ProductStatus(resp.Status),
@@ -240,9 +251,7 @@ func (d *DoDImpl) GetPendingResourceCheck(addr pkg.Address) ([]*qlcSdk.DoDPendin
 	); err != nil {
 		return nil, err
 	} else {
-		var info []*qlcSdk.DoDPendingResourceCheckInfo
-		_ = convert(resp.Result, &info)
-		return info, nil
+		return resp.Result, nil
 	}
 }
 
@@ -252,9 +261,7 @@ func (d *DoDImpl) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderInf
 	}); err != nil {
 		return nil, err
 	} else {
-		var info qlcSdk.DoDSettleOrderInfo
-		_ = convert(resp, &info)
-		return &info, nil
+		return resp.Result, nil
 	}
 }
 
@@ -289,14 +296,18 @@ func (d *DoDImpl) GetUpdateOrderInfoBlock(param *qlcSdk.DoDSettleUpdateOrderInfo
 
 func (d *DoDImpl) GetUpdateProductInfoBlock(param *qlcSdk.DoDSettleUpdateProductInfoParam) (*pkg.StateBlock, error) {
 	var req sw.DltOrderSellerUpdateProductInfoBlockReq
+	d.logger.Debug(util.ToIndentString(param))
 	if err := convert(param, &req); err != nil {
 		return nil, err
 	}
+	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerUpdateProductInfoBlockPost(context.Background(), req); err != nil {
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetUpdateProductInfoBlock: %s", resp.Data.TxId)
+		if resp.Result != nil {
+			d.logger.Debugf("GetUpdateProductInfoBlock: %s", resp.Result.TxId)
+		}
 		return nil, nil
 	}
 }
@@ -310,7 +321,9 @@ func (d *DoDImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseP
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetUpdateOrderInfoRewardBlock: %s", resp.Data.TxId)
+		if resp.Result != nil {
+			d.logger.Debugf("GetUpdateOrderInfoRewardBlock: %s", resp.Result.TxId)
+		}
 		return nil, nil
 	}
 }
