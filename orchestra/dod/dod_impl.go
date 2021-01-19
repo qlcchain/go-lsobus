@@ -11,6 +11,8 @@ import (
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 
+	invmod "github.com/qlcchain/go-lsobus/orchestra/sonata/inventory/models"
+
 	"github.com/qlcchain/go-lsobus/log"
 
 	"github.com/qlcchain/go-lsobus/api"
@@ -167,8 +169,18 @@ func (d *DoDImpl) ExecInventoryFind(params *api.FindParams) error {
 	panic("implement me")
 }
 
+//FIXME:
 func (d *DoDImpl) ExecInventoryGet(params *api.GetParams) error {
-	panic("implement me")
+	if resp, _, err := d.client.OrdersApi.V1OrdersProductInventoryIdGet(context.Background(), params.ID); err != nil {
+		return err
+	} else {
+		d.logger.Debug(resp)
+		params.RspInv = &invmod.Product{
+			ID:     swag.String(resp.Id),
+			Status: invmod.ProductStatus(resp.Status),
+		}
+		return nil
+	}
 }
 
 func (d *DoDImpl) ExecSiteFind(params *api.FindParams) error {
@@ -229,7 +241,7 @@ func (d *DoDImpl) GetPendingResourceCheck(addr pkg.Address) ([]*qlcSdk.DoDPendin
 		return nil, err
 	} else {
 		var info []*qlcSdk.DoDPendingResourceCheckInfo
-		_ = convert(resp, &info)
+		_ = convert(resp.Result, &info)
 		return info, nil
 	}
 }

@@ -31,12 +31,12 @@ func (cs *ContractCaller) getProductStatus() {
 	var err error
 	var orderInfo *qlcSdk.DoDSettleOrderInfo
 
-	id, err := cs.seller.GetPendingResourceCheck(addr)
-	if id == nil {
+	resources, err := cs.seller.GetPendingResourceCheck(addr)
+	if resources == nil {
 		return
 	}
 
-	for _, v := range id {
+	for _, v := range resources {
 		var productActive []*qlcSdk.DoDSettleProductInfo
 		orderInfo, err = cs.seller.GetOrderInfoByInternalId(v.InternalId.String())
 		if err != nil {

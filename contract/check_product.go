@@ -26,11 +26,11 @@ func (cs *ContractCaller) checkProduct() {
 
 func (cs *ContractCaller) getProductId() {
 	addr := cs.seller.Account().Address()
-	id, err := cs.seller.GetPendingResourceCheck(addr)
-	if id == nil || err != nil {
+	resources, err := cs.seller.GetPendingResourceCheck(addr)
+	if resources == nil || err != nil {
 		return
 	}
-	for _, order := range id {
+	for _, order := range resources {
 		if len(order.Products) == 0 {
 			orderInfo, err := cs.seller.GetOrderInfoByInternalId(order.InternalId.String())
 			if err != nil {
