@@ -1,15 +1,16 @@
 package commands
 
 import (
-	"io/ioutil"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
-	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 	"gopkg.in/validator.v2"
+
+	"github.com/qlcchain/go-lsobus/config"
 
 	"github.com/qlcchain/go-lsobus/services"
 	ct "github.com/qlcchain/go-lsobus/services/context"
@@ -20,7 +21,8 @@ import (
 )
 
 var (
-	cfgPathP string
+	cfgPathP      string
+	configParamsP string
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -39,6 +41,7 @@ func Execute() {
 	}
 	flag := rootCmd.PersistentFlags()
 	flag.StringVar(&cfgPathP, "config", "", "config file")
+	flag.StringVar(&configParamsP, "configParams", "", "parameters that can be override")
 	if err := rootCmd.Execute(); err != nil {
 		log.Root.Info(err)
 		os.Exit(1)
@@ -46,9 +49,21 @@ func Execute() {
 }
 
 func start() error {
-	var account *pkg.Account
 	serviceContext := ct.NewServiceContext(cfgPathP)
-	cm, err := serviceContext.ConfigManager()
+	cm, err := serviceContext.ConfigManager(func(cm *config.CfgManager) error {
+		if len(configParamsP) > 0 {
+			cfg, _ := cm.Config()
+			params := strings.Split(configParamsP, ";")
+
+			if len(params) > 0 {
+				_, err := cm.PatchParams(params, cfg)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
@@ -61,12 +76,9 @@ func start() error {
 		return err
 	}
 
-	s := util.ToIndentString(cfg)
-	_ = ioutil.WriteFile(cm.ConfigFile, []byte(s), 0600)
+	log.Root.Debug(util.ToIndentString(cfg))
 	log.Root.Info("Run service id: ", serviceContext.Id())
 
-	// save accounts to context
-	serviceContext.SetAccount(account)
 	// start all services by chain context
 	err = serviceContext.Init(func() error {
 		return services.RegisterServices(serviceContext)

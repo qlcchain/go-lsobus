@@ -17,7 +17,7 @@ AGENT_BINARY = cbc-agent
 AGENT_MAIN = $(shell pwd)/cmd/agent/main.go
 
 BUILDDIR = $(shell pwd)/build
-VERSION ?= 0.0.1
+VERSION ?= 2.0.0
 GITREV = $(shell git rev-parse --short HEAD)
 BUILDTIME = $(shell date +'%FT%TZ%z')
 LDFLAGS=-ldflags "-X github.com/qlcchain/go-lsobus/services/version.Version=${VERSION} \
@@ -34,7 +34,7 @@ deps:
 	go get -u golang.org/x/tools/cmd/goimports
 
 build:
-	go build ${LDFLAGS} -o $(BUILDDIR)/${BINARY} -i $(MAIN)
+	go build -tags testnet ${LDFLAGS} -o $(BUILDDIR)/${BINARY} -i $(MAIN)
 	@echo 'Build $(BINARY) done.'
 
 client:

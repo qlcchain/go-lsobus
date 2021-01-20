@@ -17,11 +17,13 @@ require (
 	github.com/go-openapi/validate v0.20.1
 	github.com/go-resty/resty/v2 v2.4.0
 	github.com/golang/protobuf v1.4.3
+	github.com/google/go-cmp v0.5.2
 	github.com/google/uuid v1.1.5
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/qlcchain/qlc-go-sdk v1.4.2
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.1.1
+	github.com/spf13/viper v1.7.1
 	go.uber.org/atomic v1.7.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/oauth2 v0.0.0-20210113205817-d3ed898aa8a3

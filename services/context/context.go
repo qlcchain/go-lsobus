@@ -35,7 +35,6 @@ type ServiceContext struct {
 	cfgFile  string
 	chainId  string
 	locker   sync.RWMutex
-	account  *types.Account
 }
 
 func NewServiceContext(cfgFile string) *ServiceContext {
@@ -63,18 +62,6 @@ func NewServiceContext(cfgFile string) *ServiceContext {
 
 func (sc *ServiceContext) EventBus() event.EventBus {
 	return event.GetEventBus(sc.Id())
-}
-
-func (sc *ServiceContext) SetAccount(account *types.Account) {
-	sc.locker.Lock()
-	defer sc.locker.Unlock()
-	sc.account = account
-}
-
-func (sc *ServiceContext) Account() *types.Account {
-	sc.locker.RLock()
-	defer sc.locker.RUnlock()
-	return sc.account
 }
 
 func (sc *ServiceContext) Id() string {
@@ -279,8 +266,10 @@ func (sc *serviceContainer) Iter(fn func(name string, service common.Service) er
 	})
 }
 
-func (sc *serviceContainer) IterWithPredicate(fn func(name string, service common.Service) error,
-	predicate func(name string) bool) {
+func (sc *serviceContainer) IterWithPredicate(
+	fn func(name string, service common.Service) error,
+	predicate func(name string) bool,
+) {
 	sc.locker.RLock()
 	defer sc.locker.RUnlock()
 	for idx := range sc.names {
