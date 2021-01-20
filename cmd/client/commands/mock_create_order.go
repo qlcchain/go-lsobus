@@ -115,7 +115,7 @@ const (
 	"quoteLevel": "FIRM",
 	"instantSyncQuoting": true,
 	"description": "",
-	"requestedQuoteCompletionDate": "2021-01-19T08:19:10.528Z",
+	"requestedQuoteCompletionDate": "2021-02-19T08:19:10.528Z",
 	"expectedFulfillmentStartDate": "",
 	"agreement": [
 		{
@@ -1012,6 +1012,7 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 	u.Info("STEP3, create quote")
 	quoteReq := strings.ReplaceAll(QuoteSample, "MyProject-03", poq.ProjectID)
 	quoteReq = strings.ReplaceAll(quoteReq, "8e32872f156b4f25814720d17f2fc0c8", poq.ID)
+	quoteReq = strings.ReplaceAll(quoteReq, "2021-02-19T08:19:10.528Z", time.Now().AddDate(0, 0, 1).Format("2006-01-02T15:04:05.000Z"))
 	//u.Info(quoteReq)
 	resp, err = client.R().SetBody(quoteReq).SetResult(&QuoteResponse{}).Post(fmt.Sprintf("%s/v1/quotes", endpointP))
 	if err != nil {
