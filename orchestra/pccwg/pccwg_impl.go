@@ -23,6 +23,12 @@ import (
 	"github.com/qlcchain/go-lsobus/log"
 )
 
+const (
+	ChainURLKey = "chainurl"
+	UserNameKey = "username"
+	PasswordKey = "password"
+)
+
 type PCCWGImpl struct {
 	logger          *zap.SugaredLogger
 	cfg             *config.Config
@@ -36,6 +42,8 @@ type PCCWGImpl struct {
 	sonataInvImpl   *sonataInvImpl
 	sonataOfferImpl *sonataOfferImpl
 	status          atomic.Int32
+	user            string
+	password        string
 }
 
 func (p *PCCWGImpl) GetConfig() *config.Config {
@@ -47,7 +55,24 @@ func (p *PCCWGImpl) GetSellerConfig() *config.PartnerCfg {
 }
 
 func NewPCCGWImpl(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
-	p := &PCCWGImpl{cfg: cfg}
+	cfg.Verify(func(c *config.Config) error {
+		extra := c.Partner.Extra
+		if extra == nil {
+			return fmt.Errorf("empty extra in partner")
+		}
+		if v, ok := extra[ChainURLKey]; !ok || v == "" {
+			return errors.New("invalid chainURL")
+		}
+		if v, ok := extra[UserNameKey]; !ok || v == "" {
+			return errors.New("invalid userName")
+		}
+		if _, ok := extra[PasswordKey]; !ok {
+			return errors.New("invalid password")
+		}
+		return nil
+	})
+
+	p := &PCCWGImpl{cfg: cfg, user: cfg.Partner.Extra[UserNameKey], password: cfg.Partner.Extra[PasswordKey]}
 	p.logger = log.NewLogger("PCCWGImpl")
 
 	p.sonataSiteImpl = newSonataSiteImpl(p)
@@ -57,7 +82,8 @@ func NewPCCGWImpl(ctx context.Context, cfg *config.Config) (api.DoDSeller, error
 	p.sonataInvImpl = newSonataInvImpl(p)
 	p.sonataOfferImpl = newSonataOfferImpl(p)
 
-	client, err := qlcSdk.NewQLCClient(cfg.Partner.ChainUrl)
+	client, err := qlcSdk.NewQLCClient(cfg.Partner.Extra[ChainURLKey])
+
 	if err != nil {
 		return nil, err
 	}

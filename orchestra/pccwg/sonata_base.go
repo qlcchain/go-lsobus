@@ -49,7 +49,7 @@ type sonataBaseImpl struct {
 }
 
 func (s *sonataBaseImpl) Init() error {
-	s.URL = s.Partner.GetSellerConfig().SonataUrl
+	s.URL = s.Partner.GetSellerConfig().BackEndURL
 	if s.URL != "" {
 		retUrl, err := url.Parse(s.URL)
 		if err != nil {

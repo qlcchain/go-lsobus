@@ -6,6 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/qlcchain/go-lsobus/cmd/util"
+
 	"github.com/qlcchain/go-lsobus/orchestra/dod"
 
 	"github.com/qlcchain/go-lsobus/api"
@@ -28,6 +30,8 @@ func NewSeller(ctx context.Context, cfgFile string) (seller api.DoDSeller, err e
 	cc := chainctx.NewServiceContext(cfgFile)
 	cfg, _ := cc.Config()
 
+	log.Root.Debug(util.ToIndentString(cfg))
+
 	o := &Seller{cfg: cfg, logger: log.NewLogger("seller")}
 	partner := cfg.Partner
 
@@ -43,7 +47,7 @@ func NewSeller(ctx context.Context, cfgFile string) (seller api.DoDSeller, err e
 			return nil, err
 		}
 	default:
-		return nil, fmt.Errorf("invalid partner %s implementation, %s", partner.Name, partner.Implementation)
+		return nil, fmt.Errorf("invalid implementation %s", partner.Implementation)
 	}
 
 	o.DoDSeller = seller

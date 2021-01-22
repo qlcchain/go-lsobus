@@ -13,22 +13,16 @@ import (
 )
 
 func (p *PCCWGImpl) TryUpdateApiToken() {
-	cfg := p.GetSellerConfig()
-	if cfg.Username == "" || cfg.Password == "" {
-		p.logger.Infof("partner %s username is empty", cfg.Name)
-		return
-	}
-
 	reqParams := &api.LoginParams{}
-	reqParams.Username = cfg.Username
-	reqParams.Password = cfg.Password
+	reqParams.Username = p.user
+	reqParams.Password = p.password
 
 	err := p.ExecAuthLogin(reqParams)
 	if err == nil {
-		p.logger.Infof("partner %s update api token, got new token %s", cfg.Name, reqParams.RspLogin.Data)
+		p.logger.Infof("update api token, got new token %s", reqParams.RspLogin.Data)
 		p.apiToken = reqParams.RspLogin.Data
 	} else {
-		p.logger.Errorf("partner %s ExecAuthLogin err %s", cfg.Name, err)
+		p.logger.Errorf("ExecAuthLogin err %s", err)
 	}
 }
 
@@ -58,7 +52,7 @@ func (p *PCCWGImpl) ExecAuthLogin(params *api.LoginParams) error {
 	var err error
 
 	req := rest.Request{Method: rest.Post}
-	req.BaseURL = p.GetSellerConfig().SonataUrl + "/api/login"
+	req.BaseURL = p.GetSellerConfig().BackEndURL + "/api/login"
 	req.Body, err = json.Marshal(params)
 	if err != nil {
 		return err

@@ -30,14 +30,10 @@ func DefaultConfig(dir string) (*Config, error) {
 			CORSAllowedOrigins: []string{"*"},
 		},
 		Partner: &PartnerCfg{
-			Name:           "QLC",
-			SonataUrl:      "http://127.0.0.1:7777",
-			Username:       "",
-			Password:       "",
-			APIToken:       "",
+			BackEndURL:     "http://127.0.0.1:7777",
 			IsFake:         false,
-			ChainUrl:       "",
 			Implementation: QLCDoDBackend,
+			Extra:          map[string]string{"apiToken": "", "clientToken": ""},
 		},
 		Privacy: &PrivacyCfg{
 			Enable:         false,
