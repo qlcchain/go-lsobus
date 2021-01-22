@@ -1,13 +1,15 @@
 package config
 
+import "gopkg.in/validator.v2"
+
 type Config struct {
-	Version  int    `json:"version"`
-	DataDir  string `json:"dataDir"`
-	LogLevel string `json:"logLevel"` //info,warn,debug.
+	Version  int    `json:"version" validate:"nonzero"`
+	DataDir  string `json:"dataDir" validate:"nonzero"`
+	LogLevel string `json:"logLevel" validate:"nonzero"` //info,warn,debug.
 
 	RPC     *RPCConfig  `json:"rpc"`
-	Partner *PartnerCfg `json:"partner"`
-	Privacy *PrivacyCfg `json:"privacy"`
+	Partner *PartnerCfg `json:"partner" validate:"nonnil"`
+	Privacy *PrivacyCfg `json:"privacy" validate:"nonnil"`
 }
 
 type RPCConfig struct {
@@ -22,15 +24,11 @@ type RPCConfig struct {
 }
 
 type PartnerCfg struct {
-	Name           string `json:"name" validate:"nonzero"`
-	SonataUrl      string `json:"sonataUrl" validate:"nonzero"`
-	Username       string `json:"username,omitempty"`
-	Password       string `json:"password,omitempty"`
-	APIToken       string `json:"token,omitempty"`
-	Implementation string `json:"implementation"`
-	ChainUrl       string `json:"chainUrl,omitempty"`
-	Account        string `json:"account" validate:"nonzero"`
-	IsFake         bool   `json:"isFake"`
+	BackEndURL     string            `json:"backEndURL" validate:"nonzero"`
+	Implementation string            `json:"implementation"`
+	Account        string            `json:"account" validate:"nonzero"`
+	IsFake         bool              `json:"isFake"`
+	Extra          map[string]string `json:"extra,omitempty"`
 }
 
 type PrivacyCfg struct {
@@ -38,4 +36,19 @@ type PrivacyCfg struct {
 	From           string   `json:"from"`
 	For            []string `json:"for"`
 	PrivateGroupID string   `json:"privateGroupID"`
+}
+
+type Validator func(*Config) error
+
+func (c *Config) Verify(validators ...Validator) error {
+	if err := validator.Validate(c); err != nil {
+		return err
+	}
+
+	for _, validator := range validators {
+		if err := validator(c); err != nil {
+			return err
+		}
+	}
+	return nil
 }

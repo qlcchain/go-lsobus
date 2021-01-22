@@ -44,7 +44,7 @@ func setupTestCase(t *testing.T) (*mockOrchestraData, func(t *testing.T)) {
 //	p1 := &config.PartnerCfg{
 //		Name:      "PCCW",
 //		ID:        "PCCW",
-//		SonataUrl: "http://127.0.0.1:7777",
+//		BackEndURL: "http://127.0.0.1:7777",
 //		Username:  "test",
 //		Password:  "test",
 //	}

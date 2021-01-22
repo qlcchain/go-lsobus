@@ -237,11 +237,11 @@ func (cm *CfgManager) Load(migrations ...CfgMigrate) (*Config, error) {
 		return nil, err
 	}
 	cm.cfg = &cfg
-	err = cm.verify(nil)
-	if err != nil {
-		cm.cfg = nil
-		return nil, err
-	}
+	//err = cm.verify(nil)
+	//if err != nil {
+	//	cm.cfg = nil
+	//	return nil, err
+	//}
 
 	if flag {
 		cm.backUp(content)

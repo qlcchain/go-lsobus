@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/qlcchain/qlc-go-sdk/pkg/util"
-	"gopkg.in/validator.v2"
 
 	"github.com/qlcchain/go-lsobus/config"
 
@@ -69,10 +68,6 @@ func start() error {
 	}
 	cfg, err := cm.Config()
 	if err != nil {
-		return err
-	}
-
-	if err = validator.Validate(cfg); err != nil {
 		return err
 	}
 

@@ -38,10 +38,7 @@ func setupTestCaseOrchestraAPI(t *testing.T) (func(t *testing.T), *OrchestraApi)
 
 func setupOrchestraAPIConfig(cfg *config.Config) {
 	cfg.Partner = &config.PartnerCfg{
-		Name:      "PCCWG",
-		SonataUrl: "http://127.0.0.1:7777",
-		Username:  "test",
-		Password:  "test",
+		BackEndURL: "http://127.0.0.1:7777",
 	}
 }
 
