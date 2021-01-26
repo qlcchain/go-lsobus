@@ -8,6 +8,6 @@
  */
 package swagger
 
-type DltOrderSellerTerminateOrderRewardBlockRes struct {
+type DltOrderSellerCreateOrderRewardBlockResData struct {
 	TxId string `json:"txId,omitempty"`
 }

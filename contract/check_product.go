@@ -118,19 +118,8 @@ func (cs *ContractCaller) updateProductInfoToChain(
 	return nil
 }
 
+// FIXME:
 func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
-	//FIXME: find order status
-	//fp := &api.FindParams{
-	//	Seller:         &api.PartnerParams{Name: sellName},
-	//	ProductOrderID: orderInfo.OrderId,
-	//}
-	//err := cs.seller.ExecInventoryFind(fp)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//if len(fp.RspInvList) == 0 {
-	//	return nil, noInventoryList
-	//}
 	var productIds []*Product
 	for _, conn := range orderInfo.Connections {
 		pt := &Product{
@@ -138,24 +127,6 @@ func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSe
 			productID:   fmt.Sprintf("MOCKPRD-%s", util.RandomFixedString(20)),
 		}
 		productIds = append(productIds, pt)
-
-		//var b bool
-		//for _, productSummary := range fp.RspInvList {
-		//	for _, productOrderRef := range productSummary.ProductOrder {
-		//		if conn.OrderItemId == *productOrderRef.OrderItemID {
-		//			pt := &Product{
-		//				orderItemID: *productOrderRef.OrderItemID,
-		//				productID:   *productSummary.ID,
-		//			}
-		//			productIds = append(productIds, pt)
-		//			b = true
-		//			break
-		//		}
-		//		if b {
-		//			break
-		//		}
-		//	}
-		//}
 	}
 
 	return productIds, nil

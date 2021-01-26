@@ -9,6 +9,6 @@
 package swagger
 
 type DltOrderInfoPlacingOrderModel struct {
-	InternalId string                          `json:"internalId,omitempty"`
-	OrderInfo  []DltOrderInfoOrderDetailResRpc `json:"orderInfo,omitempty"`
+	InternalId string                       `json:"internalId,omitempty"`
+	OrderInfo  []DltOrderInfoOrderDetailRes `json:"orderInfo,omitempty"`
 }

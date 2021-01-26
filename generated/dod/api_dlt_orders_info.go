@@ -242,15 +242,15 @@ DLTOrdersInfoApiService
 Get internal id by seller address and order id
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoInternalIdByOrderIdRes
+@return string
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoInternalIdByOrderIdPost(ctx context.Context, body DltOrderInfoInternalIdByOrderIdReq) (DltOrderInfoInternalIdByOrderIdRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoInternalIdByOrderIdPost(ctx context.Context, body DltOrderInfoInternalIdByOrderIdReq) (string, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoInternalIdByOrderIdRes
+		localVarReturnValue string
 	)
 
 	// create path and map variables
@@ -309,7 +309,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoInternalIdByOrderIdPost(ctx cont
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoInternalIdByOrderIdRes
+			var v string
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -349,15 +349,15 @@ DLTOrdersInfoApiService
 Get order count by buyer&#x27;s address and seller&#x27;s address
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoOrderCountByAddressAndSellerRes
+@return float64
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressAndSellerPost(ctx context.Context, body DltOrderInfoOrderCountByAddressAndSellerReq) (DltOrderInfoOrderCountByAddressAndSellerRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressAndSellerPost(ctx context.Context, body DltOrderInfoOrderCountByAddressAndSellerReq) (float64, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoOrderCountByAddressAndSellerRes
+		localVarReturnValue float64
 	)
 
 	// create path and map variables
@@ -416,7 +416,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressAndSellerPost
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoOrderCountByAddressAndSellerRes
+			var v float64
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -456,15 +456,15 @@ DLTOrdersInfoApiService
 Get order count by buyer&#x27;s address
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoOrderCountByAddressRes
+@return float64
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressPost(ctx context.Context, body DltOrderInfoOrderCountByAddressReq) (DltOrderInfoOrderCountByAddressRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressPost(ctx context.Context, body DltOrderInfoOrderCountByAddressReq) (float64, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoOrderCountByAddressRes
+		localVarReturnValue float64
 	)
 
 	// create path and map variables
@@ -523,7 +523,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderCountByAddressPost(ctx cont
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoOrderCountByAddressRes
+			var v float64
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -563,15 +563,15 @@ DLTOrdersInfoApiService
 Get buyer&#x27;s all order ids with specified seller
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoOrderIdListByAddressAndSellerRes
+@return []DltOrderInfoOrderIdListByAddressModel
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressAndSellerPost(ctx context.Context, body DltOrderInfoOrderIdListByAddressAndSellerReq) (DltOrderInfoOrderIdListByAddressAndSellerRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressAndSellerPost(ctx context.Context, body DltOrderInfoOrderIdListByAddressAndSellerReq) ([]DltOrderInfoOrderIdListByAddressModel, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoOrderIdListByAddressAndSellerRes
+		localVarReturnValue []DltOrderInfoOrderIdListByAddressModel
 	)
 
 	// create path and map variables
@@ -630,7 +630,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressAndSellerPos
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoOrderIdListByAddressAndSellerRes
+			var v []DltOrderInfoOrderIdListByAddressModel
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -670,15 +670,15 @@ DLTOrdersInfoApiService
 Get buyer&#x27;s all order ids
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoOrderIdListByAddressRes
+@return []DltOrderInfoOrderIdListByAddressModel
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressPost(ctx context.Context, body DltOrderInfoOrderIdListByAddressReq) (DltOrderInfoOrderIdListByAddressRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressPost(ctx context.Context, body DltOrderInfoOrderIdListByAddressReq) ([]DltOrderInfoOrderIdListByAddressModel, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoOrderIdListByAddressRes
+		localVarReturnValue []DltOrderInfoOrderIdListByAddressModel
 	)
 
 	// create path and map variables
@@ -737,7 +737,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoOrderIdListByAddressPost(ctx con
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoOrderIdListByAddressRes
+			var v []DltOrderInfoOrderIdListByAddressModel
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1098,15 +1098,15 @@ DLTOrdersInfoApiService
 Get product count by buyer&#x27;s address and seller&#x27;s address
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoProductCountByAddressAndSellerRes
+@return float64
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressAndSellerPost(ctx context.Context, body DltOrderInfoProductCountByAddressAndSellerReq) (DltOrderInfoProductCountByAddressAndSellerRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressAndSellerPost(ctx context.Context, body DltOrderInfoProductCountByAddressAndSellerReq) (float64, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoProductCountByAddressAndSellerRes
+		localVarReturnValue float64
 	)
 
 	// create path and map variables
@@ -1165,7 +1165,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressAndSellerPo
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoProductCountByAddressAndSellerRes
+			var v float64
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1205,15 +1205,15 @@ DLTOrdersInfoApiService
 Get product count by buyer&#x27;s address
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoProductCountByAddressRes
+@return float64
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressPost(ctx context.Context, body DltOrderInfoProductCountByAddressReq) (DltOrderInfoProductCountByAddressRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressPost(ctx context.Context, body DltOrderInfoProductCountByAddressReq) (float64, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoProductCountByAddressRes
+		localVarReturnValue float64
 	)
 
 	// create path and map variables
@@ -1272,7 +1272,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductCountByAddressPost(ctx co
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoProductCountByAddressRes
+			var v float64
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1312,15 +1312,15 @@ DLTOrdersInfoApiService
 Get buyer&#x27;s all product ids with specified seller
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoProductIdListByAddressAndSellerRes
+@return []DltOrderInfoProductIdListByAddressModel
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressAndSellerPost(ctx context.Context, body DltOrderInfoProductIdListByAddressAndSellerReq) (DltOrderInfoProductIdListByAddressAndSellerRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressAndSellerPost(ctx context.Context, body DltOrderInfoProductIdListByAddressAndSellerReq) ([]DltOrderInfoProductIdListByAddressModel, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoProductIdListByAddressAndSellerRes
+		localVarReturnValue []DltOrderInfoProductIdListByAddressModel
 	)
 
 	// create path and map variables
@@ -1379,7 +1379,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressAndSellerP
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoProductIdListByAddressAndSellerRes
+			var v []DltOrderInfoProductIdListByAddressModel
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1419,15 +1419,15 @@ DLTOrdersInfoApiService
 Get buyer&#x27;s all product ids
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
-@return DltOrderInfoProductIdListByAddressRes
+@return []DltOrderInfoProductIdListByAddressModel
 */
-func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressPost(ctx context.Context, body DltOrderInfoProductIdListByAddressReq) (DltOrderInfoProductIdListByAddressRes, *http.Response, error) {
+func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressPost(ctx context.Context, body DltOrderInfoProductIdListByAddressReq) ([]DltOrderInfoProductIdListByAddressModel, *http.Response, error) {
 	var (
 		localVarHttpMethod  = strings.ToUpper("Post")
 		localVarPostBody    interface{}
 		localVarFileName    string
 		localVarFileBytes   []byte
-		localVarReturnValue DltOrderInfoProductIdListByAddressRes
+		localVarReturnValue []DltOrderInfoProductIdListByAddressModel
 	)
 
 	// create path and map variables
@@ -1486,7 +1486,7 @@ func (a *DLTOrdersInfoApiService) V1DltOrderInfoProductIdListByAddressPost(ctx c
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v DltOrderInfoProductIdListByAddressRes
+			var v []DltOrderInfoProductIdListByAddressModel
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

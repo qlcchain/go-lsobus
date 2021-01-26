@@ -9,8 +9,5 @@
 package swagger
 
 type DltOrderBuyerCreateOrderBlockRes struct {
-	Code   float64                               `json:"code,omitempty"`
-	Error_ *interface{}                          `json:"error,omitempty"`
-	Data   *DltOrderBuyerCreateOrderBlockResData `json:"data,omitempty"`
-	Meta   *interface{}                          `json:"meta,omitempty"`
+	TxId string `json:"txId,omitempty"`
 }

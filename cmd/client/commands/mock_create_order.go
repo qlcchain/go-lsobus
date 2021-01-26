@@ -469,7 +469,14 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 	}
 
 	apiToken := u.Flag{
-		Name:  "token",
+		Name:  "apiToken",
+		Must:  false,
+		Usage: "DoD backend API token",
+		Value: "f93713d0-beac-4661-879c-3d479aaa7333",
+	}
+
+	clientToken := u.Flag{
+		Name:  "clientToken",
 		Must:  false,
 		Usage: "DoD backend API token",
 		Value: "9bdb61d9-8ecb-421f-9495-c79c066dd613",
@@ -493,10 +500,11 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 			buyerSeedP := u.StringVar(c.Args, buyerSeed)
 			vendorP := u.StringVar(c.Args, vendor)
 			apiTokenP := u.StringVar(c.Args, apiToken)
+			clientTokenP := u.StringVar(c.Args, clientToken)
+			u.Info(fmt.Sprintf("buyer:%s, vendor: %s, apiToken: %s,clientToken: %s", buyerSeedP, vendorP,
+				apiTokenP, clientTokenP))
 
-			u.Info(fmt.Sprintf("buyer:%s, vendor: %s, api: %s", buyerSeedP, vendorP, apiTokenP))
-
-			if err := mockOrderForBuyer(buyerSeedP, vendorP, apiTokenP); err != nil {
+			if err := mockOrderForBuyer(buyerSeedP, vendorP, apiTokenP, clientTokenP); err != nil {
 				u.Warn(err)
 				return
 			}
@@ -505,7 +513,7 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 	parentCmd.AddCmd(cmd)
 }
 
-func mockOrderForBuyer(seed, vendor, token string) error {
+func mockOrderForBuyer(seed, vendor, apiToken, clientToken string) error {
 	//var account *pkg.Account
 	//if bytes, err := hex.DecodeString(seed); err != nil {
 	//	return err
@@ -520,7 +528,7 @@ func mockOrderForBuyer(seed, vendor, token string) error {
 	//	}
 	//}
 
-	client := resty.New().SetHeader("CLIENT-KEY", token).
+	client := resty.New().SetHeader("CLIENT-KEY", clientToken).SetHeader("API-KEY", apiToken).
 		SetHeader("Content-Type", "application/json").EnableTrace().SetDebug(true)
 
 	switch strings.ToUpper(vendor) {
@@ -1044,6 +1052,8 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 
 	u.Info("STEP6, waiting the seller to sign the contract")
 	oi := &OrderInfo{}
+	client.DisableTrace()
+	client.Debug = false
 	for {
 		resp, err = client.R().SetBody(fmt.Sprintf(`{"internalId": "%s"}`, order.ExternalID)).SetResult(&OrderInfo{}).
 			Post(fmt.Sprintf("%s/v1/dlt/order/info/by-internal-id", endpointP))
@@ -1053,10 +1063,14 @@ func mockHGCOrderForBuyer(client *resty.Client, seed string) error {
 		}
 		oi = resp.Result().(*OrderInfo)
 		if oi.Result.ContractState == qlcchain.DoDSettleContractStateConfirmed {
+			u.Info(fmt.Sprintf("order: %s status is %s", order.ExternalID, qlcchain.DoDSettleContractStateConfirmed))
 			break
 		}
 		time.Sleep(time.Second)
 	}
+
+	client.EnableTrace()
+	client.Debug = true
 
 	param := &UpdateOrderRequest{
 		Buyer:      buyer,

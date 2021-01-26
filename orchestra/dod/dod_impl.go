@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/go-openapi/swag"
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
@@ -62,11 +61,13 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 
 	client := sw.NewAPIClient(swCfg)
 
-	bytes, err := hex.DecodeString(cfg.Partner.Account)
+	data, err := hex.DecodeString(cfg.Partner.Account)
 	if err != nil {
 		return nil, err
 	}
-	account := pkg.NewAccount(bytes)
+	s, _ := pkg.BytesToSeed(data)
+	account, _ := s.Account(0)
+
 	p := &DoDImpl{
 		client:  client,
 		cfg:     cfg,
@@ -74,10 +75,12 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 		logger:  log.NewLogger("qlc_dod"),
 	}
 
+	p.logger.Debug("run as " + account.Address().String())
+
 	//FIXME: verify PoV status
 	p.status.Store(1)
 	if resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background()); err == nil {
-		p.logger.Debugf("pov status %d, %APITokenKey", resp.SyncState, resp.SyncStateStr)
+		p.logger.Debugf("pov status %d, %s", resp.SyncState, resp.SyncStateStr)
 	}
 
 	//go func(ctx context.Context, client *sw.APIClient) {
@@ -190,19 +193,11 @@ func (d *DoDImpl) ExecOrderGet(params *api.GetParams) error {
 }
 
 func (d *DoDImpl) ExecInventoryFind(params *api.FindParams) error {
-	return fmt.Errorf("implement me")
+	panic("implement me")
+
 }
 
-//FIXME:
 func (d *DoDImpl) ExecInventoryGet(params *api.GetParams) error {
-	if strings.HasPrefix(params.ID, "MOCKPRD") {
-		params.RspInv = &invmod.Product{
-			ID:     swag.String(params.ID),
-			Status: invmod.ProductStatusActive,
-		}
-		return nil
-	}
-
 	if resp, _, err := d.client.OrdersApi.V1OrdersProductInventoryIdGet(context.Background(), params.ID); err != nil {
 		return err
 	} else {
@@ -212,6 +207,17 @@ func (d *DoDImpl) ExecInventoryGet(params *api.GetParams) error {
 		}
 		return nil
 	}
+}
+
+func (d *DoDImpl) ExecInventoryStatusGet(params *api.InventoryParams) error {
+	if resp, _, err := d.client.OrdersApi.V1OrdersProductStatusIdGet(context.Background(), params.OrderID); err != nil {
+		d.logger.Debug("fake order status for %s", params.OrderID)
+		params.Status = string(invmod.ProductStatusActive)
+		return nil
+	} else {
+		params.Status = resp.Status
+	}
+	return nil
 }
 
 func (d *DoDImpl) ExecSiteFind(params *api.FindParams) error {
@@ -309,7 +315,7 @@ func (d *DoDImpl) GetUpdateOrderInfoBlock(param *qlcSdk.DoDSettleUpdateOrderInfo
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetUpdateOrderInfoBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetUpdateOrderInfoBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
@@ -326,7 +332,7 @@ func (d *DoDImpl) GetUpdateProductInfoBlock(param *qlcSdk.DoDSettleUpdateProduct
 	} else {
 		//FIXME: generate work and sign the block
 		if resp.Result != nil {
-			d.logger.Debugf("GetUpdateProductInfoBlock: %APITokenKey", resp.Result.TxId)
+			d.logger.Debugf("GetUpdateProductInfoBlock: %s", resp.Result.TxId)
 		}
 		return nil, nil
 	}
@@ -342,7 +348,7 @@ func (d *DoDImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseP
 	} else {
 		//FIXME: generate work and sign the block
 		if resp.Result != nil {
-			d.logger.Debugf("GetUpdateOrderInfoRewardBlock: %APITokenKey", resp.Result.TxId)
+			d.logger.Debugf("GetUpdateOrderInfoRewardBlock: %s", resp.Result.TxId)
 		}
 		return nil, nil
 	}
@@ -357,7 +363,7 @@ func (d *DoDImpl) GetChangeOrderBlock(param *qlcSdk.DoDSettleChangeOrderParam) (
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetChangeOrderBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetChangeOrderBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
@@ -371,7 +377,7 @@ func (d *DoDImpl) GetCreateOrderBlock(param *qlcSdk.DoDSettleCreateOrderParam) (
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetCreateOrderBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetCreateOrderBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
@@ -385,7 +391,7 @@ func (d *DoDImpl) GetTerminateOrderBlock(param *qlcSdk.DoDSettleTerminateOrderPa
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetTerminateOrderBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetTerminateOrderBlock: %APITokenKey", resp.TxId)
 		return nil, nil
 	}
 }
@@ -399,7 +405,7 @@ func (d *DoDImpl) GetCreateOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetCreateOrderRewardBlock: %APITokenKey", resp.TxId)
+		d.logger.Debugf("GetCreateOrderRewardBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
@@ -413,7 +419,7 @@ func (d *DoDImpl) GetChangeOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetChangeOrderRewardBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetChangeOrderRewardBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
@@ -427,7 +433,7 @@ func (d *DoDImpl) GetTerminateOrderRewardBlock(param *qlcSdk.DoDSettleResponsePa
 		return nil, err
 	} else {
 		//FIXME: generate work and sign the block
-		d.logger.Debugf("GetTerminateOrderRewardBlock: %APITokenKey", resp.Data.TxId)
+		d.logger.Debugf("GetTerminateOrderRewardBlock: %s", resp.TxId)
 		return nil, nil
 	}
 }
