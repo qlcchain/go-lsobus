@@ -5,7 +5,6 @@ import (
 	"time"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
-	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
 
 	"github.com/qlcchain/go-lsobus/api"
 	qm "github.com/qlcchain/go-lsobus/orchestra/sonata/quote/models"
@@ -67,23 +66,23 @@ func (cs *ContractCaller) processDoDContract() {
 			param.PrivateFor = cs.cfg.Privacy.For
 			param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 		}
-		blk := new(pkg.StateBlock)
+
 		if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 			cs.logger.Info(" order type is create")
-			if blk, err = cs.seller.GetCreateOrderRewardBlock(param); err != nil {
+			if _, err = cs.seller.GetCreateOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue
 			}
 
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeChange {
 			cs.logger.Info(" order type is change")
-			if blk, err = cs.seller.GetChangeOrderRewardBlock(param); err != nil {
+			if _, err = cs.seller.GetChangeOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue
 			}
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
 			cs.logger.Info(" order type is terminate")
-			if blk, err = cs.seller.GetTerminateOrderRewardBlock(param); err != nil {
+			if _, err = cs.seller.GetTerminateOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue
 			}
@@ -91,7 +90,7 @@ func (cs *ContractCaller) processDoDContract() {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())
 			continue
 		}
-		cs.logger.Debug(blk)
+		//cs.logger.Debug(blk)
 
 		//if h, err := cs.seller.Process(blk); err != nil {
 		//	cs.logger.Errorf("process block error: %s", err)

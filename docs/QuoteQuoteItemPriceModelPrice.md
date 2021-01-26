@@ -1,9 +1,0 @@
-# QuoteQuoteItemPriceModelPrice
-
-## Properties
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**PreTaxAmount** | [***QuoteQuoteItemPriceModelPricePreTaxAmount**](quoteQuoteItemPriceModel_price_preTaxAmount.md) |  | [optional] [default to null]
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-

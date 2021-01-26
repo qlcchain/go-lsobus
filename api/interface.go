@@ -26,6 +26,7 @@ type Orchestrator interface {
 	ExecOrderGet(params *GetParams) error
 	ExecInventoryFind(params *FindParams) error
 	ExecInventoryGet(params *GetParams) error
+	ExecInventoryStatusGet(params *InventoryParams) error
 	ExecSiteFind(params *FindParams) error
 	ExecSiteGet(params *GetParams) error
 	ExecOfferFind(params *FindParams) error

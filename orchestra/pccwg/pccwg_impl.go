@@ -46,6 +46,10 @@ type PCCWGImpl struct {
 	password        string
 }
 
+func (p *PCCWGImpl) ExecInventoryStatusGet(params *api.InventoryParams) error {
+	panic("implement me")
+}
+
 func (p *PCCWGImpl) GetConfig() *config.Config {
 	return p.cfg
 }

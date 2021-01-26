@@ -144,3 +144,8 @@ type LoginParams struct {
 type LoginResponse struct {
 	Data string `json:"data"`
 }
+
+type InventoryParams struct {
+	OrderID string `json:"orderID,omitempty"`
+	Status  string `json:"status,omitempty"`
+}

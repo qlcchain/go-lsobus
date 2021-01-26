@@ -8,6 +8,7 @@
  */
 package swagger
 
-type DltOrderSellerTerminateOrderRewardBlockRes struct {
-	TxId string `json:"txId,omitempty"`
+type DltInvoiceGenerateInvoiceByOrderIdResBuyer struct {
+	Address string `json:"address,omitempty"`
+	Name    string `json:"name,omitempty"`
 }

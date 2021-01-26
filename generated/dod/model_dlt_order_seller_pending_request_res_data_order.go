@@ -9,12 +9,12 @@
 package swagger
 
 type DltOrderSellerPendingRequestResDataOrder struct {
-	Buyer         *DltInvoiceGenerateInvoiceByOrderIdResDataBuyer `json:"buyer,omitempty"`
-	Seller        *DltInvoiceGenerateInvoiceByOrderIdResDataBuyer `json:"seller,omitempty"`
-	OrderId       string                                          `json:"orderId,omitempty"`
-	OrderType     string                                          `json:"orderType,omitempty"`
-	OrderState    string                                          `json:"orderState,omitempty"`
-	ContractState string                                          `json:"contractState,omitempty"`
-	Connections   []DltOrderSellerPendingRequestConnectionModel   `json:"connections,omitempty"`
-	Track         []DltOrderSellerPendingRequestTrackModel        `json:"track,omitempty"`
+	Buyer         *DltInvoiceGenerateInvoiceByOrderIdResBuyer   `json:"buyer,omitempty"`
+	Seller        *DltInvoiceGenerateInvoiceByOrderIdResBuyer   `json:"seller,omitempty"`
+	OrderId       string                                        `json:"orderId,omitempty"`
+	OrderType     string                                        `json:"orderType,omitempty"`
+	OrderState    string                                        `json:"orderState,omitempty"`
+	ContractState string                                        `json:"contractState,omitempty"`
+	Connections   []DltOrderSellerPendingRequestConnectionModel `json:"connections,omitempty"`
+	Track         []DltOrderSellerPendingRequestTrackModel      `json:"track,omitempty"`
 }

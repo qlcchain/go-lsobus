@@ -45,17 +45,16 @@ func (cs *ContractCaller) getProductStatus() {
 		}
 		for _, value := range resource.Products {
 			if !value.Active {
-				gp := &api.GetParams{
-					Seller: &api.PartnerParams{},
-					ID:     value.ProductId,
+				gp := &api.InventoryParams{
+					OrderID: resource.OrderId,
 				}
-				err := cs.seller.ExecInventoryGet(gp)
+				err := cs.seller.ExecInventoryStatusGet(gp)
 				if err != nil {
-					cs.logger.Error(err)
+					cs.logger.Errorf("order %s status, err: %s", gp.OrderID, err)
 					continue
 				}
 				if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
-					if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusTerminated)) {
+					if strings.EqualFold(string(gp.Status), string(models.ProductStatusTerminated)) {
 						cs.logger.Infof("product %s is terminated", value.ProductId)
 						value.Active = true
 						productInfo := &qlcSdk.DoDSettleProductInfo{
@@ -66,7 +65,7 @@ func (cs *ContractCaller) getProductStatus() {
 						productActive = append(productActive, productInfo)
 					}
 				} else {
-					if strings.EqualFold(string(gp.RspInv.Status), string(models.ProductStatusActive)) {
+					if strings.EqualFold(string(gp.Status), string(models.ProductStatusActive)) {
 						cs.logger.Infof("product %s is active", value.ProductId)
 						value.Active = true
 						productInfo := &qlcSdk.DoDSettleProductInfo{
