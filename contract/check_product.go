@@ -6,7 +6,6 @@ import (
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 	pkg "github.com/qlcchain/qlc-go-sdk/pkg/types"
-	"github.com/qlcchain/qlc-go-sdk/pkg/util"
 )
 
 func (cs *ContractCaller) checkProduct() {
@@ -124,7 +123,7 @@ func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSe
 	for _, conn := range orderInfo.Connections {
 		pt := &Product{
 			orderItemID: conn.OrderItemId,
-			productID:   fmt.Sprintf("MOCKPRD-%s", util.RandomFixedString(20)),
+			productID:   fmt.Sprintf("PRODUCT-%s-%s", conn.ProductOfferingId, conn.OrderItemId),
 		}
 		productIds = append(productIds, pt)
 	}

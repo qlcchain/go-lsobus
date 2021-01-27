@@ -1132,8 +1132,9 @@ func mockSmartContract(quote *QuoteResponse, buyer, seed string) *SmartContractR
 	smRequest.Buyer = User{Address: buyer, Seed: seed, Name: "LSOBus Bot"}
 
 	for i := 0; i < len(quote.QuoteItem); i++ {
-		smRequest.OrderItem[i].ID = generateID("PRD", 32)
-		smRequest.OrderItem[i].ProductOffering.ID = quote.QuoteItem[i].Qualification[0].ID
+		poqId := quote.QuoteItem[i].Qualification[0].ID
+		smRequest.OrderItem[i].ID = fmt.Sprintf("PRODUCT-%s-%s", poqId, quote.QuoteItem[i].ID)
+		smRequest.OrderItem[i].ProductOffering.ID = poqId
 		smRequest.OrderItem[i].Quote.ID = quote.ID
 	}
 

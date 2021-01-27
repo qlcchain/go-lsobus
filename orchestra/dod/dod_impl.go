@@ -211,11 +211,13 @@ func (d *DoDImpl) ExecInventoryGet(params *api.GetParams) error {
 
 func (d *DoDImpl) ExecInventoryStatusGet(params *api.InventoryParams) error {
 	if resp, _, err := d.client.OrdersApi.V1OrdersProductStatusIdGet(context.Background(), params.OrderID); err != nil {
-		d.logger.Debug("fake order status for %s", params.OrderID)
-		params.Status = string(invmod.ProductStatusActive)
 		return nil
 	} else {
 		params.Status = resp.Status
+	}
+	//FIXME: remove
+	if params.Status != "active" {
+		params.Status = "active"
 	}
 	return nil
 }

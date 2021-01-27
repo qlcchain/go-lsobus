@@ -65,7 +65,7 @@ func (cs *ContractCaller) getProductStatus() {
 						productActive = append(productActive, productInfo)
 					}
 				} else {
-					if strings.EqualFold(string(gp.Status), string(models.ProductStatusActive)) {
+					if strings.EqualFold(gp.Status, string(models.ProductStatusActive)) {
 						cs.logger.Infof("product %s is active", value.ProductId)
 						value.Active = true
 						productInfo := &qlcSdk.DoDSettleProductInfo{
@@ -74,6 +74,8 @@ func (cs *ContractCaller) getProductStatus() {
 							Active:      true,
 						}
 						productActive = append(productActive, productInfo)
+					} else {
+						cs.logger.Debugf("%s stauts, got: %s, exp: %s", gp.OrderID, gp.Status, string(models.ProductStatusActive))
 					}
 				}
 			}
