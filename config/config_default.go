@@ -33,7 +33,7 @@ func DefaultConfig(dir string) (*Config, error) {
 			BackEndURL:     "http://127.0.0.1:7777",
 			IsFake:         false,
 			Implementation: QLCDoDBackend,
-			Extra:          map[string]string{"apiToken": "", "clientToken": ""},
+			Extra:          map[string]string{"apikey": ""},
 		},
 		Privacy: &PrivacyCfg{
 			Enable:         false,

@@ -475,13 +475,6 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 		Value: "f93713d0-beac-4661-879c-3d479aaa7333",
 	}
 
-	clientToken := u.Flag{
-		Name:  "clientToken",
-		Must:  false,
-		Usage: "DoD backend API token",
-		Value: "9bdb61d9-8ecb-421f-9495-c79c066dd613",
-	}
-
 	args := []u.Flag{buyerSeed, vendor}
 	cmd := &ishell.Cmd{
 		Name:                "mock",
@@ -500,11 +493,10 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 			buyerSeedP := u.StringVar(c.Args, buyerSeed)
 			vendorP := u.StringVar(c.Args, vendor)
 			apiTokenP := u.StringVar(c.Args, apiToken)
-			clientTokenP := u.StringVar(c.Args, clientToken)
-			u.Info(fmt.Sprintf("buyer:%s, vendor: %s, apiToken: %s,clientToken: %s", buyerSeedP, vendorP,
-				apiTokenP, clientTokenP))
+			u.Info(fmt.Sprintf("buyer:%s, vendor: %s, apiToken: %s", buyerSeedP, vendorP,
+				apiTokenP))
 
-			if err := mockOrderForBuyer(buyerSeedP, vendorP, apiTokenP, clientTokenP); err != nil {
+			if err := mockOrderForBuyer(buyerSeedP, vendorP, apiTokenP); err != nil {
 				u.Warn(err)
 				return
 			}
@@ -513,7 +505,7 @@ func addMockOrderCmdByShell(parentCmd *ishell.Cmd) {
 	parentCmd.AddCmd(cmd)
 }
 
-func mockOrderForBuyer(seed, vendor, apiToken, clientToken string) error {
+func mockOrderForBuyer(seed, vendor, apiToken string) error {
 	//var account *pkg.Account
 	//if bytes, err := hex.DecodeString(seed); err != nil {
 	//	return err
@@ -528,7 +520,7 @@ func mockOrderForBuyer(seed, vendor, apiToken, clientToken string) error {
 	//	}
 	//}
 
-	client := resty.New().SetHeader("CLIENT-KEY", clientToken).SetHeader("API-KEY", apiToken).
+	client := resty.New().SetHeader("API-KEY", apiToken).
 		SetHeader("Content-Type", "application/json").EnableTrace().SetDebug(true)
 
 	switch strings.ToUpper(vendor) {

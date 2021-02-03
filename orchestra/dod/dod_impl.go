@@ -26,8 +26,7 @@ import (
 )
 
 const (
-	APITokenKey    = "apitoken"
-	ClientTokenKey = "clienttoken"
+	APITokenKey = "apikey"
 )
 
 type DoDImpl struct {
@@ -46,10 +45,7 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 		}
 
 		if v, ok := extra[APITokenKey]; !ok || v == "" {
-			return errors.New("invalid apiToken")
-		}
-		if v, ok := extra[ClientTokenKey]; !ok || v == "" {
-			return errors.New("invalid clientToken")
+			return errors.New("invalid API KEY")
 		}
 		return nil
 	})
@@ -57,7 +53,6 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	swCfg := sw.NewConfiguration()
 	swCfg.BasePath = cfg.Partner.BackEndURL
 	swCfg.AddDefaultHeader("API-KEY", cfg.Partner.Extra[APITokenKey])
-	swCfg.AddDefaultHeader("CLIENT-KEY", cfg.Partner.Extra[ClientTokenKey])
 
 	client := sw.NewAPIClient(swCfg)
 
