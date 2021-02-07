@@ -72,7 +72,6 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 
 	p.logger.Debug("run as " + account.Address().String())
 
-	//FIXME: verify PoV status
 	p.status.Store(1)
 	if resp, _, err := client.DLTPovApi.V1DltPovStatusGet(context.Background()); err == nil {
 		p.logger.Debugf("pov status %d, %s", resp.SyncState, resp.SyncStateStr)
@@ -210,10 +209,6 @@ func (d *DoDImpl) ExecInventoryStatusGet(params *api.InventoryParams) error {
 	} else {
 		params.Status = resp.Status
 	}
-	//FIXME: remove
-	if params.Status != "active" {
-		params.Status = "active"
-	}
 	return nil
 }
 
@@ -340,6 +335,7 @@ func (d *DoDImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseP
 	if err := convert(param, &req); err != nil {
 		return nil, err
 	}
+	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerUpdateOrderInfoRewardBlockPost(context.Background(), req); err != nil {
 		return nil, err
 	} else {
@@ -370,6 +366,7 @@ func (d *DoDImpl) GetCreateOrderBlock(param *qlcSdk.DoDSettleCreateOrderParam) (
 	if err := convert(param, &req); err != nil {
 		return nil, err
 	}
+	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersBuyerApi.V1DltOrderBuyerChangeOrderBlockPost(context.Background(), req); err != nil {
 		return nil, err
 	} else {

@@ -1,7 +1,6 @@
 package contract
 
 import (
-	"fmt"
 	"time"
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
@@ -117,13 +116,12 @@ func (cs *ContractCaller) updateProductInfoToChain(
 	return nil
 }
 
-// FIXME:
 func (cs *ContractCaller) inventoryFind(sellName string, orderInfo *qlcSdk.DoDSettleOrderInfo) ([]*Product, error) {
 	var productIds []*Product
 	for _, conn := range orderInfo.Connections {
 		pt := &Product{
 			orderItemID: conn.OrderItemId,
-			productID:   fmt.Sprintf("PRODUCT-%s-%s", conn.ProductOfferingId, conn.OrderItemId),
+			productID:   conn.ItemId,
 		}
 		productIds = append(productIds, pt)
 	}
