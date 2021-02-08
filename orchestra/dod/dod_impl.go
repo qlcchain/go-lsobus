@@ -277,7 +277,12 @@ func (d *DoDImpl) GetOrderInfoByInternalId(id string) (*qlcSdk.DoDSettleOrderInf
 	if resp, _, err := d.client.DLTOrdersInfoApi.V1DltOrderInfoByInternalIdPost(context.Background(), sw.DltOrderInfoByInternalIdReq{
 		InternalId: id,
 	}); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		return resp.Result, nil
 	}
@@ -304,7 +309,12 @@ func (d *DoDImpl) GetUpdateOrderInfoBlock(param *qlcSdk.DoDSettleUpdateOrderInfo
 		return nil, err
 	}
 	if resp, _, err := d.client.DLTOrdersBuyerApi.V1DltOrderBuyerUpdateOrderInfoBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		d.logger.Debugf("GetUpdateOrderInfoBlock: %s", resp.TxId)
@@ -320,7 +330,12 @@ func (d *DoDImpl) GetUpdateProductInfoBlock(param *qlcSdk.DoDSettleUpdateProduct
 	}
 	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerUpdateProductInfoBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		if resp.Result != nil {
@@ -337,7 +352,12 @@ func (d *DoDImpl) GetUpdateOrderInfoRewardBlock(param *qlcSdk.DoDSettleResponseP
 	}
 	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerUpdateOrderInfoRewardBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		if resp.Result != nil {
@@ -353,7 +373,12 @@ func (d *DoDImpl) GetChangeOrderBlock(param *qlcSdk.DoDSettleChangeOrderParam) (
 		return nil, err
 	}
 	if resp, _, err := d.client.DLTOrdersBuyerApi.V1DltOrderBuyerChangeOrderBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		d.logger.Debugf("GetChangeOrderBlock: %s", resp.TxId)
@@ -368,7 +393,12 @@ func (d *DoDImpl) GetCreateOrderBlock(param *qlcSdk.DoDSettleCreateOrderParam) (
 	}
 	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersBuyerApi.V1DltOrderBuyerChangeOrderBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		d.logger.Debugf("GetCreateOrderBlock: %s", resp.TxId)
@@ -382,7 +412,12 @@ func (d *DoDImpl) GetTerminateOrderBlock(param *qlcSdk.DoDSettleTerminateOrderPa
 		return nil, err
 	}
 	if resp, _, err := d.client.DLTOrdersBuyerApi.V1DltOrderBuyerTerminateOrderBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		d.logger.Debugf("GetTerminateOrderBlock: %APITokenKey", resp.TxId)
@@ -396,7 +431,12 @@ func (d *DoDImpl) GetCreateOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 		return nil, err
 	}
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerCreateOrderRewardBlockPost(context.Background(), req); err != nil {
-		return nil, err
+		switch v := err.(type) {
+		default:
+			return nil, err
+		case sw.GenericSwaggerError:
+			return nil, toError(v)
+		}
 	} else {
 		//FIXME: generate work and sign the block
 		d.logger.Debugf("GetCreateOrderRewardBlock: %s", resp.TxId)
@@ -454,4 +494,9 @@ func convert(from, to interface{}) error {
 			return nil
 		}
 	}
+}
+
+func toError(e sw.GenericSwaggerError) error {
+	resp := e.Model().(sw.Model500ErrorResponse)
+	return fmt.Errorf("%s, %s", e.Error(), resp.Message)
 }

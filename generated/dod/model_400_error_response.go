@@ -9,7 +9,6 @@
 package swagger
 
 type Model400ErrorResponse struct {
-	Code   float64                     `json:"code,omitempty"`
-	Error_ *Model400ErrorResponseError `json:"error,omitempty"`
-	Data   *OneOf400ErrorResponseData  `json:"data,omitempty"`
+	Code    int    `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
 }

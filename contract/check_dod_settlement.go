@@ -39,11 +39,6 @@ func (cs *ContractCaller) processDoDContract() {
 			continue
 		}
 
-		//FIXME: ignore
-		if v.Hash.String() == "6ee24e3061ae8cb66e0b13e3f5b99c8fb9f4fc1f9a51ced4ccc4d7cf9cde2edd" {
-			continue
-		}
-
 		cs.logger.Infof("find a dod settlement need sign,request hash is %s", v.Hash.String())
 		b := cs.verifyOrderInfoFromSonata(v.Order)
 		if !b {
