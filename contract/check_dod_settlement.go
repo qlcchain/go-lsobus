@@ -6,6 +6,8 @@ import (
 
 	qlcSdk "github.com/qlcchain/qlc-go-sdk"
 
+	"github.com/qlcchain/go-lsobus/cmd/util"
+
 	"github.com/qlcchain/go-lsobus/api"
 	qm "github.com/qlcchain/go-lsobus/orchestra/sonata/quote/models"
 )
@@ -63,20 +65,20 @@ func (cs *ContractCaller) processDoDContract() {
 		}
 
 		if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
-			cs.logger.Info(" order type is create")
+			cs.logger.Infof("order type is create, %s", util.ToIndentString(param))
 			if _, err = cs.seller.GetCreateOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue
 			}
 
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeChange {
-			cs.logger.Info(" order type is change")
+			cs.logger.Info("order type is change")
 			if _, err = cs.seller.GetChangeOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue
 			}
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
-			cs.logger.Info(" order type is terminate")
+			cs.logger.Info("order type is terminate")
 			if _, err = cs.seller.GetTerminateOrderRewardBlock(param); err != nil {
 				cs.logger.Error(err)
 				continue

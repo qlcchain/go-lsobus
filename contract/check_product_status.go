@@ -54,7 +54,7 @@ func (cs *ContractCaller) getProductStatus() {
 					continue
 				}
 				if orderInfo.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
-					if strings.EqualFold(string(gp.Status), string(models.ProductStatusTerminated)) {
+					if strings.EqualFold(gp.Status, string(models.ProductStatusTerminated)) {
 						cs.logger.Infof("product %s is terminated", value.ProductId)
 						value.Active = true
 						productInfo := &qlcSdk.DoDSettleProductInfo{

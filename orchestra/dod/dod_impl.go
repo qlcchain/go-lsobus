@@ -430,6 +430,7 @@ func (d *DoDImpl) GetCreateOrderRewardBlock(param *qlcSdk.DoDSettleResponseParam
 	if err := convert(param, &req); err != nil {
 		return nil, err
 	}
+	d.logger.Debug(util.ToIndentString(req))
 	if resp, _, err := d.client.DLTOrdersSellerApi.V1DltOrderSellerCreateOrderRewardBlockPost(context.Background(), req); err != nil {
 		switch v := err.(type) {
 		default:
