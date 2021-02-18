@@ -9,7 +9,6 @@ type Config struct {
 
 	RPC     *RPCConfig  `json:"rpc"`
 	Partner *PartnerCfg `json:"partner" validate:"nonnil"`
-	Privacy *PrivacyCfg `json:"privacy" validate:"nonnil"`
 }
 
 type RPCConfig struct {
@@ -28,14 +27,8 @@ type PartnerCfg struct {
 	Implementation string            `json:"implementation"`
 	Account        string            `json:"account" validate:"nonzero"`
 	IsFake         bool              `json:"isFake"`
+	IsPrivacy      bool              `json:"isPrivacy"`
 	Extra          map[string]string `json:"extra,omitempty"`
-}
-
-type PrivacyCfg struct {
-	Enable         bool     `json:"enabled"`
-	From           string   `json:"from"`
-	For            []string `json:"for"`
-	PrivateGroupID string   `json:"privateGroupID"`
 }
 
 type Validator func(*Config) error

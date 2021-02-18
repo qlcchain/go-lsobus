@@ -53,6 +53,9 @@ func NewDoD(ctx context.Context, cfg *config.Config) (api.DoDSeller, error) {
 	swCfg := sw.NewConfiguration()
 	swCfg.BasePath = cfg.Partner.BackEndURL
 	swCfg.AddDefaultHeader("API-KEY", cfg.Partner.Extra[APITokenKey])
+	if cfg.Partner.IsPrivacy {
+		swCfg.AddDefaultHeader("PRIVATE", "1")
+	}
 
 	client := sw.NewAPIClient(swCfg)
 

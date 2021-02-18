@@ -17,11 +17,6 @@ func (cs *ContractCaller) GetChangeOrderBlock(param *proto.ChangeOrderParam) (st
 		if err != nil {
 			return "", err
 		}
-		if cs.cfg.Privacy.Enable {
-			op.PrivateFrom = cs.cfg.Privacy.From
-			op.PrivateFor = cs.cfg.Privacy.For
-			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 		blk, err := cs.seller.GetChangeOrderBlock(op)
 		if err != nil {
 			return "", err

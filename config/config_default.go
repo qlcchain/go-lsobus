@@ -34,12 +34,7 @@ func DefaultConfig(dir string) (*Config, error) {
 			IsFake:         false,
 			Implementation: QLCDoDBackend,
 			Extra:          map[string]string{"apikey": ""},
-		},
-		Privacy: &PrivacyCfg{
-			Enable:         false,
-			From:           "",
-			For:            []string{},
-			PrivateGroupID: "",
+			IsPrivacy:      false,
 		},
 	}
 	return &cfg, nil

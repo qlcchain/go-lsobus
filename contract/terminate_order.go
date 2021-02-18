@@ -16,11 +16,6 @@ func (cs *ContractCaller) GetTerminateOrderBlock(param *proto.TerminateOrderPara
 		if err != nil {
 			return "", err
 		}
-		if cs.cfg.Privacy.Enable {
-			op.PrivateFrom = cs.cfg.Privacy.From
-			op.PrivateFor = cs.cfg.Privacy.For
-			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 		blk, err := cs.seller.GetTerminateOrderBlock(op)
 		if err != nil {
 			return "", err

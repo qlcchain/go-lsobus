@@ -58,11 +58,6 @@ func (cs *ContractCaller) processDoDContract() {
 			RequestHash: v.Hash,
 			Action:      action,
 		}
-		if cs.cfg.Privacy.Enable {
-			param.PrivateFrom = cs.cfg.Privacy.From
-			param.PrivateFor = cs.cfg.Privacy.For
-			param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 
 		if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 			cs.logger.Infof("order type is create, %s", util.ToIndentString(param))
