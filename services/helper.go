@@ -16,12 +16,6 @@ func RegisterServices(cs *context.ServiceContext) error {
 		return err
 	} else {
 		_ = cs.Register(context.ContractService, contractService)
-		//FIXME: disable RPC
-		//if rpcService, err := NewRPCService(cfgFile, contractService); err != nil {
-		//	return err
-		//} else {
-		//	_ = cs.Register(context.RPCService, rpcService)
-		//}
 	}
 
 	return nil

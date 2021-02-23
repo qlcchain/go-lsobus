@@ -97,11 +97,6 @@ func (cs *ContractCaller) updateProductInfoToChain(
 			OrderId:     orderInfo.OrderId,
 			ProductInfo: productInfos,
 		}
-		if cs.cfg.Privacy.Enable {
-			param.PrivateFrom = cs.cfg.Privacy.From
-			param.PrivateFor = cs.cfg.Privacy.For
-			param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 		blk := new(pkg.StateBlock)
 		var err error
 

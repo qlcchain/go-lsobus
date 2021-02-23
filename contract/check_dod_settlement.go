@@ -1,6 +1,7 @@
 package contract
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -58,30 +59,39 @@ func (cs *ContractCaller) processDoDContract() {
 			RequestHash: v.Hash,
 			Action:      action,
 		}
-		if cs.cfg.Privacy.Enable {
-			param.PrivateFrom = cs.cfg.Privacy.From
-			param.PrivateFor = cs.cfg.Privacy.For
-			param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 
 		if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeCreate {
 			cs.logger.Infof("order type is create, %s", util.ToIndentString(param))
-			if _, err = cs.seller.GetCreateOrderRewardBlock(param); err != nil {
-				cs.logger.Error(err)
-				continue
+			key := fmt.Sprintf("%s%d", v.Hash.String(), qlcSdk.DoDSettleOrderTypeCreate)
+			if !cs.cache.Has(key) {
+				if _, err = cs.seller.GetCreateOrderRewardBlock(param); err != nil {
+					cs.logger.Error(err)
+					continue
+				} else {
+					cs.cache.Set(key, true)
+				}
 			}
-
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeChange {
 			cs.logger.Info("order type is change")
-			if _, err = cs.seller.GetChangeOrderRewardBlock(param); err != nil {
-				cs.logger.Error(err)
-				continue
+			key := fmt.Sprintf("%s%d", v.Hash.String(), qlcSdk.DoDSettleOrderTypeChange)
+			if !cs.cache.Has(key) {
+				if _, err = cs.seller.GetChangeOrderRewardBlock(param); err != nil {
+					cs.logger.Error(err)
+					continue
+				} else {
+					cs.cache.Set(key, true)
+				}
 			}
 		} else if v.Order.OrderType == qlcSdk.DoDSettleOrderTypeTerminate {
 			cs.logger.Info("order type is terminate")
-			if _, err = cs.seller.GetTerminateOrderRewardBlock(param); err != nil {
-				cs.logger.Error(err)
-				continue
+			key := fmt.Sprintf("%s%d", v.Hash.String(), qlcSdk.DoDSettleOrderTypeTerminate)
+			if !cs.cache.Has(key) {
+				if _, err = cs.seller.GetTerminateOrderRewardBlock(param); err != nil {
+					cs.logger.Error(err)
+					continue
+				} else {
+					cs.cache.Set(key, true)
+				}
 			}
 		} else {
 			cs.logger.Errorf("unknown order type==%s", v.Order.OrderType.String())

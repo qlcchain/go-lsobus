@@ -117,11 +117,6 @@ func (cs *ContractCaller) updateProductStatusToChain(
 		OrderId:     orderId,
 		ProductInfo: products,
 	}
-	if cs.cfg.Privacy.Enable {
-		param.PrivateFrom = cs.cfg.Privacy.From
-		param.PrivateFor = cs.cfg.Privacy.For
-		param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-	}
 	blk := new(pkg.StateBlock)
 	var err error
 
@@ -143,11 +138,6 @@ func (cs *ContractCaller) updateProductStatusToChain(
 func (cs *ContractCaller) updateOrderCompleteStatusToChain(requestHash pkg.Hash) error {
 	param := &qlcSdk.DoDSettleResponseParam{
 		RequestHash: requestHash,
-	}
-	if cs.cfg.Privacy.Enable {
-		param.PrivateFrom = cs.cfg.Privacy.From
-		param.PrivateFor = cs.cfg.Privacy.For
-		param.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
 	}
 	blk := new(pkg.StateBlock)
 	var err error

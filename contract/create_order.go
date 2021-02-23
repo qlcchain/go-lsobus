@@ -14,11 +14,6 @@ func (cs *ContractCaller) GetCreateOrderBlock(param *proto.CreateOrderParam) (st
 		if err != nil {
 			return "", err
 		}
-		if cs.cfg.Privacy.Enable {
-			op.PrivateFrom = cs.cfg.Privacy.From
-			op.PrivateFor = cs.cfg.Privacy.For
-			op.PrivateGroupID = cs.cfg.Privacy.PrivateGroupID
-		}
 		blk, err := cs.seller.GetCreateOrderBlock(op)
 		if err != nil {
 			return "", err

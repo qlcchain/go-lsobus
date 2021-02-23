@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/bluele/gcache"
+
 	"github.com/qlcchain/go-lsobus/api"
 	"github.com/qlcchain/go-lsobus/orchestra"
 
@@ -53,6 +55,7 @@ type ContractCaller struct {
 	orderIdOnChainBuyer  *sync.Map
 	seller               api.DoDSeller
 	mutex                *sync.Mutex
+	cache                gcache.Cache
 }
 
 type Product struct {
@@ -81,6 +84,7 @@ func NewContractService(cfgFile string) (*ContractCaller, error) {
 		orderIdOnChainBuyer:  new(sync.Map),
 		seller:               seller,
 		mutex:                new(sync.Mutex),
+		cache:                gcache.New(100).LRU().Expiration(time.Minute).Build(),
 	}
 	return cs, nil
 }
