@@ -8,10 +8,6 @@
  */
 package swagger
 
-import (
-	"time"
-)
-
 type QuoteItem struct {
 	ID      string `json:"id"`
 	State   string `json:"state"`
@@ -36,7 +32,7 @@ type QuoteItem struct {
 			Role string `json:"role"`
 			Type string `json:"@type"`
 		} `json:"place"`
-	} `json:"product,omitempty"`
+	} `json:"-"`
 	QuoteItemPrice []struct {
 		PriceType             string `json:"priceType"`
 		RecurringChargePeriod string `json:"recurringChargePeriod,omitempty"`
@@ -69,15 +65,15 @@ type QuoteItem struct {
 		ID   string `json:"id"`
 	} `json:"quoteItemRelationship"`
 	Note []struct {
-		Date   time.Time `json:"date"`
-		Author string    `json:"author"`
-		Text   string    `json:"text"`
-	} `json:"note,omitempty"`
+		Date   string `json:"date"`
+		Author string `json:"author"`
+		Text   string `json:"text"`
+	} `json:"-"`
 	Qualification []struct {
 		ID                string `json:"id"`
 		Href              string `json:"href"`
 		QualificationItem string `json:"qualificationItem"`
-	} `json:"qualification"`
+	} `json:"-"`
 	RelatedParty []struct {
 		ID              string   `json:"id"`
 		Role            []string `json:"role"`
@@ -86,32 +82,32 @@ type QuoteItem struct {
 		Number          string   `json:"number"`
 		NumberExtension string   `json:"numberExtension"`
 		ReferredType    string   `json:"@referredType"`
-	} `json:"relatedParty"`
+	} `json:"-"`
 }
 
 type QuoteRes struct {
-	ApimXUserID                  string    `json:"apimXUserId"`
-	HTTPStatus                   string    `json:"httpStatus"`
-	ID                           string    `json:"id"`
-	Href                         string    `json:"href"`
-	ProjectID                    string    `json:"projectId"`
-	Description                  string    `json:"description"`
-	State                        string    `json:"state"`
-	QuoteDate                    time.Time `json:"quoteDate"`
-	InstantSyncQuoting           bool      `json:"instantSyncQuoting"`
-	QuoteLevel                   string    `json:"quoteLevel"`
-	RequestedQuoteCompletionDate time.Time `json:"requestedQuoteCompletionDate"`
-	ExpectedQuoteCompletionDate  time.Time `json:"expectedQuoteCompletionDate"`
-	ExpectedFulfillmentStartDate string    `json:"expectedFulfillmentStartDate"`
-	EffectiveQuoteCompletionDate time.Time `json:"effectiveQuoteCompletionDate"`
+	ApimXUserID                  string `json:"apimXUserId"`
+	HTTPStatus                   string `json:"httpStatus"`
+	ID                           string `json:"id"`
+	Href                         string `json:"href"`
+	ProjectID                    string `json:"projectId"`
+	Description                  string `json:"description"`
+	State                        string `json:"state"`
+	QuoteDate                    string `json:"quoteDate"`
+	InstantSyncQuoting           bool   `json:"instantSyncQuoting"`
+	QuoteLevel                   string `json:"quoteLevel"`
+	RequestedQuoteCompletionDate string `json:"requestedQuoteCompletionDate"`
+	ExpectedQuoteCompletionDate  string `json:"expectedQuoteCompletionDate"`
+	ExpectedFulfillmentStartDate string `json:"expectedFulfillmentStartDate"`
+	EffectiveQuoteCompletionDate string `json:"effectiveQuoteCompletionDate"`
 	ValidFor                     struct {
-		StartDate time.Time `json:"startDate"`
-		EndDate   time.Time `json:"endDate"`
+		StartDate string `json:"startDate"`
+		EndDate   string `json:"endDate"`
 	} `json:"validFor"`
 	Note []struct {
-		Date   time.Time `json:"date"`
-		Author string    `json:"author"`
-		Text   string    `json:"text"`
+		Date   string `json:"date"`
+		Author string `json:"author"`
+		Text   string `json:"text"`
 	} `json:"note"`
 	Agreement []struct {
 		ID   string `json:"id"`
