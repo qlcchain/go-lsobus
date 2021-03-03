@@ -7,6 +7,7 @@ require (
 	github.com/abiosoft/readline v0.0.0-20180607040430-155bce2042db
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bluele/gcache v0.0.2
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/cornelk/hashmap v1.0.1
 	github.com/fatih/color v1.10.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
@@ -21,6 +22,7 @@ require (
 	github.com/google/go-cmp v0.5.4
 	github.com/google/uuid v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/qlcchain/qlc-go-sdk v1.4.2
 	github.com/sahilm/fuzzy v0.1.0
 	github.com/spf13/cobra v1.1.3
@@ -29,7 +31,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/oauth2 v0.0.0-20210216194517-16ff1888fd2e
 	google.golang.org/genproto v0.0.0-20210217220511-c18582744cc2
-	google.golang.org/grpc v1.35.0
+	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/validator.v2 v2.0.0-20200605151824-2b28d334fa05
