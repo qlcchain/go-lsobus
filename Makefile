@@ -23,7 +23,7 @@ BUILDTIME = $(shell date +'%FT%TZ%z')
 LDFLAGS=-ldflags "-X github.com/qlcchain/go-lsobus/services/version.Version=${VERSION} \
 				  -X github.com/qlcchain/go-lsobus/services/version.GitRev=${GITREV} \
 				  -X github.com/qlcchain/go-lsobus/services/version.BuildTime=${BUILDTIME}"
-GO_BUILDER_VERSION=v1.15.6
+GO_BUILDER_VERSION=v1.16
 
 default: build
 
@@ -34,15 +34,15 @@ deps:
 	go get -u golang.org/x/tools/cmd/goimports
 
 build:
-	go build -tags testnet ${LDFLAGS} -o $(BUILDDIR)/${BINARY} -i $(MAIN)
+	go build -tags testnet ${LDFLAGS} -o $(BUILDDIR)/${BINARY} $(MAIN)
 	@echo 'Build $(BINARY) done.'
 
 client:
-	go build ${LDFLAGS} -o $(BUILDDIR)/${CLIENT_BINARY} -i $(CLIENT_MAIN)
+	go build ${LDFLAGS} -o $(BUILDDIR)/${CLIENT_BINARY} $(CLIENT_MAIN)
 	@echo "Build $(CLIENT_BINARY) done."
 
 agent:
-	go build ${LDFLAGS} -o $(BUILDDIR)/${AGENT_BINARY} -i $(AGENT_MAIN)
+	go build ${LDFLAGS} -o $(BUILDDIR)/${AGENT_BINARY} $(AGENT_MAIN)
 	@echo "Build $(AGENT_BINARY) done."
 
 changelog:
