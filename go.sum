@@ -465,11 +465,9 @@ github.com/prometheus/common v0.4.0/go.mod h1:TNfzLD0ON7rHzMJeJkieUDPYmFC7Snx/y8
 github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190507164030-5867b95ac084/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsTZCD3I8kEA=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
-github.com/qlcchain/jsonrpc2 v0.0.7 h1:ZcySG/jZ76vupXRrmCAKunyu6ZLmWqo0vNxRRviBjd8=
-github.com/qlcchain/jsonrpc2 v0.0.7/go.mod h1:VwJvudc0L888gtEldst7bZdZxvk3wubZs18yO0CI0Zc=
+github.com/qlcchain/jsonrpc2 v0.0.8 h1:/TZ5czbQ9l7AzL63IChOf0g8SJ7jE85rcWIl6ZzbKQM=
 github.com/qlcchain/jsonrpc2 v0.0.8/go.mod h1:VwJvudc0L888gtEldst7bZdZxvk3wubZs18yO0CI0Zc=
-github.com/qlcchain/qlc-go-sdk v1.4.2 h1:zqTS4se6oF4EiRBllhO1KmjQxg/FkR0rwCNy9kbLQ0c=
-github.com/qlcchain/qlc-go-sdk v1.4.2/go.mod h1:mJCwFArCXVIhwkBWN+N4xjeaDA4BW17iMXCATlfq8Oc=
+github.com/qlcchain/qlc-go-sdk v1.5.0 h1:LIaSaa0H/BW6Jl3c4HxKu9qaYUfgcvaa0NyCvktxIiE=
 github.com/qlcchain/qlc-go-sdk v1.5.0/go.mod h1:mGuVmVKDcS6rnQ/lvqmZswm1q49/DrXrrjb6Tb6o/4M=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
@@ -874,8 +872,7 @@ google.golang.org/grpc v1.29.1/go.mod h1:itym6AZVZYACWQqET3MqgPpjcuV5QH3BxFS3Iji
 google.golang.org/grpc v1.30.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
 google.golang.org/grpc v1.31.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
 google.golang.org/grpc v1.33.1/go.mod h1:fr5YgcSWrqhRRxogOsw7RzIpsmvOZ6IcH4kBYTpR3n0=
-google.golang.org/grpc v1.36.0 h1:o1bcQ6imQMIOpdrO3SWf2z5RV72WbDwdXuK0MDlc8As=
-google.golang.org/grpc v1.36.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
+google.golang.org/grpc v1.36.1 h1:cmUfbeGKnz9+2DD/UYsMQXeqbHZqZDs4eQwW0sFOpBY=
 google.golang.org/grpc v1.36.1/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=

@@ -553,15 +553,15 @@ func StateBlockWithoutWork() *pkg.StateBlock {
 	i, _ := random.Intn(math.MaxInt16)
 	sb.Type = pkg.ContractSend
 	sb.Balance = pkg.Balance{Int: big.NewInt(int64(i))}
-	sb.Vote = pkg.NewBalance(0)
-	sb.Network = pkg.NewBalance(0)
-	sb.Oracle = pkg.NewBalance(0)
-	sb.Storage = pkg.NewBalance(0)
+	//sb.Vote = pkg.NewBalance(0)
+	//sb.Network = pkg.NewBalance(0)
+	//sb.Oracle = pkg.NewBalance(0)
+	//sb.Storage = pkg.NewBalance(0)
 	sb.Address = a
 	sb.Previous = RandomHash()
 	sb.Representative = a
 	sb.Timestamp = time.Now().Unix()
 	sb.Link = RandomHash()
-	sb.Message = RandomHash()
+	//sb.Message = RandomHash()
 	return sb
 }

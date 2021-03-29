@@ -1,6 +1,6 @@
 module github.com/qlcchain/go-lsobus
 
-go 1.15
+go 1.16
 
 require (
 	github.com/abiosoft/ishell v0.0.0-20190613190920-79d20b1325a4
