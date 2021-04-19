@@ -12,7 +12,7 @@ require (
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/gammazero/workerpool v1.1.1
 	github.com/go-openapi/errors v0.20.0
-	github.com/go-openapi/runtime v0.19.27
+	github.com/go-openapi/runtime v0.19.28
 	github.com/go-openapi/strfmt v0.20.0
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.2
