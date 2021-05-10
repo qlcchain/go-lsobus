@@ -10,7 +10,7 @@ require (
 	github.com/cornelk/hashmap v1.0.1
 	github.com/fatih/color v1.10.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
-	github.com/gammazero/workerpool v1.1.1
+	github.com/gammazero/workerpool v1.1.2
 	github.com/go-openapi/errors v0.20.0
 	github.com/go-openapi/runtime v0.19.27
 	github.com/go-openapi/strfmt v0.20.0
