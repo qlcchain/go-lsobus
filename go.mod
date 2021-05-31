@@ -8,7 +8,7 @@ require (
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bluele/gcache v0.0.2
 	github.com/cornelk/hashmap v1.0.1
-	github.com/fatih/color v1.10.0
+	github.com/fatih/color v1.12.0
 	github.com/flynn-archive/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/gammazero/workerpool v1.1.1
 	github.com/go-openapi/errors v0.20.0
