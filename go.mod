@@ -29,7 +29,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
 	google.golang.org/genproto v0.0.0-20210319143718-93e7006c17a6
-	google.golang.org/grpc v1.36.1
+	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/validator.v2 v2.0.0-20200605151824-2b28d334fa05
